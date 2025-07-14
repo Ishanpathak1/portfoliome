@@ -1,7 +1,8 @@
 'use client';
 
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink, Briefcase, GraduationCap, Code, Award } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink, Briefcase, GraduationCap, Code, Award, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface DarkProfessionalTemplateProps {
   portfolio: DatabasePortfolio;
@@ -10,6 +11,7 @@ interface DarkProfessionalTemplateProps {
 export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplateProps) {
   const { resumeData, personalization } = portfolio;
   const { contact, summary, experience, education, skills, projects } = resumeData;
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Color scheme based on personalization
   const colors = {
@@ -24,9 +26,27 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="fixed top-4 left-4 z-50 p-3 rounded-full bg-gray-800 text-white hover:bg-gray-700 shadow-lg transition-all duration-300 lg:hidden"
+      >
+        {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-80 bg-gray-800 min-h-screen p-8 border-r border-gray-700">
+        <div className={`w-80 bg-gray-800 min-h-screen p-4 lg:p-8 border-r border-gray-700 fixed lg:static h-full z-40 transition-transform duration-300 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}>
           {/* Profile Section */}
           <div className="text-center mb-8">
             <div 
@@ -115,12 +135,12 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-12">
+        <div className="flex-1 p-4 lg:p-12 lg:ml-0">
           {/* About Section */}
           {summary && (
-            <section className="mb-12">
-              <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700">About</h2>
-              <p className="text-gray-300 text-lg leading-relaxed">{summary}</p>
+            <section className="mb-8 lg:mb-12">
+              <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 pb-2 lg:pb-3 border-b border-gray-700">About</h2>
+              <p className="text-gray-300 text-base lg:text-lg leading-relaxed">{summary}</p>
             </section>
           )}
 
@@ -214,12 +234,12 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
 
           {/* Projects Section */}
           {projects.length > 0 && (
-            <section className="mb-12">
-              <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700 flex items-center">
-                <Code className="w-8 h-8 mr-3" style={{ color: currentColors.accent }} />
+            <section className="mb-8 lg:mb-12">
+              <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 pb-2 lg:pb-3 border-b border-gray-700 flex items-center">
+                <Code className="w-6 h-6 lg:w-8 lg:h-8 mr-2 lg:mr-3" style={{ color: currentColors.accent }} />
                 Projects
               </h2>
-              <div className="grid gap-6 md:grid-cols-1">
+              <div className="grid gap-4 lg:gap-6 md:grid-cols-1">
                 {projects.map((project, index) => (
                   <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                     <div className="flex justify-between items-start mb-4">

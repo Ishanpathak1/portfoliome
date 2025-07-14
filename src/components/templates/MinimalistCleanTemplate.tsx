@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Mail, Phone, Github, Linkedin, MapPin, ExternalLink, Sun, Moon, Code, Briefcase, User, Award, FolderOpen, GraduationCap } from 'lucide-react';
+import { Mail, Phone, Github, Linkedin, MapPin, ExternalLink, Sun, Moon, Code, Briefcase, User, Award, FolderOpen, GraduationCap, Menu, X } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
 
@@ -13,6 +13,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
   const { resumeData, personalization } = portfolio;
   const [isDark, setIsDark] = useState(false);
   const [activeSection, setActiveSection] = useState('about');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Refs for sections
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
@@ -112,6 +113,8 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
         top: elementTop - 40, // 40px offset for better visibility
         behavior: 'smooth'
       });
+      // Close mobile menu after navigation
+      setIsMobileMenuOpen(false);
     }
   };
 
@@ -151,21 +154,41 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
 
   return (
     <div className={`min-h-screen transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className={`fixed top-4 left-4 z-50 p-3 rounded-full shadow-lg transition-all duration-300 lg:hidden ${
+          isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+
       {/* Theme Toggle */}
       <button
         onClick={() => setIsDark(!isDark)}
-        className={`fixed top-6 right-6 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
+        className={`fixed top-4 right-4 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
           isDark ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100'
         }`}
       >
         {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </button>
 
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       <div className="flex min-h-screen">
         {/* Sidebar Navigation */}
-        <aside className={`w-80 fixed h-full transition-all duration-300 ${
+        <aside className={`w-80 fixed h-full transition-all duration-300 z-40 ${
           isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        } border-r flex flex-col`}>
+        } border-r flex flex-col ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}>
           {/* Profile Header */}
           <div className="p-8 border-b border-gray-200 dark:border-gray-700">
             <div className="text-center">
@@ -270,27 +293,27 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 ml-80">
+        <main className="flex-1 lg:ml-80">
           <div 
             ref={contentRef}
             className="h-screen overflow-y-auto"
           >
-            <div className="max-w-4xl mx-auto p-8 space-y-16">
+            <div className="max-w-4xl mx-auto p-4 lg:p-8 space-y-8 lg:space-y-16">
               {/* About Section */}
               <section 
                 id="about" 
                 ref={setSectionRef('about')}
-                className="pt-8"
+                className="pt-4 lg:pt-8"
               >
-                <div className={`rounded-2xl p-8 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
-                  <h2 className={`text-3xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-900'} flex items-center`}>
+                <div className={`rounded-2xl p-4 lg:p-8 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+                  <h2 className={`text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 ${isDark ? 'text-white' : 'text-gray-900'} flex items-center`}>
                     <User 
-                      className="w-8 h-8 mr-3"
+                      className="w-6 h-6 lg:w-8 lg:h-8 mr-2 lg:mr-3"
                       style={{ color: colors.primary }}
                     />
                     About Me
                   </h2>
-                  <p className={`text-lg leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <p className={`text-base lg:text-lg leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     {resumeData.summary || 'Passionate professional dedicated to creating exceptional solutions and delivering outstanding results.'}
                   </p>
                 </div>
@@ -409,14 +432,14 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                   id="projects" 
                   ref={setSectionRef('projects')}
                 >
-                  <h2 className={`text-3xl font-bold mb-8 ${isDark ? 'text-white' : 'text-gray-900'} flex items-center`}>
+                  <h2 className={`text-2xl lg:text-3xl font-bold mb-6 lg:mb-8 ${isDark ? 'text-white' : 'text-gray-900'} flex items-center`}>
                     <FolderOpen 
-                      className="w-8 h-8 mr-3"
+                      className="w-6 h-6 lg:w-8 lg:h-8 mr-2 lg:mr-3"
                       style={{ color: colors.primary }}
                     />
                     Featured Projects
                   </h2>
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                     {resumeData.projects.map((project, index) => (
                       <div key={index} className={`rounded-2xl overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm hover:shadow-md transition-shadow`}>
                         <div 
