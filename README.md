@@ -1,4 +1,4 @@
-# 🎨 Portfolio Generator.
+# 🎨 Portfolio Generator
 
 Transform your resume into a beautiful, personalized portfolio website in minutes! This web application uses smart parsing to extract information from your resume and creates a stunning portfolio with customizable themes and layouts.
 
