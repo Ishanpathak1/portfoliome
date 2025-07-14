@@ -282,15 +282,17 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                       <div className={`p-3 bg-gradient-to-r ${colors.accent} rounded-2xl`}>
                         <Target className="w-5 h-5 md:w-6 md:h-6 text-white" />
                       </div>
-                      <div className="flex space-x-2">
+                      {/* Enhanced Project Links */}
+                      <div className="flex flex-col space-y-2">
                         {project.link && (
                           <a 
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`p-2 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'} transition-colors hover:scale-110 transform`}
+                            className={`inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r ${colors.primary} text-white rounded-full text-sm font-medium hover:scale-105 transition-all duration-300 shadow-lg`}
                           >
-                            <ExternalLink className="w-5 h-5" />
+                            <ExternalLink className="w-4 h-4" />
+                            <span>View Live</span>
                           </a>
                         )}
                         {project.github && (
@@ -298,9 +300,10 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                             href={project.github}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`p-2 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'} transition-colors hover:scale-110 transform`}
+                            className={`inline-flex items-center space-x-2 px-4 py-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} ${isDark ? 'text-white' : 'text-gray-800'} rounded-full text-sm font-medium hover:scale-105 transition-all duration-300 shadow-md`}
                           >
-                            <Github className="w-5 h-5" />
+                            <Github className="w-4 h-4" />
+                            <span>View Code</span>
                           </a>
                         )}
                       </div>

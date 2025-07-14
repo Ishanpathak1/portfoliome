@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserPortfolio } from '@/lib/portfolio-db';
 import { prisma } from '@/lib/prisma';
-import { PersonalizationData } from '@/types/resume';
+import { PersonalizationData, ResumeData } from '@/types/resume';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { slug, personalization } = await request.json();
+    const { slug, personalization, resumeData } = await request.json();
 
     // Get current portfolio
     const currentPortfolio = await getUserPortfolio(userId);
@@ -46,6 +46,11 @@ export async function PUT(request: NextRequest) {
     if (personalization) {
       updateData.personalization = personalization as PersonalizationData;
       updateData.templateId = personalization.templateId || currentPortfolio.templateId;
+    }
+
+    // Update resume data if provided
+    if (resumeData) {
+      updateData.resumeData = resumeData as ResumeData;
     }
 
     // Update slug if provided and different

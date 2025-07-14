@@ -224,25 +224,29 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                   <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-xl font-semibold text-white">{project.name}</h3>
-                      <div className="flex space-x-3">
-                        {project.github && (
-                          <a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-400 hover:text-white transition-colors"
-                          >
-                            <Github className="w-5 h-5" />
-                          </a>
-                        )}
+                      {/* Enhanced Project Links */}
+                      <div className="flex flex-col space-y-2">
                         {project.link && (
                           <a
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-gray-400 hover:text-white transition-colors"
+                            className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-white transition-all duration-300 hover:scale-105 shadow-md"
+                            style={{ backgroundColor: currentColors.accent }}
                           >
-                            <ExternalLink className="w-5 h-5" />
+                            <ExternalLink className="w-4 h-4" />
+                            <span>View Live</span>
+                          </a>
+                        )}
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 shadow-md"
+                          >
+                            <Github className="w-4 h-4" />
+                            <span>View Code</span>
                           </a>
                         )}
                       </div>

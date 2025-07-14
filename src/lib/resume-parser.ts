@@ -515,21 +515,54 @@ export class AIResumeParser {
             github: ''
           };
         } else if (currentProject && line.trim()) {
-          if (line.includes('http')) {
+          // Enhanced URL detection
+          if (line.includes('http') || line.includes('www.') || line.match(/\w+\.\w+\/\w+/)) {
             const urlMatch = line.match(URL_PATTERN);
             if (urlMatch) {
-              if (line.toLowerCase().includes('github')) {
-                currentProject.github = urlMatch[0];
+              const url = urlMatch[0];
+              if (line.toLowerCase().includes('github') || url.includes('github.com')) {
+                currentProject.github = url;
+              } else if (line.toLowerCase().includes('live') || line.toLowerCase().includes('demo') || line.toLowerCase().includes('deployed')) {
+                currentProject.link = url;
               } else {
-                currentProject.link = urlMatch[0];
+                // Default to live link if not github
+                if (!currentProject.link) {
+                  currentProject.link = url;
+                } else if (!currentProject.github) {
+                  currentProject.github = url;
+                }
               }
             }
-          } else if (line.toLowerCase().includes('tech') || line.includes(':')) {
+          } 
+          // Look for URL keywords even without http
+          else if (line.toLowerCase().includes('live:') || line.toLowerCase().includes('demo:') || line.toLowerCase().includes('url:') || line.toLowerCase().includes('link:')) {
+            const parts = line.split(':');
+            if (parts.length > 1) {
+              const possibleUrl = parts[1].trim();
+              if (possibleUrl.includes('.')) {
+                currentProject.link = possibleUrl.startsWith('http') ? possibleUrl : `https://${possibleUrl}`;
+              }
+            }
+          }
+          // Look for GitHub without full URL
+          else if (line.toLowerCase().includes('github:') || line.toLowerCase().includes('repository:') || line.toLowerCase().includes('repo:')) {
+            const parts = line.split(':');
+            if (parts.length > 1) {
+              const possibleRepo = parts[1].trim();
+              if (possibleRepo.includes('/') && !possibleRepo.includes(' ')) {
+                currentProject.github = possibleRepo.startsWith('http') ? possibleRepo : `https://github.com/${possibleRepo}`;
+              }
+            }
+          }
+          // Technology detection
+          else if (line.toLowerCase().includes('tech') || line.includes(':')) {
             const techMatch = line.split(':')[1];
             if (techMatch) {
               currentProject.technologies = techMatch.split(',').map(t => t.trim());
             }
-          } else {
+          } 
+          // Description
+          else {
             if (!currentProject.description) {
               currentProject.description = line.trim();
             } else {

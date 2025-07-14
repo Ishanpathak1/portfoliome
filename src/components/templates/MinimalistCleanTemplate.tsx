@@ -428,15 +428,34 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                             <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                               {project.name}
                             </h3>
-                            <div className="flex space-x-2">
+                            {/* Enhanced Project Links */}
+                            <div className="flex flex-col space-y-2">
                               {project.link && (
-                                <a href={project.link} target="_blank" rel="noopener noreferrer" className={`p-2 ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} transition-colors`}>
+                                <a 
+                                  href={project.link} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="inline-flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 shadow-md"
+                                  style={{ 
+                                    backgroundColor: colors.primary, 
+                                    color: 'white' 
+                                  }}
+                                >
                                   <ExternalLink className="w-4 h-4" />
+                                  <span>View Live</span>
                                 </a>
                               )}
                               {project.github && (
-                                <a href={project.github} target="_blank" rel="noopener noreferrer" className={`p-2 ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} transition-colors`}>
+                                <a 
+                                  href={project.github} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 shadow-md ${
+                                    isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                                  }`}
+                                >
                                   <Github className="w-4 h-4" />
+                                  <span>View Code</span>
                                 </a>
                               )}
                             </div>

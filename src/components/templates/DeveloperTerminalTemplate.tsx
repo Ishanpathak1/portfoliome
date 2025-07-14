@@ -148,15 +148,27 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
                     <span className="text-blue-400">📂</span>
                     <span className="text-cyan-400 font-semibold">{project.name}</span>
                     {(project.link || project.github) && (
-                      <div className="flex space-x-2 ml-auto">
+                      <div className="flex space-x-3 ml-auto">
                         {project.link && (
-                          <a href={project.link} className="text-blue-400 hover:underline text-sm">
-                            🔗 demo
+                          <a 
+                            href={project.link} 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-1 px-3 py-1 bg-green-600 text-black rounded text-xs font-mono font-bold hover:bg-green-500 transition-colors"
+                          >
+                            <span>🚀</span>
+                            <span>LIVE</span>
                           </a>
                         )}
                         {project.github && (
-                          <a href={project.github} className="text-blue-400 hover:underline text-sm">
-                            🔗 repo
+                          <a 
+                            href={project.github} 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-1 px-3 py-1 bg-gray-600 text-white rounded text-xs font-mono font-bold hover:bg-gray-500 transition-colors"
+                          >
+                            <span>💻</span>
+                            <span>CODE</span>
                           </a>
                         )}
                       </div>

@@ -42,6 +42,7 @@ function DashboardContent() {
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
   const [editedPersonalization, setEditedPersonalization] = useState<PersonalizationData | null>(null);
+  const [editedResumeData, setEditedResumeData] = useState<ResumeData | null>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
 
@@ -64,6 +65,7 @@ function DashboardContent() {
         setPortfolio(data.portfolio);
         setEditedSlug(data.portfolio?.slug || '');
         setEditedPersonalization(data.portfolio?.personalization || null);
+        setEditedResumeData(data.portfolio?.resumeData || null);
       } else if (response.status === 404) {
         // User doesn't have a portfolio yet
         setPortfolio(null);
@@ -107,7 +109,8 @@ function DashboardContent() {
         },
         body: JSON.stringify({
           slug: editedSlug !== portfolio.slug ? editedSlug : undefined,
-          personalization: editedPersonalization
+          personalization: editedPersonalization,
+          resumeData: editedResumeData
         })
       });
 
@@ -115,6 +118,7 @@ function DashboardContent() {
         const data = await response.json();
         setPortfolio(data.portfolio);
         setEditedSlug(data.portfolio.slug); // Update slug if changed
+        setEditedResumeData(data.portfolio.resumeData);
         setPreviewKey(prev => prev + 1); // Force iframe refresh
         alert('Portfolio updated successfully!');
       } else {
@@ -376,7 +380,7 @@ function DashboardContent() {
               </div>
             )}
 
-            {activeTab === 'content' && (
+            {activeTab === 'content' && editedResumeData && (
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
                 <h2 className="text-2xl font-bold text-white mb-6">Content & Information</h2>
                 <div className="space-y-6">
@@ -390,6 +394,58 @@ function DashboardContent() {
                       <p><strong>Skills:</strong> {portfolio.resumeData.skills.length} categories</p>
                     </div>
                   </div>
+
+                  {/* Project Links Editor */}
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <h3 className="text-white font-medium mb-4">Project Links</h3>
+                    <p className="text-gray-300 text-sm mb-4">Add or edit links for your projects (live demos, GitHub repositories, etc.)</p>
+                    <div className="space-y-4">
+                      {editedResumeData.projects.map((project, index) => (
+                        <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                          <h4 className="text-white font-medium mb-3">{project.name}</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-gray-300 text-sm mb-2">Live Demo URL</label>
+                              <input
+                                type="url"
+                                value={project.link || ''}
+                                onChange={(e) => {
+                                  const updatedProjects = [...editedResumeData.projects];
+                                  updatedProjects[index] = { ...project, link: e.target.value || undefined };
+                                  setEditedResumeData({ ...editedResumeData, projects: updatedProjects });
+                                }}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="https://your-project-demo.com"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-gray-300 text-sm mb-2">GitHub Repository URL</label>
+                              <input
+                                type="url"
+                                value={project.github || ''}
+                                onChange={(e) => {
+                                  const updatedProjects = [...editedResumeData.projects];
+                                  updatedProjects[index] = { ...project, github: e.target.value || undefined };
+                                  setEditedResumeData({ ...editedResumeData, projects: updatedProjects });
+                                }}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="https://github.com/username/repo"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={saveChanges}
+                      disabled={saving}
+                      className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors mt-4"
+                    >
+                      {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      <span>{saving ? 'Saving...' : 'Save Project Links'}</span>
+                    </button>
+                  </div>
+
                   <div className="bg-blue-500/20 border border-blue-400/30 rounded-xl p-4">
                     <h4 className="text-blue-300 font-medium mb-2">Update Content</h4>
                     <p className="text-blue-200 text-sm">
