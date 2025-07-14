@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       slug: portfolio.slug,
-      url: `${baseUrl}/portfolio/${portfolio.slug}`
+      url: `${baseUrl}/${portfolio.slug}`
     });
 
   } catch (error) {

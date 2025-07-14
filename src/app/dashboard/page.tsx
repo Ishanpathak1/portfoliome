@@ -132,7 +132,7 @@ function DashboardContent() {
   const copyPortfolioUrl = async () => {
     if (!portfolio) return;
     
-    const url = `${window.location.origin}/portfolio/${portfolio.slug}`;
+    const url = `${window.location.origin}/${portfolio.slug}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopiedUrl(true);
@@ -200,7 +200,7 @@ function DashboardContent() {
             </div>
             <div className="flex items-center space-x-4">
               <a
-                href={`/portfolio/${portfolio.slug}`}
+                href={`/${portfolio.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
@@ -303,7 +303,7 @@ function DashboardContent() {
                   <div className="flex items-center space-x-3">
                     <div className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3">
                       <code className="text-purple-300 text-sm break-all">
-                        {window.location.origin}/portfolio/{portfolio.slug}
+                        {window.location.origin}/{portfolio.slug}
                       </code>
                     </div>
                     <button
@@ -422,7 +422,7 @@ function DashboardContent() {
                         <div className="flex-1">
                           <div className="flex">
                             <div className="bg-white/5 border border-white/20 border-r-0 rounded-l-lg px-3 py-2 text-gray-300 text-sm">
-                              {window.location.origin}/portfolio/
+                              {window.location.origin}/
                             </div>
                             <input
                               type="text"
@@ -485,13 +485,13 @@ function DashboardContent() {
               <div className="aspect-video bg-white/5 border border-white/10 rounded-lg overflow-hidden">
                 <iframe
                   key={previewKey}
-                  src={`/portfolio/${portfolio.slug}`}
+                  src={`/${portfolio.slug}`}
                   className="w-full h-full"
                   title="Portfolio Preview"
                 />
               </div>
               <a
-                href={`/portfolio/${portfolio.slug}`}
+                href={`/${portfolio.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full mt-4 text-center bg-white/10 hover:bg-white/20 border border-white/20 text-white py-2 rounded-lg transition-colors"
