@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserPortfolio } from '@/lib/portfolio-db';
 
+export const dynamic = 'force-dynamic';
+
 // Simple token verification for development
 // In production, you should use Firebase Admin SDK for proper verification
 async function getUserIdFromToken(authHeader: string | null): Promise<string | null> {

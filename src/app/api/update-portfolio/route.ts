@@ -3,6 +3,8 @@ import { getUserPortfolio } from '@/lib/portfolio-db';
 import { prisma } from '@/lib/prisma';
 import { PersonalizationData } from '@/types/resume';
 
+export const dynamic = 'force-dynamic';
+
 // Simple token verification for development
 async function getUserIdFromToken(authHeader: string | null): Promise<string | null> {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

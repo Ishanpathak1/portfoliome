@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import mammoth from 'mammoth';
 import { parseResumeWithAI } from '@/lib/ai-resume-parser';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();

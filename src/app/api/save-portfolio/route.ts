@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { saveUserPortfolio } from '@/lib/portfolio-db';
 import { ResumeData, PersonalizationData } from '@/types/resume';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { resumeData, personalization, fileInfo, userId, userEmail, userName } = await request.json();
