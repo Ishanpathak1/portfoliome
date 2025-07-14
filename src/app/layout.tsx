@@ -6,7 +6,7 @@ import { FirebaseAuthWrapper } from '@/components/FirebaseAuthWrapper';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'production' ? 'https://portfoliome.vercel.app' : 'http://localhost:3000')),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'production' ? 'https://take-my.info' : 'http://localhost:3000')),
   title: 'Portfolio Generator - Transform Your Resume into a Beautiful Portfolio',
   description: 'Upload your resume and get a personalized, professional portfolio website in minutes.',
   keywords: 'portfolio, resume, generator, website, professional, career',
