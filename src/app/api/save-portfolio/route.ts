@@ -15,7 +15,10 @@ export async function POST(request: NextRequest) {
     // Get the correct base URL from the request
     const protocol = request.headers.get('x-forwarded-proto') || 'https';
     const host = request.headers.get('host') || request.headers.get('x-forwarded-host');
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+    
+    // Clean up environment variable in case it contains the variable name
+    const envUrl = process.env.NEXT_PUBLIC_APP_URL?.replace('NEXT_PUBLIC_APP_URL=', '').trim();
+    const baseUrl = (envUrl && envUrl.startsWith('http')) ? envUrl : `${protocol}://${host}`;
 
     // Save portfolio to database
     const portfolio = await saveUserPortfolio(
