@@ -329,13 +329,18 @@ function DashboardContent() {
                 {/* Template Selection */}
                 <div className="mb-8">
                   <h3 className="text-lg font-medium text-white mb-4">Choose Template</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     {[
                       { id: 'modern-glassmorphism', name: 'Modern Glassmorphism', desc: 'Sleek with glass effects' },
                       { id: 'minimalist-clean', name: 'Minimalist Clean', desc: 'Clean sidebar navigation' },
                       { id: 'creative-gradient', name: 'Creative Gradient', desc: 'Vibrant and artistic' },
                       { id: 'developer-terminal', name: 'Developer Terminal', desc: 'Code-inspired terminal UI' },
                       { id: 'dark-professional', name: 'Dark Professional', desc: 'Elegant dark theme' },
+                      { id: 'corporate-executive', name: 'Corporate Executive', desc: 'Premium executive portfolio' },
+                      { id: 'creative-portfolio', name: 'Creative Portfolio', desc: 'Visual-first creative showcase' },
+                      { id: 'tech-innovator', name: 'Tech Innovator', desc: 'Futuristic developer showcase' },
+                      { id: 'fullstack-developer', name: 'Full Stack Developer', desc: 'Modern web development focus' },
+                      { id: 'opensource-contributor', name: 'Open Source Contributor', desc: 'GitHub-focused community profile' },
                     ].map((template) => (
                       <button
                         key={template.id}

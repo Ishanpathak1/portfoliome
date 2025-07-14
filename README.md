@@ -190,7 +190,6 @@ If you encounter any issues or have questions:
 1. Check the [Issues](https://github.com/your-repo/issues) page
 2. Create a new issue with detailed information
 3. Include your browser version and error messages
-
 ---
 
 Made with ❤️ for job seekers and professionals worldwide! 
