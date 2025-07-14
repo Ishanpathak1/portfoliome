@@ -2,14 +2,13 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth, googleProvider, githubProvider } from '@/lib/firebase';
+import { auth, googleProvider } from '@/lib/firebase';
 import { User as UserIcon, LogOut, LogIn } from 'lucide-react';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
-  signInWithGithub: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -48,14 +47,6 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
     }
   };
 
-  const signInWithGithub = async () => {
-    try {
-      await signInWithPopup(auth, githubProvider);
-    } catch (error) {
-      console.error('Error signing in with GitHub:', error);
-    }
-  };
-
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
@@ -68,7 +59,6 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
     user,
     loading,
     signInWithGoogle,
-    signInWithGithub,
     signOut,
   };
 
@@ -135,7 +125,7 @@ export function AuthWrapper({ children, requireAuth = false }: AuthWrapperProps)
 }
 
 function SignInPrompt() {
-  const { signInWithGoogle, signInWithGithub } = useAuth();
+  const { signInWithGoogle } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-6">
@@ -155,13 +145,6 @@ function SignInPrompt() {
             >
               <span>🚀</span>
               <span>Continue with Google</span>
-            </button>
-            <button
-              onClick={signInWithGithub}
-              className="w-full flex items-center justify-center space-x-3 bg-gray-800 text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-700 transition-all duration-300"
-            >
-              <span>💻</span>
-              <span>Continue with GitHub</span>
             </button>
           </div>
         </div>

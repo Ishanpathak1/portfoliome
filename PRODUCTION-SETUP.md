@@ -7,7 +7,7 @@ Your portfolio generator has been upgraded to be production-ready with user auth
 ## 🏗️ Architecture Overview
 
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js (Google, GitHub, Email)
+- **Authentication**: NextAuth.js (Google, Email)
 - **File Storage**: Ready for AWS S3/Cloudinary
 - **Caching**: Redis support for portfolio caching
 - **User Management**: One portfolio per user
@@ -43,10 +43,6 @@ NEXTAUTH_SECRET="your-super-secret-key-minimum-32-characters-long"
 # Google OAuth (https://console.developers.google.com)
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
-
-# GitHub OAuth (https://github.com/settings/applications/new)
-GITHUB_CLIENT_ID="your-github-client-id"
-GITHUB_CLIENT_SECRET="your-github-client-secret"
 
 # Optional: AWS S3 for file uploads (future enhancement)
 AWS_ACCESS_KEY_ID=""
@@ -94,14 +90,6 @@ NODE_ENV="development"  # Change to "production" when deploying
 5. Add authorized redirect URIs:
    - `http://localhost:3000/api/auth/callback/google` (development)
    - `https://yourdomain.com/api/auth/callback/google` (production)
-
-#### GitHub OAuth
-
-1. Go to [GitHub Settings](https://github.com/settings/applications/new)
-2. Register a new OAuth app
-3. Set Authorization callback URL:
-   - `http://localhost:3000/api/auth/callback/github` (development)
-   - `https://yourdomain.com/api/auth/callback/github` (production)
 
 ## 🎯 Installation & Deployment
 
@@ -169,7 +157,6 @@ CMD ["npm", "start"]
 
 ### User Authentication
 - ✅ Google OAuth login
-- ✅ GitHub OAuth login
 - ✅ One portfolio per user
 - ✅ Automatic user session management
 
@@ -232,9 +219,4 @@ Consider adding:
 
 Your portfolio generator is now production-ready with:
 - ✅ User authentication
-- ✅ Scalable database architecture
-- ✅ One portfolio per user
-- ✅ SEO optimization
-- ✅ Beautiful, responsive designs
-
-Deploy and start helping users create amazing portfolios! 🚀 
+- ✅ Scalable database architecture 
