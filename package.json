@@ -1,0 +1,52 @@
+{
+  "name": "portfolio-generator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.844.0",
+    "@aws-sdk/s3-request-presigner": "^3.844.0",
+    "@hookform/resolvers": "^3.3.2",
+    "@prisma/client": "^6.11.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/ioredis": "^4.28.10",
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/uuid": "^9.0.6",
+    "autoprefixer": "^10.4.16",
+    "aws-sdk": "^2.1692.0",
+    "bcryptjs": "^3.0.2",
+    "clsx": "^2.0.0",
+    "firebase": "^11.10.0",
+    "firebase-admin": "^13.4.0",
+    "framer-motion": "^10.16.0",
+    "ioredis": "^5.6.1",
+    "lucide-react": "^0.288.0",
+    "mammoth": "^1.6.0",
+    "next": "14.0.0",
+    "openai": "^5.9.0",
+    "pdf-parse": "^1.1.1",
+    "postcss": "^8.4.31",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.47.0",
+    "redis": "^5.6.0",
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.2.2",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.51.0",
+    "eslint-config-next": "14.0.0",
+    "prisma": "^6.11.1"
+  }
+}

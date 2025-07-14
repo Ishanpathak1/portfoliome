@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// User model
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts  Account[]
+  sessions  Session[]
+  portfolio Portfolio?
+
+  @@map("users")
+}
+
+// Portfolio model - One per user
+model Portfolio {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  slug      String   @unique // Custom URL slug
+  views     Int      @default(0)
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Resume data (JSON)
+  resumeData Json
+
+  // Personalization data (JSON)
+  personalization Json
+
+  // Template selection
+  templateId String @default("modern-glassmorphism")
+
+  // File storage info
+  originalFileName String?
+  fileUrl          String? // S3/Cloudinary URL
+  fileType         String? // pdf, docx, txt
+
+  // SEO and metadata
+  metaTitle       String?
+  metaDescription String?
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("portfolios")
+}
+
+// Analytics model for tracking
+model PortfolioView {
+  id          String   @id @default(cuid())
+  portfolioId String
+  viewerIp    String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("portfolio_views")
+}

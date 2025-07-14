@@ -1,0 +1,58 @@
+John Doe
+Software Developer
+
+Contact Information
+Email: john.doe@email.com
+Phone: (555) 123-4567
+LinkedIn: linkedin.com/in/johndoe
+GitHub: github.com/johndoe
+
+Summary
+Experienced software developer with 5+ years of experience in full-stack web development. Passionate about creating efficient and scalable solutions using modern technologies.
+
+Experience
+
+Senior Software Developer at Tech Corp
+January 2021 - Present
+• Led development of microservices architecture serving 1M+ users
+• Implemented CI/CD pipelines reducing deployment time by 60%
+• Mentored junior developers and conducted code reviews
+
+Software Developer at StartupXYZ
+June 2019 - December 2020
+• Developed responsive web applications using React and Node.js
+• Collaborated with cross-functional teams to deliver features on time
+• Optimized database queries improving application performance by 40%
+
+Education
+
+Bachelor of Science in Computer Science
+University of Technology
+Graduated: May 2019
+GPA: 3.8/4.0
+
+Skills
+
+Programming Languages
+JavaScript, TypeScript, Python, Java, SQL
+
+Frameworks & Libraries
+React, Node.js, Express, Next.js, Vue.js
+
+Databases
+PostgreSQL, MongoDB, Redis
+
+Tools & Technologies
+Docker, AWS, Git, Jenkins, Kubernetes
+
+Projects
+
+E-commerce Platform
+• Built full-stack e-commerce application with React and Node.js
+• Integrated payment processing and inventory management
+• Technologies: React, Node.js, PostgreSQL, Stripe API
+
+Task Management App
+• Developed collaborative task management tool
+• Implemented real-time updates using WebSockets
+• Technologies: Vue.js, Express, MongoDB, Socket.io 
