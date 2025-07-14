@@ -86,27 +86,67 @@ export async function saveUserPortfolio(
 }
 
 export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfolio | null> {
-  const portfolio = await prisma.portfolio.findUnique({
-    where: { slug, isPublic: true },
-    include: { user: true },
-  });
+  try {
+    // ⚡ Optimized query - only select needed fields
+    const portfolio = await prisma.portfolio.findUnique({
+      where: { 
+        slug, 
+        isPublic: true 
+      },
+      select: {
+        id: true,
+        userId: true,
+        slug: true,
+        views: true,
+        isPublic: true,
+        resumeData: true,
+        personalization: true,
+        templateId: true,
+        originalFileName: true,
+        fileUrl: true,
+        fileType: true,
+        metaTitle: true,
+        metaDescription: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
 
-  if (!portfolio) return null;
+    if (!portfolio) return null;
 
-  // Increment view count
-  await prisma.portfolio.update({
-    where: { id: portfolio.id },
-    data: { views: { increment: 1 } },
-  });
+    // ⚡ Make analytics non-blocking - run in background after returning data
+    setImmediate(async () => {
+      try {
+        // Increment view count and track analytics in parallel
+        await Promise.all([
+          prisma.portfolio.update({
+            where: { id: portfolio.id },
+            data: { views: { increment: 1 } },
+          }),
+          prisma.portfolioView.create({
+            data: {
+              portfolioId: portfolio.id,
+            },
+          })
+        ]);
+      } catch (error) {
+        console.error('Background analytics failed:', error);
+        // Don't throw - this shouldn't break the page load
+      }
+    });
 
-  // Track view analytics
-  await prisma.portfolioView.create({
-    data: {
-      portfolioId: portfolio.id,
-    },
-  });
-
-  return transformPortfolio(portfolio);
+    return transformPortfolio(portfolio);
+  } catch (error) {
+    console.error('Error fetching portfolio by slug:', error);
+    return null;
+  }
 }
 
 export async function getUserPortfolio(userId: string): Promise<DatabasePortfolio | null> {

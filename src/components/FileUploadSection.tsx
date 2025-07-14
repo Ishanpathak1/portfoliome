@@ -81,12 +81,12 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
           {...getRootProps()}
           className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all duration-200 ${
             isDragActive
-              ? 'border-blue-400 bg-blue-500/20'
+              ? 'border-blue-500 bg-blue-50'
               : error
-              ? 'border-red-400 bg-red-500/20'
+              ? 'border-red-300 bg-red-50'
               : uploadedFile && !isLoading
-              ? 'border-green-400 bg-green-500/20'
-              : 'border-white/40 hover:border-purple-400 hover:bg-purple-500/20'
+              ? 'border-green-300 bg-green-50'
+              : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
           }`}
         >
           <input {...getInputProps()} />
@@ -94,8 +94,8 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
           <div className="flex flex-col items-center space-y-4">
             {isLoading ? (
               <>
-                <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-2">🧠 GPT-3.5 analyzing your resume...</h3>
@@ -104,8 +104,8 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
               </>
             ) : error ? (
               <>
-                <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-red-400" />
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-8 h-8 text-red-600" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-red-300 mb-2">Upload Failed</h3>
@@ -115,7 +115,7 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
                       setError(null);
                       setUploadedFile(null);
                     }}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-all duration-300"
+                    className="btn-primary"
                   >
                     Try Again
                   </button>
@@ -123,8 +123,8 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
               </>
             ) : uploadedFile ? (
               <>
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8 text-green-400" />
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-green-300 mb-2">Resume uploaded successfully!</h3>
@@ -133,8 +133,8 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
               </>
             ) : (
               <>
-                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center">
-                  <Upload className="w-8 h-8 text-purple-400" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Upload className="w-8 h-8 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-2">
@@ -158,9 +158,9 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
         </div>
 
         {fileRejections.length > 0 && (
-          <div className="mt-4 p-4 bg-red-500/20 border border-red-400/50 rounded-lg">
-            <h4 className="text-sm font-semibold text-red-300 mb-2">File rejected:</h4>
-            <ul className="text-sm text-red-400 space-y-1">
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <h4 className="text-sm font-semibold text-red-800 mb-2">File rejected:</h4>
+            <ul className="text-sm text-red-600 space-y-1">
               {fileRejections.map(({ file, errors }) => (
                 <li key={file.name}>
                   {file.name}: {errors.map(e => e.message).join(', ')}
