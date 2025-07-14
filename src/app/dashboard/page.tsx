@@ -5,6 +5,7 @@ import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { AuthWrapper } from '@/components/FirebaseAuthWrapper';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { ResumeData, PersonalizationData } from '@/types/resume';
+import { ToastContainer, useToast } from '@/components/Toast';
 import { 
   Settings, 
   Eye, 
@@ -45,6 +46,9 @@ function DashboardContent() {
   const [editedResumeData, setEditedResumeData] = useState<ResumeData | null>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
+
+  // Toast notifications
+  const { toasts, removeToast, showSuccess, showError } = useToast();
 
   useEffect(() => {
     if (user) {
@@ -120,14 +124,14 @@ function DashboardContent() {
         setEditedSlug(data.portfolio.slug); // Update slug if changed
         setEditedResumeData(data.portfolio.resumeData);
         setPreviewKey(prev => prev + 1); // Force iframe refresh
-        alert('Portfolio updated successfully!');
+        showSuccess('Portfolio updated successfully!');
       } else {
         const error = await response.json();
-        alert(`Error: ${error.message}`);
+        showError(`Error: ${error.message}`);
       }
     } catch (error) {
       console.error('Error saving changes:', error);
-      alert('Failed to save changes. Please try again.');
+      showError('Failed to save changes. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -586,6 +590,7 @@ function DashboardContent() {
           </div>
         </div>
       </div>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 } 

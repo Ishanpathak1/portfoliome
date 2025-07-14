@@ -318,7 +318,10 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-6">
-                <button 
+                <a
+                  href={resumeData.contact.github || resumeData.projects?.find(p => p.github)?.github || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group relative overflow-hidden px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-semibold text-base lg:text-lg transition-all duration-300 hover:scale-105 text-white"
                   style={{ backgroundColor: colors.primary }}
                 >
@@ -327,7 +330,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                     <span>View Projects</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
-                </button>
+                </a>
                 
                 <a
                   href={`mailto:${resumeData.contact.email}`}
