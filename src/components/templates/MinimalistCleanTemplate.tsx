@@ -205,7 +205,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                 className="text-sm font-medium"
                 style={{ color: colors.primary }}
               >
-                {resumeData.experience[0]?.title || 'Professional'}
+                {resumeData.experience[0]?.position || 'Professional'}
               </p>
             </div>
           </div>
@@ -342,7 +342,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                         <div className="flex justify-between items-start mb-4">
                           <div>
                             <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                              {exp.title}
+                              {exp.position}
                             </h3>
                             <p 
                               className="text-lg font-semibold mb-1"
@@ -374,7 +374,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                           </div>
                         </div>
                         <ul className="space-y-2">
-                          {exp.description.map((desc, i) => (
+                          {(exp.responsibilities || []).map((desc: string, i: number) => (
                             <li key={i} className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'} flex items-start`}>
                               <span 
                               className="w-1.5 h-1.5 rounded-full mt-2 mr-3 flex-shrink-0"
@@ -414,7 +414,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                           {skillGroup.category}
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
-                          {skillGroup.items.map((skill, i) => (
+                          {(skillGroup.items || []).map((skill, i) => (
                             <div key={i} className={`p-2 text-sm ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-700'} rounded-lg`}>
                               {skill}
                             </div>
@@ -487,7 +487,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                             {project.description}
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {project.technologies.map((tech, i) => (
+                            {(project.technologies || []).map((tech, i) => (
                               <span key={i} className={`px-2 py-1 text-xs ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'} rounded-md`}>
                                 {tech}
                               </span>

@@ -289,9 +289,9 @@ export class AIResumeParser {
             currentJob.endDate = dates.endDate;
             currentJob.current = dates.current;
           } else if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
-            currentJob.description.push(line.replace(/^[•\-*]\s*/, '').trim());
+            currentJob.responsibilities.push(line.replace(/^[•\-*]\s*/, '').trim());
           } else {
-            currentJob.description.push(line.trim());
+            currentJob.responsibilities.push(line.trim());
           }
         }
       }
@@ -336,13 +336,17 @@ export class AIResumeParser {
     return datePatterns.some(pattern => pattern.test(line));
   }
 
-  private parseJobTitle(line: string): Partial<Experience> & { description: string[] } {
+  private parseJobTitle(line: string): Partial<Experience> & { responsibilities: string[]; title: string; description: string[] } {
+    const position = line.trim();
     return {
-      title: line.trim(),
+      position,
       company: '',
       startDate: '',
       endDate: '',
       current: false,
+      responsibilities: [],
+      // Legacy field names for template compatibility
+      title: position,
       description: []
     };
   }
@@ -385,8 +389,12 @@ export class AIResumeParser {
           currentEdu = {
             degree: line.trim(),
             institution: '',
+            field: '',
             graduationDate: '',
-            gpa: ''
+            gpa: '',
+            // Additional fields for template compatibility
+            location: '',
+            honors: []
           };
         } else if (currentEdu && line.trim()) {
           if (this.looksLikeInstitution(line) && !currentEdu.institution) {

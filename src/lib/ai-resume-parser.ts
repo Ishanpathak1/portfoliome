@@ -32,12 +32,12 @@ OUTPUT FORMAT (JSON only, no markdown):
   "summary": "Professional summary paragraph",
   "experience": [
     {
-      "title": "Job Title",
+      "position": "Job Title",
       "company": "Company Name",
       "startDate": "2020",
       "endDate": "2024",
       "current": false,
-      "description": ["Achievement 1", "Achievement 2", "Achievement 3"]
+      "responsibilities": ["Achievement 1", "Achievement 2", "Achievement 3"]
     }
   ],
   "education": [
@@ -185,19 +185,32 @@ export class AIResumeParser {
         website: data.contact?.website || ''
       },
       summary: data.summary || '',
-      experience: Array.isArray(data.experience) ? data.experience.map((exp: any) => ({
-        title: exp.title || '',
-        company: exp.company || '',
-        startDate: exp.startDate || '',
-        endDate: exp.endDate || '',
-        current: exp.current || false,
-        description: Array.isArray(exp.description) ? exp.description : []
-      })) : [],
+      experience: Array.isArray(data.experience) ? data.experience.map((exp: any) => {
+        const responsibilities = Array.isArray(exp.description) ? exp.description : (Array.isArray(exp.responsibilities) ? exp.responsibilities : []);
+        const position = exp.title || exp.position || '';
+        
+        return {
+          // New field names (semantically correct)
+          position,
+          company: exp.company || '',
+          startDate: exp.startDate || '',
+          endDate: exp.endDate || '',
+          current: exp.current || false,
+          responsibilities,
+          // Legacy field names for template compatibility
+          title: position,
+          description: responsibilities
+        };
+      }) : [],
       education: Array.isArray(data.education) ? data.education.map((edu: any) => ({
         degree: edu.degree || '',
         institution: edu.institution || '',
+        field: edu.field || '',
         graduationDate: edu.graduationDate || '',
-        gpa: edu.gpa || ''
+        gpa: edu.gpa || '',
+        // Additional fields for template compatibility
+        location: edu.location || '',
+        honors: Array.isArray(edu.honors) ? edu.honors : []
       })) : [],
       skills: Array.isArray(data.skills) ? data.skills.map((skill: any) => ({
         category: skill.category || 'Skills',

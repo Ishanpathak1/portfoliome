@@ -229,7 +229,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                     
                     <div className="space-y-2">
                       <h3 className={`text-xl md:text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        {exp.title}
+                        {exp.position}
                       </h3>
                       <p className={`text-base md:text-lg font-semibold bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
                         {exp.company}
@@ -242,7 +242,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                     </div>
                     
                     <div className="space-y-3">
-                      {exp.description.map((desc, i) => (
+                      {(exp.responsibilities || []).map((desc: string, i: number) => (
                         <div key={i} className="flex items-start space-x-3">
                           <div className={`w-2 h-2 bg-gradient-to-r ${colors.accent} rounded-full mt-2 flex-shrink-0`}></div>
                           <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} leading-relaxed text-sm md:text-base`}>{desc}</p>
@@ -319,7 +319,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                     </div>
                     
                     <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech, i) => (
+                      {(project.technologies || []).map((tech, i) => (
                         <span 
                           key={i}
                           className={`px-2 py-1 md:px-3 bg-gradient-to-r ${
@@ -366,7 +366,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                   </div>
                   
                   <div className="space-y-3">
-                    {skillGroup.items.map((skill, i) => (
+                    {(skillGroup.items || []).map((skill, i) => (
                       <div 
                         key={i} 
                         className={`flex items-center justify-between p-3 ${

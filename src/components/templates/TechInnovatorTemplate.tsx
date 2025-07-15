@@ -99,10 +99,12 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
     { 
       label: 'Leadership Impact', 
       value: resumeData.experience?.filter(exp => 
-        exp.title.toLowerCase().includes('lead') || 
-        exp.title.toLowerCase().includes('senior') ||
-        exp.title.toLowerCase().includes('architect') ||
-        exp.title.toLowerCase().includes('principal')
+        exp.position && (
+          exp.position.toLowerCase().includes('lead') || 
+          exp.position.toLowerCase().includes('senior') ||
+          exp.position.toLowerCase().includes('architect') ||
+          exp.position.toLowerCase().includes('principal')
+        )
       ).length || 0,
       icon: Users,
       description: 'Teams led & mentored'
@@ -112,8 +114,8 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
   // Real achievements derived from resume data
   const achievements = [
     ...(resumeData.experience?.map((job, index) => ({
-      category: job.title.includes('Lead') || job.title.includes('Senior') ? 'Leadership' : 'Experience',
-      description: `${job.title} at ${job.company}`
+      category: (job.position && (job.position.includes('Lead') || job.position.includes('Senior'))) ? 'Leadership' : 'Experience',
+      description: `${job.position || 'Position'} at ${job.company || 'Company'}`
     })) || []),
     ...(resumeData.projects?.map((project, index) => ({
       category: 'Innovation',

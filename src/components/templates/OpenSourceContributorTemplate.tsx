@@ -174,7 +174,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                 {resumeData.contact.name}
               </h1>
               <p className="text-xl lg:text-2xl mb-4" style={{ color: colors.textSecondary }}>
-                {resumeData.experience?.[0]?.title || 'Open Source Developer'}
+                {resumeData.experience?.[0]?.position || 'Open Source Developer'}
               </p>
             </div>
 
@@ -458,7 +458,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-3">
                       <div>
                         <h3 className="font-semibold text-lg mb-1" style={{ color: colors.text }}>
-                          {job.title}
+                          {job.position}
                         </h3>
                         <p className="text-base" style={{ color: colors.primary }}>
                           {job.company}
@@ -477,9 +477,9 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                       </div>
                     </div>
                     
-                    {job.description && (
+                    {job.responsibilities && (
                       <div className="space-y-2">
-                        {job.description.map((line, lineIndex) => (
+                        {job.responsibilities.map((line, lineIndex) => (
                           <p key={lineIndex} className="text-sm leading-relaxed" style={{ color: colors.textSecondary }}>
                             {line}
                           </p>

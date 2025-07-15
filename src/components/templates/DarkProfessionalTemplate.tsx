@@ -117,7 +117,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                   <div key={index}>
                     <h4 className="font-medium mb-2 text-gray-300">{skillCategory.category}</h4>
                     <div className="flex flex-wrap gap-2">
-                      {skillCategory.items.map((skill, skillIndex) => (
+                      {(skillCategory.items || []).map((skill, skillIndex) => (
                         <span
                           key={skillIndex}
                           className="px-2 py-1 text-xs rounded-full bg-gray-700 text-gray-300 border"
@@ -156,7 +156,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                   <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="text-xl font-semibold text-white">{job.title}</h3>
+                        <h3 className="text-xl font-semibold text-white">{job.position}</h3>
                         <p className="text-lg" style={{ color: currentColors.accent }}>{job.company}</p>
                         {job.location && (
                           <p className="text-gray-400 text-sm">{job.location}</p>
@@ -170,7 +170,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                       </div>
                     </div>
                     <ul className="space-y-2">
-                      {job.description.map((item, descIndex) => (
+                      {(job.responsibilities || []).map((item, descIndex) => (
                         <li key={descIndex} className="text-gray-300 flex items-start">
                           <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0" style={{ backgroundColor: currentColors.accent }}></span>
                           {item}
@@ -213,7 +213,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                       <div className="mt-4">
                         <h4 className="font-medium text-gray-300 mb-2">Honors & Awards:</h4>
                         <div className="flex flex-wrap gap-2">
-                          {edu.honors.map((honor, honorIndex) => (
+                          {(edu.honors || []).map((honor, honorIndex) => (
                             <span
                               key={honorIndex}
                               className="px-3 py-1 text-sm rounded-full bg-gray-700 text-gray-300 border"
@@ -274,7 +274,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                     <p className="text-gray-300 mb-4">{project.description}</p>
                     {project.technologies.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {project.technologies.map((tech, techIndex) => (
+                        {(project.technologies || []).map((tech, techIndex) => (
                           <span
                             key={techIndex}
                             className="px-3 py-1 text-sm rounded-full bg-gray-700 text-gray-300 border"

@@ -124,9 +124,11 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     { 
       label: 'Team Leadership', 
       value: resumeData.experience?.filter(exp => 
-        exp.title.toLowerCase().includes('lead') || 
-        exp.title.toLowerCase().includes('senior') ||
-        exp.title.toLowerCase().includes('architect')
+        exp.position && (
+          exp.position.toLowerCase().includes('lead') ||
+          exp.position.toLowerCase().includes('senior') ||
+          exp.position.toLowerCase().includes('architect')
+        )
       ).length || 1,
       icon: Users,
       color: colors.success

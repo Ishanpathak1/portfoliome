@@ -185,7 +185,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
               </div>
               <div className="text-white">
                 <div className="font-bold text-lg">{resumeData.contact.name}</div>
-                <div className="text-white/80 text-sm">{resumeData.experience[0]?.title || 'Creative Professional'}</div>
+                <div className="text-white/80 text-sm">{resumeData.experience[0]?.position || 'Creative Professional'}</div>
               </div>
             </div>
 

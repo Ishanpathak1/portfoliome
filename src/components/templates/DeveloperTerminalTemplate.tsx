@@ -122,7 +122,7 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
                 <div key={index} className="border-l-2 border-yellow-500 pl-4">
                   <div className="flex items-center space-x-2">
                     <span className="text-yellow-500">●</span>
-                    <span className="text-cyan-400 font-semibold">{exp.title}</span>
+                    <span className="text-cyan-400 font-semibold">{exp.position}</span>
                     <span className="text-gray-500">@</span>
                     <span className="text-blue-400">{exp.company}</span>
                   </div>
@@ -130,7 +130,7 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
                     📅 {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                   </div>
                   <div className="space-y-1">
-                    {exp.description.map((desc, descIndex) => (
+                    {exp.responsibilities.map((desc, descIndex) => (
                       <div key={descIndex} className="text-sm">
                         <span className="text-green-400">→</span> {desc}
                       </div>

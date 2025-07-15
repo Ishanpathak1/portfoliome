@@ -85,7 +85,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
 
   // Typing animation effect
   useEffect(() => {
-    const text = `${resumeData.experience[0]?.title || 'Executive Leader'}`;
+    const text = `${resumeData.experience[0]?.position || 'Executive Leader'}`;
     let index = 0;
     const timer = setInterval(() => {
       if (index <= text.length) {
@@ -375,7 +375,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                     {resumeData.contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{resumeData.contact.name}</h3>
-                  <p className="text-gray-600 font-medium">{resumeData.experience[0]?.title || 'Executive Leader'}</p>
+                  <p className="text-gray-600 font-medium">{resumeData.experience[0]?.position || 'Executive Leader'}</p>
                 </div>
 
                 <div className="space-y-4">
@@ -446,7 +446,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                     <div className="flex-1 bg-white rounded-3xl border border-gray-200 p-8 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 group">
                       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
                         <div>
-                          <h3 className="text-2xl font-bold text-gray-900 mb-2">{exp.title}</h3>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2">{exp.position}</h3>
                           <div className="flex items-center space-x-4 text-gray-600">
                             <div className="flex items-center">
                               <Building2 className="w-5 h-5 mr-2" style={{ color: colors.accent }} />
@@ -472,7 +472,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                       </div>
 
                       <div className="space-y-3">
-                        {exp.description.map((desc, descIndex) => (
+                        {(exp.responsibilities || []).map((desc: string, descIndex: number) => (
                           <div key={descIndex} className="flex items-start space-x-3">
                             <ChevronRight className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: colors.accent }} />
                             <p className="text-gray-700 leading-relaxed">{desc}</p>
@@ -542,7 +542,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                       <div className="space-y-3">
                         <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Key Technologies & Methodologies</h4>
                         <div className="flex flex-wrap gap-2">
-                          {project.technologies.map((tech, techIndex) => (
+                          {(project.technologies || []).map((tech, techIndex) => (
                             <span 
                               key={techIndex}
                               className="px-3 py-1 rounded-full text-xs font-medium border"

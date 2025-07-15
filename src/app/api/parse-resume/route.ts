@@ -4,6 +4,14 @@ import { parseResumeWithAI } from '@/lib/ai-resume-parser';
 
 export const dynamic = 'force-dynamic';
 
+// Import pdf-parse at the top level to avoid dynamic import issues during build
+let pdfParse: any = null;
+try {
+  pdfParse = require('pdf-parse');
+} catch (error) {
+  console.warn('pdf-parse not available:', error);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -22,10 +30,15 @@ export async function POST(request: NextRequest) {
     try {
       if (fileType === 'application/pdf' || fileName.endsWith('.pdf')) {
         // Handle PDF files
+        if (!pdfParse) {
+          return NextResponse.json({ 
+            error: 'PDF parsing is not available in this environment. Please upload a DOCX or TXT file instead.' 
+          }, { status: 400 });
+        }
+        
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-        const pdf = (await import('pdf-parse')).default;
-        const pdfData = await pdf(buffer);
+        const pdfData = await pdfParse(buffer);
         text = pdfData.text;
         console.log('PDF parsed successfully, text length:', text.length);
       } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fileName.endsWith('.docx')) {

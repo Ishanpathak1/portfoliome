@@ -16,6 +16,9 @@ export interface Experience {
   endDate: string;
   current: boolean;
   responsibilities: string[];
+  // Legacy fields for template compatibility
+  title?: string;
+  description?: string[];
 }
 
 export interface Education {
@@ -24,6 +27,9 @@ export interface Education {
   field: string;
   graduationDate: string;
   gpa?: string;
+  // Additional fields for template compatibility
+  location?: string;
+  honors?: string[];
 }
 
 export interface Project {
