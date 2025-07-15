@@ -6,6 +6,7 @@ import { AuthWrapper } from '@/components/FirebaseAuthWrapper';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { ResumeData, PersonalizationData, Experience, Education, Project, SkillCategory, Contact } from '@/types/resume';
 import { ToastContainer, useToast } from '@/components/Toast';
+import { SectionManager } from '@/components/SectionManager';
 import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
 import { 
   Settings, 
@@ -36,7 +37,8 @@ import {
   Linkedin,
   Globe,
   Building,
-  X
+  X,
+  Layers
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -357,6 +359,7 @@ function DashboardContent() {
     { id: 'overview', title: 'Overview', icon: BarChart3 },
     { id: 'design', title: 'Design & Theme', icon: Palette },
     { id: 'content', title: 'Content & Info', icon: User },
+    { id: 'custom', title: 'Custom Sections', icon: Layers },
     { id: 'settings', title: 'Settings', icon: Settings },
   ];
 
@@ -1212,6 +1215,116 @@ function DashboardContent() {
                         )}
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'custom' && editedResumeData && (
+              <div className="space-y-6">
+                {/* Custom Sections Header */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-white flex items-center space-x-3">
+                        <Layers className="w-6 h-6 text-purple-400" />
+                        <span>Custom Sections</span>
+                      </h2>
+                      <p className="text-gray-300 mt-1">Add and organize custom sections for your portfolio</p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={saveChanges}
+                        disabled={saving}
+                        className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                      >
+                        {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Quick Stats */}
+                  <div className="grid grid-cols-3 gap-4 mt-6">
+                    <div className="bg-white/5 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-white">
+                        {editedResumeData.customSections?.length || 0}
+                      </div>
+                      <div className="text-gray-300 text-sm">Custom Sections</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-white">
+                        {editedPersonalization?.sectionOrder?.length || 0}
+                      </div>
+                      <div className="text-gray-300 text-sm">Total Sections</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-white">
+                        {editedPersonalization?.hiddenSections?.length || 0}
+                      </div>
+                      <div className="text-gray-300 text-sm">Hidden Sections</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section Manager */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-white mb-6">Section Manager</h3>
+                  
+                  <SectionManager
+                    resumeData={editedResumeData}
+                    onUpdateResumeData={(data: ResumeData) => setEditedResumeData(data)}
+                    sectionOrder={editedPersonalization?.sectionOrder || []}
+                    hiddenSections={editedPersonalization?.hiddenSections || []}
+                    onSectionOrderChange={(order) => {
+                      if (editedPersonalization) {
+                        setEditedPersonalization({
+                          ...editedPersonalization,
+                          sectionOrder: order
+                        });
+                      }
+                    }}
+                    onHiddenSectionsChange={(hidden) => {
+                      if (editedPersonalization) {
+                        setEditedPersonalization({
+                          ...editedPersonalization,
+                          hiddenSections: hidden
+                        });
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Live Preview */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-white">Live Preview</h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      </div>
+                      <a
+                        href={`/${portfolio.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-1 text-gray-300 hover:text-white text-sm transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>Open in New Tab</span>
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden" style={{ height: '600px' }}>
+                    <iframe
+                      key={`custom-preview-${previewKey}`}
+                      src={`/${portfolio.slug}`}
+                      className="w-full h-full border-none"
+                      title="Portfolio Preview"
+                      style={{ colorScheme: 'normal' }}
+                    />
                   </div>
                 </div>
               </div>

@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Phone, Github, Linkedin, Calendar, Award, Code, Briefcase, Star, Zap, Heart, Target, Sparkles, Mouse, ExternalLink } from 'lucide-react';
+import { 
+  Mail, Phone, Github, Linkedin, Calendar, Award, Code, Briefcase, 
+  Star, Zap, Heart, Target, Sparkles, ExternalLink, ArrowRight, 
+  FileText, MapPin, GraduationCap, Building, Users, Trophy
+} from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
 
@@ -9,11 +13,21 @@ interface ModernGlassmorphismTemplateProps {
   portfolio: DatabasePortfolio;
 }
 
+interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  bg: string;
+  glass: string;
+  glow: string;
+}
+
 export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTemplateProps) {
   const { resumeData, personalization } = portfolio;
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
+  // Mouse tracking for interactive effects
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -23,12 +37,13 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
     return () => document.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const getThemeColors = (scheme: string) => {
-    const colors = {
+  // Theme color schemes
+  const getThemeColors = (scheme: string): ThemeColors => {
+    const themes: Record<string, ThemeColors> = {
       blue: {
         primary: 'from-blue-500 via-purple-500 to-indigo-600',
         secondary: 'from-blue-400 to-cyan-400',
-        accent: 'text-blue-500',
+        accent: 'text-blue-400',
         bg: 'bg-blue-50/50',
         glass: 'bg-blue-500/10 backdrop-blur-xl border-blue-200/20',
         glow: 'shadow-blue-500/25'
@@ -36,7 +51,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
       green: {
         primary: 'from-emerald-400 via-teal-500 to-green-600',
         secondary: 'from-green-400 to-emerald-400',
-        accent: 'text-emerald-500',
+        accent: 'text-emerald-400',
         bg: 'bg-emerald-50/50',
         glass: 'bg-emerald-500/10 backdrop-blur-xl border-emerald-200/20',
         glow: 'shadow-emerald-500/25'
@@ -44,341 +59,298 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
       purple: {
         primary: 'from-purple-500 via-pink-500 to-violet-600',
         secondary: 'from-purple-400 to-pink-400',
-        accent: 'text-purple-500',
+        accent: 'text-purple-400',
         bg: 'bg-purple-50/50',
         glass: 'bg-purple-500/10 backdrop-blur-xl border-purple-200/20',
         glow: 'shadow-purple-500/25'
       },
       orange: {
-        primary: 'from-orange-400 via-red-500 to-pink-500',
+        primary: 'from-orange-400 via-red-500 to-pink-600',
         secondary: 'from-orange-400 to-yellow-400',
-        accent: 'text-orange-500',
+        accent: 'text-orange-400',
         bg: 'bg-orange-50/50',
         glass: 'bg-orange-500/10 backdrop-blur-xl border-orange-200/20',
         glow: 'shadow-orange-500/25'
-      },
-      red: {
-        primary: 'from-red-500 via-pink-500 to-rose-600',
-        secondary: 'from-red-400 to-pink-400',
-        accent: 'text-red-500',
-        bg: 'bg-red-50/50',
-        glass: 'bg-red-500/10 backdrop-blur-xl border-red-200/20',
-        glow: 'shadow-red-500/25'
-      },
+      }
     };
-    return colors[scheme as keyof typeof colors] || colors.blue;
+    return themes[scheme] || themes.blue;
   };
 
-  const colors = getThemeColors(personalization.colorScheme);
+  const themeColors = getThemeColors(personalization?.colorScheme || 'blue');
+  const sectionOrder = personalization?.sectionOrder || [
+    'experience', 'skills', 'projects', 'education', 'certifications'
+  ];
+  const hiddenSections = personalization?.hiddenSections || [];
+  const customSections = resumeData?.customSections || [];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
+  // Header Section
+  const renderHeader = () => (
+    <header className="relative z-10 min-h-screen flex items-center justify-center p-8">
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 opacity-90" />
+      
+      {/* Animated background elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-to-r from-pink-400/20 to-red-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-gradient-to-r from-yellow-400/20 to-orange-600/20 rounded-full blur-2xl animate-bounce" style={{ animationDelay: '2s' }}></div>
+        <div className={`absolute top-20 left-20 w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-30 animate-pulse`} />
+        <div className={`absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r ${themeColors.secondary} rounded-full blur-3xl opacity-20 animate-pulse`} style={{ animationDelay: '1s' }} />
+        <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-25 animate-pulse`} style={{ animationDelay: '2s' }} />
       </div>
 
-      {/* Floating Cursor Follower */}
+      {/* Mouse follower */}
       <div 
-        className="fixed w-6 h-6 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-300 ease-out"
+        className={`fixed w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-10 pointer-events-none transition-all duration-300 ease-out z-0`}
         style={{
-          left: mousePosition.x - 12,
-          top: mousePosition.y - 12,
-          transform: isHovering ? 'scale(2)' : 'scale(1)',
+          left: mousePosition.x - 192,
+          top: mousePosition.y - 192,
+          transform: isHovering ? 'scale(1.5)' : 'scale(1)'
         }}
       />
 
-      {/* Portfolio Created Badge */}
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-full px-4 py-2 text-white text-sm">
-          <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4" />
-            <span>Portfolio created with AI</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-6">
-        <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left Side - Text Content */}
-          <div className="space-y-8 z-10">
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <div className={`w-16 h-16 bg-gradient-to-r ${colors.primary} rounded-2xl flex items-center justify-center shadow-2xl ${colors.glow}`}>
-                  <span className="text-2xl font-bold text-white">{resumeData.contact.name.charAt(0)}</span>
-                </div>
-                <div className="text-sm text-gray-400 space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span>Available for work</span>
-                  </div>
-                  <div>Portfolio • {new Date().getFullYear()}</div>
-                </div>
-              </div>
-
-              <h1 className="text-6xl lg:text-7xl font-black leading-tight">
-                <span className="text-white">Hi, I'm</span>
-                <br />
-                <span className={`bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent animate-pulse`}>
-                  {resumeData.contact.name.split(' ')[0]}
+      <div className="relative z-10 text-center max-w-4xl mx-auto">
+        {/* Name and Title */}
+        <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight">
+          <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+            {resumeData.contact?.name || 'Your Name'}
                 </span>
               </h1>
 
-              <p className="text-xl text-gray-300 leading-relaxed max-w-lg">
-                {resumeData.summary || 'Creative professional passionate about building exceptional digital experiences that make a difference.'}
+        <p className="text-xl md:text-2xl text-gray-300 mb-8 font-light">
+          Professional Portfolio
               </p>
 
-              <div className="flex flex-wrap gap-4">
-                {resumeData.contact.email && (
+        {/* Contact Info */}
+        <div className="flex flex-wrap justify-center gap-6 mb-12">
+          {resumeData.contact?.email && (
                   <a 
                     href={`mailto:${resumeData.contact.email}`}
-                    className={`group px-8 py-4 bg-gradient-to-r ${colors.primary} rounded-full text-white font-semibold hover:scale-105 transition-all duration-300 shadow-2xl ${colors.glow} hover:shadow-3xl`}
+              className={`flex items-center gap-2 ${themeColors.glass} px-6 py-3 rounded-full border transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-xl text-white hover:text-blue-300`}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <Mail className="w-5 h-5" />
+              <span>{resumeData.contact.email}</span>
+            </a>
+          )}
+          {resumeData.contact?.phone && (
+            <a 
+              href={`tel:${resumeData.contact.phone}`}
+              className={`flex items-center gap-2 ${themeColors.glass} px-6 py-3 rounded-full border transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-xl text-white hover:text-blue-300`}
                     onMouseEnter={() => setIsHovering(true)}
                     onMouseLeave={() => setIsHovering(false)}
                   >
-                    <span className="flex items-center space-x-2">
-                      <Sparkles className="w-5 h-5" />
-                      <span>Let's Talk</span>
-                    </span>
+              <Phone className="w-5 h-5" />
+              <span>{resumeData.contact.phone}</span>
                   </a>
                 )}
-                <button className="px-8 py-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white font-semibold hover:bg-white/20 transition-all duration-300">
-                  View Work
-                </button>
+          {resumeData.contact?.location && (
+            <div className={`flex items-center gap-2 ${themeColors.glass} px-6 py-3 rounded-full border text-white`}>
+              <MapPin className="w-5 h-5" />
+              <span>{resumeData.contact.location}</span>
+            </div>
+          )}
               </div>
 
               {/* Social Links */}
-              <div className="flex space-x-6 pt-8">
-                {resumeData.contact.linkedin && (
-                  <a href={resumeData.contact.linkedin} className="group">
-                    <div className="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all duration-300 group-hover:scale-110">
-                      <Linkedin className="w-5 h-5 text-white" />
-                    </div>
+        <div className="flex justify-center gap-4">
+          {resumeData.contact?.linkedin && (
+            <a 
+              href={resumeData.contact.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-4 ${themeColors.glass} rounded-full border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-xl text-white hover:text-blue-300`}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <Linkedin className="w-6 h-6" />
                   </a>
                 )}
-                {resumeData.contact.github && (
-                  <a href={resumeData.contact.github} className="group">
-                    <div className="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all duration-300 group-hover:scale-110">
-                      <Github className="w-5 h-5 text-white" />
-                    </div>
+          {resumeData.contact?.github && (
+            <a 
+              href={resumeData.contact.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-4 ${themeColors.glass} rounded-full border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-xl text-white hover:text-blue-300`}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <Github className="w-6 h-6" />
                   </a>
                 )}
-                {resumeData.contact.phone && (
-                  <div className="group">
-                    <div className="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all duration-300 group-hover:scale-110">
-                      <Phone className="w-5 h-5 text-white" />
+        </div>
+
+        {/* Summary */}
+        {resumeData.summary && (
+          <div className="mt-16 max-w-3xl mx-auto">
+            <div className={`${themeColors.glass} p-8 rounded-3xl border backdrop-blur-xl`}>
+              <p className="text-lg text-gray-200 leading-relaxed">
+                {resumeData.summary}
+              </p>
                     </div>
                   </div>
                 )}
               </div>
-            </div>
+    </header>
+  );
+
+  // Experience Section
+  const renderExperienceSection = () => {
+    if (!resumeData.experience?.length) return null;
+
+    return (
+      <section className="py-20 relative">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-4">
+              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+                Experience
+              </span>
+            </h2>
+            <div className={`w-24 h-1 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
           </div>
 
-          {/* Right Side - Visual Element */}
-          <div className="relative">
-            <div className="relative z-10">
-              {/* Floating Cards */}
-              <div className="space-y-6">
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 hover:bg-white/20 transition-all duration-500 hover:scale-105 group">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 bg-gradient-to-r ${colors.secondary} rounded-2xl flex items-center justify-center`}>
-                      <Code className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">Full Stack Developer</h3>
-                      <p className="text-gray-400 text-sm">Bringing ideas to life</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 hover:bg-white/20 transition-all duration-500 hover:scale-105 group ml-12">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 bg-gradient-to-r ${colors.primary} rounded-2xl flex items-center justify-center`}>
-                      <Zap className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">Innovation Focused</h3>
-                      <p className="text-gray-400 text-sm">Always pushing boundaries</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 hover:bg-white/20 transition-all duration-500 hover:scale-105 group">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 bg-gradient-to-r ${colors.secondary} rounded-2xl flex items-center justify-center`}>
-                      <Heart className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">User-Centered Design</h3>
-                      <p className="text-gray-400 text-sm">Creating meaningful experiences</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <div className="flex flex-col items-center space-y-2 text-white/60">
-            <Mouse className="w-6 h-6 animate-bounce" />
-            <span className="text-sm">Scroll to explore</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Experience Section */}
-      {resumeData.experience.length > 0 && (
-        <section className="py-32 px-6 relative">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl font-black text-white mb-6">
-                Professional
-                <span className={`block bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
-                  Journey
-                </span>
-              </h2>
-              <p className="text-xl text-gray-400">Building the future, one project at a time</p>
-            </div>
-
-            {/* Timeline */}
-            <div className="relative">
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
-              
-              <div className="space-y-24">
-                {resumeData.experience.map((exp, index) => (
-                  <div key={index} className={`relative flex items-center ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
-                    <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full shadow-2xl z-10 animate-pulse"></div>
-                    
-                    <div className={`w-full lg:w-5/12 ${index % 2 === 0 ? 'lg:mr-auto lg:pr-16' : 'lg:ml-auto lg:pl-16'}`}>
-                      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 hover:bg-white/20 transition-all duration-500 hover:scale-105 group">
-                        <div className="flex items-start justify-between mb-6">
-                          <div className={`p-4 bg-gradient-to-r ${colors.primary} rounded-2xl`}>
-                            <Briefcase className="w-8 h-8 text-white" />
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm text-gray-400">
-                              {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
-                            </div>
-                            {exp.current && (
-                              <div className="flex items-center justify-end space-x-1 mt-1">
-                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                <span className="text-green-400 text-sm">Current</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <h3 className="text-2xl font-bold text-white mb-2">{exp.position}</h3>
-                        <p className={`text-lg font-semibold ${colors.accent} mb-6`}>{exp.company}</p>
-                        
-                        <div className="space-y-3">
-                          {(exp.responsibilities || []).map((desc, i) => (
-                            <div key={i} className="flex items-start space-x-3">
-                              <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                              <p className="text-gray-300 leading-relaxed">{desc}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+            <div className="space-y-8">
+              {resumeData.experience.map((exp, index) => (
+                <div key={index} className={`${themeColors.glass} p-8 rounded-3xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] ${themeColors.glow} hover:shadow-2xl`}>
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-6">
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-white mb-2">{exp.position}</h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Building className={`w-5 h-5 ${themeColors.accent}`} />
+                        <span className="text-xl text-gray-300">{exp.company}</span>
                     </div>
+                      {exp.location && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className={`w-4 h-4 ${themeColors.accent}`} />
+                          <span className="text-gray-400">{exp.location}</span>
+                    </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-4 lg:mt-0">
+                      <Calendar className={`w-5 h-5 ${themeColors.accent}`} />
+                      <span className="text-gray-300 font-medium">
+                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                      </span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+                </div>
 
-      {/* Skills Section */}
-      {resumeData.skills.length > 0 && (
-        <section className="py-32 px-6 relative">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl font-black text-white mb-6">
-                Skills &
-                <span className={`block bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
-                  Expertise
-                </span>
-              </h2>
-              <p className="text-xl text-gray-400">Technologies I love working with</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {resumeData.skills.map((skillGroup, index) => (
-                <div key={index} className="group">
-                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 hover:bg-white/20 transition-all duration-500 hover:scale-105">
-                    <div className="flex items-center mb-6">
-                      <div className={`p-4 bg-gradient-to-r ${colors.primary} rounded-2xl mr-4 group-hover:scale-110 transition-transform duration-300`}>
-                        <Code className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white">{skillGroup.category}</h3>
-                    </div>
-                    
+                  {exp.responsibilities && (
                     <div className="space-y-3">
-                      {(skillGroup.items || []).map((skill, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-300 group/skill">
-                          <span className="text-gray-300 font-medium">{skill}</span>
-                          <div className="flex space-x-1">
-                            {[...Array(5)].map((_, starIndex) => (
-                              <Star 
-                                key={starIndex} 
-                                className={`w-4 h-4 ${starIndex < 4 ? 'text-yellow-400 fill-current' : 'text-gray-600'} group-hover/skill:text-yellow-400 group-hover/skill:fill-current transition-colors duration-300`}
-                                style={{ transitionDelay: `${starIndex * 50}ms` }}
-                              />
-                            ))}
-                          </div>
-                        </div>
+                      {exp.responsibilities.map((item, i) => (
+                        <div key={i} className="flex items-start gap-3">
+                          <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${themeColors.primary} mt-2 flex-shrink-0`} />
+                          <p className="text-gray-300 leading-relaxed">{item}</p>
+                    </div>
                       ))}
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+    );
+  };
 
-      {/* Projects Section */}
-      {resumeData.projects.length > 0 && (
-        <section className="py-32 px-6 relative">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl font-black text-white mb-6">
-                Featured
-                <span className={`block bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
+  // Skills Section
+  const renderSkillsSection = () => {
+    if (!resumeData.skills?.length) return null;
+
+    return (
+      <section className="py-20 relative">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-4">
+              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+                Skills
+                </span>
+              </h2>
+            <div className={`w-24 h-1 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
+            </div>
+
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {resumeData.skills.map((skillCategory, index) => (
+                <div 
+                  key={index} 
+                  className={`${themeColors.glass} p-6 rounded-2xl border backdrop-blur-xl transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-xl group`}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-3 rounded-full bg-gradient-to-r ${themeColors.primary}`}>
+                      <Code className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors">
+                      {skillCategory.category}
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {skillCategory.items.map((item, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${themeColors.primary} flex-shrink-0`} />
+                        <span className="text-gray-300">{item}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            </div>
+          </div>
+        </section>
+    );
+  };
+
+  // Projects Section
+  const renderProjectsSection = () => {
+    if (!resumeData.projects?.length) return null;
+
+    return (
+      <section className="py-20 relative">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-4">
+              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
                   Projects
                 </span>
               </h2>
-              <p className="text-xl text-gray-400">Bringing ideas to life through code</p>
+            <div className={`w-24 h-1 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-8">
               {resumeData.projects.map((project, index) => (
-                <div key={index} className="group relative">
-                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden hover:bg-white/20 transition-all duration-500 hover:scale-105">
-                    <div className={`h-2 bg-gradient-to-r ${colors.primary}`}></div>
-                    
-                    <div className="p-8">
+                <div 
+                  key={index} 
+                  className={`${themeColors.glass} p-8 rounded-3xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] ${themeColors.glow} hover:shadow-2xl group`}
+                >
                       <div className="flex items-start justify-between mb-6">
-                        <div className={`p-4 bg-gradient-to-r ${colors.secondary} rounded-2xl`}>
-                          <Target className="w-8 h-8 text-white" />
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-300 transition-colors">
+                        {project.name}
+                      </h3>
+                      {project.technologies && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {project.technologies.map((tech, i) => (
+                            <span 
+                              key={i} 
+                              className={`px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r ${themeColors.secondary} text-white`}
+                            >
+                              {tech}
+                            </span>
+                          ))}
                         </div>
-                        {/* Enhanced Project Links */}
-                        <div className="flex flex-col space-y-3">
+                      )}
+                    </div>
+                    <div className="flex gap-2 ml-4">
                           {project.link && (
                             <a 
                               href={project.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={`inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r ${colors.primary} text-white rounded-full font-semibold hover:scale-105 transition-all duration-300 shadow-xl ${colors.glow}`}
+                          className={`p-2 ${themeColors.glass} rounded-full border transition-all duration-300 hover:scale-110 text-white hover:text-blue-300`}
                             >
                               <ExternalLink className="w-5 h-5" />
-                              <span>View Live</span>
                             </a>
                           )}
                           {project.github && (
@@ -386,112 +358,254 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                               href={project.github}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center space-x-2 px-6 py-3 bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-full font-semibold hover:bg-white/30 hover:scale-105 transition-all duration-300 shadow-lg"
+                          className={`p-2 ${themeColors.glass} rounded-full border transition-all duration-300 hover:scale-110 text-white hover:text-blue-300`}
                             >
                               <Github className="w-5 h-5" />
-                              <span>View Code</span>
                             </a>
                           )}
                         </div>
                       </div>
                       
-                      <h3 className="text-3xl font-bold text-white mb-4">{project.name}</h3>
-                      <p className="text-gray-300 mb-8 leading-relaxed text-lg">{project.description}</p>
-                      
-                      <div className="flex flex-wrap gap-3">
-                        {(project.technologies || []).map((tech, i) => (
-                          <span 
-                            key={i}
-                            className="px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-sm font-medium hover:bg-white/20 transition-all duration-300"
-                          >
-                            {tech}
+                  {project.description && (
+                    <p className="text-gray-300 leading-relaxed mb-4">
+                      {project.description}
+                    </p>
+                  )}
+                  
+                  {(project.startDate || project.endDate) && (
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Calendar className="w-4 h-4" />
+                      <span>
+                        {project.startDate} {project.endDate && `- ${project.endDate}`}
                           </span>
-                        ))}
-                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
+            </div>
           </div>
         </section>
-      )}
+    );
+  };
 
-      {/* Education Section */}
-      {resumeData.education.length > 0 && (
-        <section className="py-32 px-6 relative">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl font-black text-white mb-6">
-                Education &
-                <span className={`block bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
-                  Learning
+  // Education Section
+  const renderEducationSection = () => {
+    if (!resumeData.education?.length) return null;
+
+    return (
+      <section className="py-20 relative">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-4">
+              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+                Education
                 </span>
               </h2>
-              <p className="text-xl text-gray-400">Building knowledge, expanding horizons</p>
+            <div className={`w-24 h-1 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
             </div>
 
-            <div className="space-y-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-6">
               {resumeData.education.map((edu, index) => (
-                <div key={index} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 hover:bg-white/20 transition-all duration-500 hover:scale-105 group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className={`p-4 bg-gradient-to-r ${colors.primary} rounded-2xl mr-6 group-hover:scale-110 transition-transform duration-300`}>
-                        <Award className="w-8 h-8 text-white" />
+                <div 
+                  key={index} 
+                  className={`${themeColors.glass} p-8 rounded-3xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] ${themeColors.glow} hover:shadow-xl`}
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <GraduationCap className={`w-6 h-6 ${themeColors.accent}`} />
+                        <h3 className="text-2xl font-bold text-white">{edu.degree}</h3>
                       </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white mb-2">{edu.degree}</h3>
-                        <p className={`text-lg font-semibold ${colors.accent} mb-1`}>{edu.institution}</p>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          Graduated {formatDate(edu.graduationDate)}
+                      <p className="text-xl text-gray-300 mb-2">{edu.institution}</p>
+                      {edu.location && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className={`w-4 h-4 ${themeColors.accent}`} />
+                          <span className="text-gray-400">{edu.location}</span>
                         </div>
-                      </div>
+                      )}
                     </div>
-                    {edu.gpa && (
-                      <div className="bg-white/10 backdrop-blur-xl border border-white/20 px-6 py-3 rounded-2xl">
-                        <p className="text-white font-semibold">GPA: {edu.gpa}</p>
+                    <div className="mt-4 lg:mt-0">
+                      {edu.graduationDate && (
+                        <div className="flex items-center gap-2">
+                          <Calendar className={`w-5 h-5 ${themeColors.accent}`} />
+                          <span className="text-gray-300 font-medium">
+                            {formatDate(edu.graduationDate)}
+                          </span>
                       </div>
                     )}
+                      {edu.gpa && (
+                        <p className="text-gray-300 mt-2">GPA: {edu.gpa}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            </div>
+          </div>
+        </section>
+    );
+  };
+
+  // Achievements Section - Skip since not in ResumeData type
+  const renderAchievementsSection = () => {
+    return null;
+  };
+
+  // Certifications Section
+  const renderCertificationsSection = () => {
+    if (!resumeData.certifications?.length) return null;
+
+    return (
+      <section className="py-20 relative">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-4">
+              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+                Certifications
+              </span>
+            </h2>
+            <div className={`w-24 h-1 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6">
+              {resumeData.certifications.map((cert, index) => (
+                <div 
+                  key={index} 
+                  className={`${themeColors.glass} p-6 rounded-2xl border backdrop-blur-xl transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-xl`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-full bg-gradient-to-r ${themeColors.primary} flex-shrink-0`}>
+                      <Award className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white">{cert}</h3>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+    );
+  };
 
-      {/* Contact Section */}
-      <section className="py-32 px-6 relative">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-16 hover:bg-white/20 transition-all duration-500">
-            <h2 className="text-5xl font-black text-white mb-8">
-              Let's Create
-              <span className={`block bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
-                Something Amazing
-              </span>
-            </h2>
-            <p className="text-xl text-gray-300 mb-12 leading-relaxed">
-              Ready to bring your ideas to life? Let's start a conversation and build something incredible together.
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-6">
-              {resumeData.contact.email && (
-                <a 
-                  href={`mailto:${resumeData.contact.email}`}
-                  className={`group px-12 py-6 bg-gradient-to-r ${colors.primary} rounded-full text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-2xl ${colors.glow} hover:shadow-3xl`}
-                >
-                  <span className="flex items-center space-x-3">
-                    <Mail className="w-6 h-6" />
-                    <span>Start a Project</span>
-                    <Sparkles className="w-5 h-5 group-hover:animate-spin" />
+  // Custom Section Renderer
+  const renderCustomSection = (section: any) => {
+    return (
+      <section className="py-20 relative">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-4">
+              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+                {section.title}
                   </span>
-                </a>
+            </h2>
+            <div className={`w-24 h-1 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className={`${themeColors.glass} p-8 rounded-3xl border backdrop-blur-xl`}>
+              {section.type === 'text' && (
+                <p className="text-gray-300 leading-relaxed text-lg">
+                  {section.content}
+                </p>
+              )}
+              
+              {section.type === 'list' && (
+                <ul className="space-y-3">
+                  {section.items?.map((item: string, index: number) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${themeColors.primary} mt-2 flex-shrink-0`} />
+                      <span className="text-gray-300">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              
+              {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
+                <div className="space-y-6">
+                  {section.items?.map((item: any, index: number) => (
+                    <div key={index} className="border-l-4 border-gradient-to-b from-blue-400 to-purple-500 pl-6">
+                      <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+                      {item.description && (
+                        <p className="text-gray-300 mb-2">{item.description}</p>
+                      )}
+                      {item.date && (
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(item.date)}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
         </div>
       </section>
+    );
+  };
+
+  // Dynamic Section Renderer
+  const renderSection = (sectionId: string) => {
+    // Skip hidden sections
+    if (hiddenSections.includes(sectionId)) {
+      return null;
+    }
+
+    // Render standard sections
+    switch (sectionId) {
+      case 'experience':
+        return renderExperienceSection();
+      case 'skills':
+        return renderSkillsSection();
+      case 'projects':
+        return renderProjectsSection();
+      case 'education':
+        return renderEducationSection();
+      case 'certifications':
+        return renderCertificationsSection();
+      default:
+        // Check if it's a custom section
+        const customSection = customSections.find((section: any) => section.id === sectionId);
+        if (customSection) {
+          return renderCustomSection(customSection);
+        }
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
+      {/* Render Header */}
+      {renderHeader()}
+      
+      {/* Render Sections in Order */}
+      {sectionOrder.map((sectionId) => (
+        <div key={sectionId}>
+          {renderSection(sectionId)}
+        </div>
+      ))}
+      
+      {/* Footer */}
+      <footer className="py-12 relative">
+        <div className="container mx-auto px-8 text-center">
+          <div className={`${themeColors.glass} p-8 rounded-3xl border backdrop-blur-xl max-w-2xl mx-auto`}>
+            <p className="text-gray-300 text-lg">
+              Thank you for viewing my portfolio!
+            </p>
+            <p className="text-gray-400 mt-2">
+              Built with passion and modern web technologies
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 

@@ -1,26 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, Palette, Layout, Eye, Plus } from 'lucide-react';
+import { ArrowLeft, Palette, Layout, Eye, Plus, Settings, Stethoscope } from 'lucide-react';
 import { ResumeData, PersonalizationData } from '@/types/resume';
 import { TemplateSelector } from './TemplateSelector';
+import { SectionManager } from './SectionManager';
+import { HealthcareForm } from './HealthcareForm';
 import { TemplateId } from '@/types/templates';
 
 interface PersonalizationFormProps {
   resumeData: ResumeData;
   personalization: PersonalizationData;
   onPersonalizationChange: (data: PersonalizationData) => void;
+  onResumeDataChange: (data: ResumeData) => void;
   onPreviewClick: () => void;
 }
 
-export function PersonalizationForm({ resumeData, personalization, onPersonalizationChange, onPreviewClick }: PersonalizationFormProps) {
+export function PersonalizationForm({ resumeData, personalization, onPersonalizationChange, onResumeDataChange, onPreviewClick }: PersonalizationFormProps) {
   const [formData, setFormData] = useState<PersonalizationData>(personalization);
+  const [activeTab, setActiveTab] = useState<'template' | 'sections' | 'healthcare' | 'styling'>('template');
 
   const updateFormData = (updates: Partial<PersonalizationData>) => {
     const newData = { ...formData, ...updates };
     setFormData(newData);
     onPersonalizationChange(newData);
   };
+
+  const isHealthcareProfessional = resumeData.profession === 'healthcare';
 
 
 
@@ -53,8 +59,15 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
     onPersonalizationChange(formData);
   };
 
+  const tabs = [
+    { id: 'template', name: 'Template', icon: Palette },
+    { id: 'sections', name: 'Sections', icon: Settings },
+    ...(isHealthcareProfessional ? [{ id: 'healthcare', name: 'Healthcare Info', icon: Stethoscope }] : []),
+    { id: 'styling', name: 'Styling', icon: Layout },
+  ];
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -62,7 +75,7 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
             Personalize Your Portfolio
           </h1>
           <p className="text-lg text-gray-300">
-            Customize the look and feel of your portfolio to match your personal brand.
+            Customize the look, sections, and features of your portfolio.
           </p>
         </div>
         
@@ -73,6 +86,27 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
           <Eye className="w-5 h-5" />
           <span>Preview Portfolio</span>
         </button>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="flex flex-wrap gap-3 mb-8">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span>{tab.name}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Preview Card */}
@@ -98,15 +132,43 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
         </div>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Template Selection */}
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
-          <TemplateSelector
-            selectedTemplate={formData.templateId as TemplateId}
-            onTemplateChange={(templateId) => updateFormData({ templateId })}
+      {/* Tab Content */}
+      <div className="space-y-8">
+        {/* Template Selection Tab */}
+        {activeTab === 'template' && (
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+            <TemplateSelector
+              selectedTemplate={formData.templateId as TemplateId}
+              onTemplateChange={(templateId) => updateFormData({ templateId })}
+            />
+          </div>
+        )}
+
+        {/* Section Management Tab */}
+        {activeTab === 'sections' && (
+          <SectionManager
+            resumeData={resumeData}
+            onUpdateResumeData={onResumeDataChange}
+            sectionOrder={formData.sectionOrder}
+            hiddenSections={formData.hiddenSections}
+            onSectionOrderChange={(order) => updateFormData({ sectionOrder: order })}
+            onHiddenSectionsChange={(hidden) => updateFormData({ hiddenSections: hidden })}
           />
-        </div>
+        )}
+
+        {/* Healthcare Information Tab */}
+        {activeTab === 'healthcare' && isHealthcareProfessional && (
+          <HealthcareForm
+            healthcareData={resumeData.healthcare || {}}
+            onHealthcareDataChange={(healthcare) => 
+              onResumeDataChange({ ...resumeData, healthcare })
+            }
+          />
+        )}
+
+        {/* Styling Tab */}
+        {activeTab === 'styling' && (
+          <form onSubmit={handleSubmit} className="space-y-8">
 
 
 
@@ -232,13 +294,25 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end">
-          <button type="submit" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-full font-semibold hover:scale-105 transition-all duration-300 shadow-lg">
-            Generate Portfolio
-          </button>
-        </div>
-      </form>
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button type="submit" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-full font-semibold hover:scale-105 transition-all duration-300 shadow-lg">
+                Update Styling
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Final Generate Button */}
+      <div className="flex justify-center mt-12">
+        <button 
+          onClick={onPreviewClick}
+          className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-12 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 shadow-xl"
+        >
+          Generate Portfolio
+        </button>
+      </div>
     </div>
   );
 } 

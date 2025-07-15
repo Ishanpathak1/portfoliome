@@ -28,8 +28,14 @@ export default function HomePage() {
   // Check if user has existing portfolio and redirect to dashboard
   useEffect(() => {
     if (user) {
-      setCheckingExistingPortfolio(true);
-      checkExistingPortfolio();
+      // Developer bypass for testing new user experience
+      const isDeveloper = user.email === 'ishan.pathak2711@gmail.com';
+      const bypassPortfolioCheck = isDeveloper && new URLSearchParams(window.location.search).has('test-new-user');
+      
+      if (!bypassPortfolioCheck) {
+        setCheckingExistingPortfolio(true);
+        checkExistingPortfolio();
+      }
     }
   }, [user]);
 
@@ -44,9 +50,15 @@ export default function HomePage() {
       if (response.ok) {
         const data = await response.json();
         if (data.portfolio) {
-          // User has existing portfolio, redirect to dashboard
-          router.push('/dashboard');
-          return;
+          // Developer bypass for testing new user experience
+          const isDeveloper = user?.email === 'ishan.pathak2711@gmail.com';
+          const bypassPortfolioCheck = isDeveloper && new URLSearchParams(window.location.search).has('test-new-user');
+          
+          if (!bypassPortfolioCheck) {
+            // User has existing portfolio, redirect to dashboard
+            router.push('/dashboard');
+            return;
+          }
         }
       }
       // If no portfolio or error, continue with normal flow
@@ -461,6 +473,7 @@ export default function HomePage() {
               resumeData={resumeData}
               personalization={personalization}
               onPersonalizationChange={handlePersonalizationChange}
+              onResumeDataChange={setResumeData}
               onPreviewClick={handlePreviewClick}
             />
           )}

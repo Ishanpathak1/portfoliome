@@ -45,7 +45,18 @@ export async function PUT(request: NextRequest) {
 
     // Get current portfolio with timeout
     console.log('🔍 Fetching current portfolio...');
-    const currentPortfolio = await getUserPortfolio(userId);
+    
+    // Get user email from token for developer multi-portfolio support
+    const token = authHeader?.substring(7);
+    let userEmail: string | undefined;
+    try {
+      const payload = JSON.parse(Buffer.from(token!.split('.')[1], 'base64').toString());
+      userEmail = payload.email;
+    } catch (error) {
+      console.error('Failed to extract email from token:', error);
+    }
+    
+    const currentPortfolio = await getUserPortfolio(userId, userEmail);
     if (!currentPortfolio) {
       console.log('❌ Portfolio not found');
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });

@@ -32,7 +32,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const portfolio = await getUserPortfolio(userId);
+    // Get user email from token for developer bypass
+    const token = authHeader?.substring(7);
+    let userEmail: string | undefined;
+    try {
+      const payload = JSON.parse(Buffer.from(token!.split('.')[1], 'base64').toString());
+      userEmail = payload.email;
+    } catch (error) {
+      console.error('Failed to extract email from token:', error);
+    }
+
+    // Check if this is a test-new-user request
+    const { searchParams } = new URL(request.url);
+    const testNewUser = searchParams.has('test-new-user');
+
+    const portfolio = await getUserPortfolio(userId, userEmail, testNewUser);
 
     if (!portfolio) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
