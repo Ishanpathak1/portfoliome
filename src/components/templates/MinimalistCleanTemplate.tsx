@@ -184,7 +184,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
 
       <div className="flex min-h-screen">
         {/* Sidebar Navigation */}
-        <aside className={`w-80 fixed h-full transition-all duration-300 z-40 ${
+        <aside className={`w-80 fixed h-full transition-all duration-300 z-40 overflow-y-auto ${
           isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         } border-r flex flex-col ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'

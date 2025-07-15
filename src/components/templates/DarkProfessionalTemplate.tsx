@@ -44,7 +44,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
 
       <div className="flex">
         {/* Sidebar */}
-        <div className={`w-80 bg-gray-800 min-h-screen p-4 lg:p-8 border-r border-gray-700 fixed lg:static h-full z-40 transition-transform duration-300 ${
+        <div className={`w-80 bg-gray-800 min-h-screen p-4 lg:p-8 border-r border-gray-700 fixed lg:static h-full z-40 transition-transform duration-300 overflow-y-auto ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}>
           {/* Profile Section */}
