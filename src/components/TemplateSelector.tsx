@@ -112,6 +112,83 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange }: Templat
                       </div>
                     </div>
                   )}
+                  
+                  {template.id === 'corporate-executive' && (
+                    <div className="h-full bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg p-4 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded mx-auto mb-2"></div>
+                        <div className="h-2 bg-slate-400 rounded mb-1 w-20 mx-auto"></div>
+                        <div className="h-1 bg-slate-500 rounded w-16 mx-auto mb-1"></div>
+                        <div className="flex justify-center space-x-1">
+                          <div className="h-1 w-3 bg-blue-500 rounded"></div>
+                          <div className="h-1 w-3 bg-indigo-500 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {template.id === 'full-stack-developer' && (
+                    <div className="h-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-lg p-4 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded mx-auto mb-2"></div>
+                        <div className="grid grid-cols-3 gap-1 mb-2">
+                          <div className="h-1 bg-cyan-400 rounded"></div>
+                          <div className="h-1 bg-blue-400 rounded"></div>
+                          <div className="h-1 bg-green-400 rounded"></div>
+                        </div>
+                        <div className="h-1 bg-slate-400 rounded w-16 mx-auto"></div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {template.id === 'tech-innovator' && (
+                    <div className="h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-lg p-4 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                        <div className="h-2 bg-purple-300 rounded mb-1 w-18 mx-auto"></div>
+                        <div className="flex justify-center space-x-1">
+                          <div className="h-3 w-1 bg-gradient-to-t from-purple-600 to-purple-400 rounded"></div>
+                          <div className="h-4 w-1 bg-gradient-to-t from-blue-600 to-blue-400 rounded"></div>
+                          <div className="h-2 w-1 bg-gradient-to-t from-pink-600 to-pink-400 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {template.id === 'open-source-contributor' && (
+                    <div className="h-full bg-gradient-to-br from-gray-800 to-green-900 rounded-lg p-4 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded mx-auto mb-2 flex items-center justify-center">
+                          <div className="text-white text-xs font-bold">♢</div>
+                        </div>
+                        <div className="h-2 bg-green-300 rounded mb-1 w-16 mx-auto"></div>
+                        <div className="grid grid-cols-4 gap-1">
+                          <div className="h-1 bg-green-500 rounded"></div>
+                          <div className="h-1 bg-emerald-500 rounded"></div>
+                          <div className="h-1 bg-green-400 rounded"></div>
+                          <div className="h-1 bg-emerald-400 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {template.id === 'creative-portfolio' && (
+                    <div className="h-full bg-gradient-to-br from-pink-500 via-orange-500 to-yellow-500 rounded-lg p-4 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-white to-yellow-100 rounded-full mx-auto mb-2 flex items-center justify-center">
+                          <div className="w-3 h-3 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full"></div>
+                        </div>
+                        <div className="h-2 bg-white/80 rounded mb-1 w-20 mx-auto"></div>
+                        <div className="flex justify-center space-x-1">
+                          <div className="w-2 h-2 bg-white/70 rounded-full"></div>
+                          <div className="w-2 h-2 bg-yellow-200 rounded-full"></div>
+                          <div className="w-2 h-2 bg-pink-200 rounded-full"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Category Badge */}

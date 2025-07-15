@@ -47,6 +47,46 @@ export const AVAILABLE_TEMPLATES: TemplateConfig[] = [
     preview: '/templates/developer-terminal.jpg',
     category: 'developer',
     features: ['Terminal Theme', 'Code Style', 'Monospace Font', 'Syntax Highlighting', 'Command Line']
+  },
+  {
+    id: 'corporate-executive',
+    name: 'Corporate Executive',
+    description: 'Executive-level professional design with sophisticated layout and business focus',
+    preview: '/templates/corporate-executive.jpg',
+    category: 'professional',
+    features: ['Executive Design', 'Business Focus', 'Sophisticated Layout', 'Professional Colors', 'Leadership Focus']
+  },
+  {
+    id: 'full-stack-developer',
+    name: 'Full-Stack Developer',
+    description: 'Comprehensive developer portfolio showcasing both frontend and backend skills',
+    preview: '/templates/full-stack-developer.jpg',
+    category: 'developer',
+    features: ['Tech Stack Display', 'Project Showcase', 'Skills Matrix', 'Code Snippets', 'API Documentation']
+  },
+  {
+    id: 'tech-innovator',
+    name: 'Tech Innovator',
+    description: 'Modern tech-focused design for innovation leaders and technology professionals',
+    preview: '/templates/tech-innovator.jpg',
+    category: 'modern',
+    features: ['Innovation Focus', 'Tech Leadership', 'Achievement Metrics', 'Modern Design', 'Interactive Elements']
+  },
+  {
+    id: 'open-source-contributor',
+    name: 'Open Source Contributor',
+    description: 'Community-focused design highlighting open source contributions and collaboration',
+    preview: '/templates/open-source-contributor.jpg',
+    category: 'developer',
+    features: ['GitHub Integration', 'Contribution Timeline', 'Community Focus', 'Project Gallery', 'Collaboration Metrics']
+  },
+  {
+    id: 'creative-portfolio',
+    name: 'Creative Portfolio',
+    description: 'Artistic and visually stunning design for creatives, designers, and visual artists',
+    preview: '/templates/creative-portfolio.jpg',
+    category: 'creative',
+    features: ['Visual Storytelling', 'Gallery Layout', 'Custom Cursor', 'Parallax Effects', 'Artistic Design']
   }
 ];
 

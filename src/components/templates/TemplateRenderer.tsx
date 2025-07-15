@@ -36,9 +36,9 @@ export function TemplateRenderer({ portfolio }: TemplateRendererProps) {
       return <CreativePortfolioTemplate portfolio={portfolio} />;
     case 'tech-innovator':
       return <TechInnovatorTemplate portfolio={portfolio} />;
-    case 'fullstack-developer':
+    case 'full-stack-developer':
       return <FullStackDevTemplate portfolio={portfolio} />;
-    case 'opensource-contributor':
+    case 'open-source-contributor':
       return <OpenSourceContributorTemplate portfolio={portfolio} />;
     default:
       // Fallback to modern glassmorphism template
