@@ -111,7 +111,7 @@ function DashboardContent() {
     try {
       // Create a timeout promise to handle long requests
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timed out')), 15000); // 15 second timeout
+        setTimeout(() => reject(new Error('Request timed out')), 12000); // 12 second timeout
       });
 
       const fetchPromise = fetch('/api/update-portfolio', {

@@ -121,26 +121,16 @@ export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfoli
 
     if (!portfolio) return null;
 
-    // ⚡ Make analytics non-blocking - run in background after returning data
-    setImmediate(async () => {
-      try {
-        // Increment view count and track analytics in parallel
-        await Promise.all([
-          prisma.portfolio.update({
-            where: { id: portfolio.id },
-            data: { views: { increment: 1 } },
-          }),
-          prisma.portfolioView.create({
-            data: {
-              portfolioId: portfolio.id,
-            },
-          })
-        ]);
-      } catch (error) {
-        console.error('Background analytics failed:', error);
-        // Don't throw - this shouldn't break the page load
-      }
-    });
+    // ⚡ Simplified analytics - only increment view count, no background operations
+    try {
+      await prisma.portfolio.update({
+        where: { id: portfolio.id },
+        data: { views: { increment: 1 } },
+      });
+    } catch (error) {
+      console.error('View count increment failed:', error);
+      // Don't throw - this shouldn't break the page load
+    }
 
     return transformPortfolio(portfolio);
   } catch (error) {
@@ -150,12 +140,26 @@ export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfoli
 }
 
 export async function getUserPortfolio(userId: string): Promise<DatabasePortfolio | null> {
-  const portfolio = await prisma.portfolio.findUnique({
-    where: { userId },
-  });
+  try {
+    // Add timeout protection to the database query
+    const portfolioPromise = prisma.portfolio.findUnique({
+      where: { userId },
+    });
 
-  if (!portfolio) return null;
-  return transformPortfolio(portfolio);
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Database query timed out')), 5000); // 5 second timeout
+    });
+
+    // Race between the database query and timeout
+    const portfolio = await Promise.race([portfolioPromise, timeoutPromise]) as any;
+
+    if (!portfolio) return null;
+    return transformPortfolio(portfolio);
+  } catch (error) {
+    console.error('Error fetching user portfolio:', error);
+    return null;
+  }
 }
 
 export async function deleteUserPortfolio(userId: string): Promise<boolean> {
