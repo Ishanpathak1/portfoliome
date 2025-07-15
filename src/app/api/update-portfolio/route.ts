@@ -55,9 +55,27 @@ export async function PUT(request: NextRequest) {
 
     // Update slug if provided and different
     if (slug && slug !== currentPortfolio.slug) {
-      // Check if new slug is available
+      // Validate slug format
+      const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+      if (!slugRegex.test(slug)) {
+        return NextResponse.json({ 
+          error: 'Slug must contain only lowercase letters, numbers, and hyphens',
+          field: 'slug'
+        }, { status: 400 });
+      }
+
+      // Check if slug is too short or too long
+      if (slug.length < 3 || slug.length > 50) {
+        return NextResponse.json({ 
+          error: 'Slug must be between 3 and 50 characters',
+          field: 'slug'
+        }, { status: 400 });
+      }
+
+      // Double-check if new slug is available (race condition protection)
       const existingPortfolio = await prisma.portfolio.findUnique({
-        where: { slug }
+        where: { slug },
+        select: { id: true, userId: true }
       });
 
       if (existingPortfolio && existingPortfolio.userId !== userId) {
@@ -70,11 +88,31 @@ export async function PUT(request: NextRequest) {
       updateData.slug = slug;
     }
 
-    // Update portfolio
-    const updatedPortfolio = await prisma.portfolio.update({
-      where: { userId },
-      data: updateData
-    });
+    // Update portfolio with proper error handling
+    let updatedPortfolio;
+    try {
+      updatedPortfolio = await prisma.portfolio.update({
+        where: { userId },
+        data: updateData
+      });
+    } catch (dbError: any) {
+      // Handle database constraint violations
+      if (dbError.code === 'P2002') {
+        // Unique constraint violation (slug already exists)
+        return NextResponse.json({ 
+          error: 'Slug is already taken. Please try a different one.',
+          field: 'slug'
+        }, { status: 400 });
+      }
+      
+      // Log the error for debugging
+      console.error('Database error during portfolio update:', dbError);
+      
+      return NextResponse.json({ 
+        error: 'Database error occurred while updating portfolio',
+        details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
+      }, { status: 500 });
+    }
 
     // Transform and return updated portfolio
     const transformedPortfolio = {

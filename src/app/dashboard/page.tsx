@@ -89,7 +89,11 @@ function DashboardContent() {
 
     setCheckingSlug(true);
     try {
-      const response = await fetch(`/api/check-slug?slug=${encodeURIComponent(slug)}`);
+      const response = await fetch(`/api/check-slug?slug=${encodeURIComponent(slug)}`, {
+        headers: {
+          'Authorization': `Bearer ${await user?.getIdToken()}`
+        }
+      });
       const data = await response.json();
       setSlugAvailable(data.available);
     } catch (error) {
@@ -105,7 +109,12 @@ function DashboardContent() {
 
     setSaving(true);
     try {
-      const response = await fetch('/api/update-portfolio', {
+      // Create a timeout promise to handle long requests
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), 15000); // 15 second timeout
+      });
+
+      const fetchPromise = fetch('/api/update-portfolio', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -118,6 +127,8 @@ function DashboardContent() {
         })
       });
 
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
+
       if (response.ok) {
         const data = await response.json();
         setPortfolio(data.portfolio);
@@ -127,11 +138,20 @@ function DashboardContent() {
         showSuccess('Portfolio updated successfully!');
       } else {
         const error = await response.json();
-        showError(`Error: ${error.message}`);
+        if (error.field === 'slug') {
+          showError(`URL Error: ${error.error}`);
+          setSlugAvailable(false);
+        } else {
+          showError(`Error: ${error.error || error.message}`);
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving changes:', error);
-      showError('Failed to save changes. Please try again.');
+      if (error.message === 'Request timed out') {
+        showError('Save operation timed out. Please check your internet connection and try again.');
+      } else {
+        showError('Failed to save changes. Please try again.');
+      }
     } finally {
       setSaving(false);
     }
@@ -503,7 +523,7 @@ function DashboardContent() {
                           </div>
                         </div>
                         {checkingSlug && <RefreshCw className="w-5 h-5 text-gray-400 animate-spin" />}
-                        {slugAvailable === true && <Check className="w-5 h-5 text-green-400" />}
+                        {slugAvailable === true && editedSlug !== portfolio.slug && <Check className="w-5 h-5 text-green-400" />}
                         {slugAvailable === false && <span className="text-red-400 text-sm">Taken</span>}
                       </div>
                       {slugAvailable === false && (

@@ -3,6 +3,23 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+// Simple token verification for development
+async function getUserIdFromToken(authHeader: string | null): Promise<string | null> {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.substring(7);
+  
+  try {
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    return payload.user_id || payload.sub || payload.uid;
+  } catch (error) {
+    console.error('Token parsing failed:', error);
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -29,18 +46,34 @@ export async function GET(request: NextRequest) {
       }, { status: 200 });
     }
 
+    // Get user ID from token for authenticated requests
+    const authHeader = request.headers.get('Authorization');
+    const userId = await getUserIdFromToken(authHeader);
+
     // Check if slug exists in database
     const existingPortfolio = await prisma.portfolio.findUnique({
       where: { slug },
-      select: { id: true }
+      select: { id: true, userId: true }
     });
 
-    const available = !existingPortfolio;
+    let available = true;
+    let message = 'Slug is available';
+
+    if (existingPortfolio) {
+      // If the existing portfolio belongs to the current user, it's available for them
+      if (userId && existingPortfolio.userId === userId) {
+        available = true;
+        message = 'This is your current slug';
+      } else {
+        available = false;
+        message = 'Slug is already taken';
+      }
+    }
 
     return NextResponse.json({ 
       available,
       slug,
-      message: available ? 'Slug is available' : 'Slug is already taken'
+      message
     });
 
   } catch (error) {
