@@ -549,8 +549,8 @@ function DashboardContent() {
                       { id: 'corporate-executive', name: 'Corporate Executive', desc: 'Premium executive portfolio' },
                       { id: 'creative-portfolio', name: 'Creative Portfolio', desc: 'Visual-first creative showcase' },
                       { id: 'tech-innovator', name: 'Tech Innovator', desc: 'Futuristic developer showcase' },
-                      { id: 'fullstack-developer', name: 'Full Stack Developer', desc: 'Modern web development focus' },
-                      { id: 'opensource-contributor', name: 'Open Source Contributor', desc: 'GitHub-focused community profile' },
+                      { id: 'full-stack-developer', name: 'Full Stack Developer', desc: 'Modern web development focus' },
+                                              { id: 'open-source-contributor', name: 'Open Source Contributor', desc: 'GitHub-focused community profile' },
                     ].map((template) => (
                       <button
                         key={template.id}

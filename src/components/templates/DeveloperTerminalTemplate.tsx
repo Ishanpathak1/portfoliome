@@ -1,371 +1,436 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Terminal, Code, User, Briefcase, GraduationCap, Award, 
+  FolderOpen, Github, Mail, Phone, MapPin, Calendar, ExternalLink,
+  ChevronRight, Cpu, Zap, Database, Globe, Coffee, Star
+} from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
+import { formatDate } from '@/lib/utils';
 
 interface DeveloperTerminalTemplateProps {
   portfolio: DatabasePortfolio;
 }
 
+interface TerminalColors {
+  background: string;
+  surface: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  success: string;
+  warning: string;
+  error: string;
+  text: string;
+  textSecondary: string;
+}
+
 export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTemplateProps) {
-  const { resumeData } = portfolio;
-  const [isDark, setIsDark] = useState(true);
+  const { resumeData, personalization } = portfolio;
   const [commandHistory, setCommandHistory] = useState<Array<{ command: string; output: React.ReactNode }>>([]);
   const [currentCommand, setCurrentCommand] = useState('');
+  const [currentPath, setCurrentPath] = useState('~/portfolio');
+  const [isTyping, setIsTyping] = useState(false);
+  const [bootSequence, setBootSequence] = useState<string[]>([]);
+  const [showTerminal, setShowTerminal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const userName = resumeData.contact.name.toLowerCase().replace(/\s+/g, '');
+  // Get dynamic section order and hidden sections
+  const sectionOrder = personalization?.sectionOrder || [
+    'experience', 'skills', 'projects', 'education', 'certifications'
+  ];
+  const hiddenSections = personalization?.hiddenSections || [];
+  const customSections = resumeData?.customSections || [];
 
-  useEffect(() => {
-    // Auto-show welcome and help
-    setCommandHistory([
-      {
-        command: 'welcome',
-        output: (
-          <div className="text-green-400 space-y-2">
-            <div className="text-cyan-400 text-sm lg:text-lg font-bold hidden sm:block">
-              ╔══════════════════════════════════════════════════════════════╗
-            </div>
-            <div className="text-cyan-400 text-sm lg:text-lg font-bold hidden sm:block">
-              ║                    PORTFOLIO TERMINAL v2.1                  ║
-            </div>
-            <div className="text-cyan-400 text-sm lg:text-lg font-bold hidden sm:block">
-              ║                  Welcome, {resumeData.contact.name}!                   ║
-            </div>
-            <div className="text-cyan-400 text-sm lg:text-lg font-bold hidden sm:block">
-              ╚══════════════════════════════════════════════════════════════╝
-            </div>
-            <div className="text-cyan-400 text-lg font-bold sm:hidden">
-              🖥️ PORTFOLIO TERMINAL v2.1
-            </div>
-            <div className="text-cyan-400 font-bold sm:hidden">
-              Welcome, {resumeData.contact.name}!
-            </div>
-            <div className="mt-4">
-              <div>System: Portfolio OS v2.1.0</div>
-              <div>Shell: /bin/portfolio-bash</div>
-            </div>
-          </div>
-        )
+  const userName = resumeData.contact?.name?.toLowerCase().replace(/\s+/g, '.') || 'developer';
+
+  // Terminal color schemes
+  const getTerminalColors = (scheme: string): TerminalColors => {
+    const palettes: Record<string, TerminalColors> = {
+      blue: {
+        background: '#001122',
+        surface: '#0A1A2E',
+        primary: '#00D4FF',
+        secondary: '#4A90E2',
+        accent: '#87CEEB',
+        success: '#00FF88',
+        warning: '#FFD700',
+        error: '#FF6B6B',
+        text: '#E0E0E0',
+        textSecondary: '#B0B0B0'
       },
-      {
-        command: 'help',
-        output: (
-          <div className="text-green-400 space-y-2">
-            <div className="text-cyan-400 font-semibold">Available Commands:</div>
-            <div className="ml-4 space-y-1">
-              <div><span className="text-blue-400">about</span> - Display professional summary</div>
-              <div><span className="text-blue-400">skills</span> - List technical skills</div>
-              <div><span className="text-blue-400">experience</span> - Show work experience</div>
-              <div><span className="text-blue-400">projects</span> - Browse projects</div>
-              <div><span className="text-blue-400">education</span> - Display educational background</div>
-              <div><span className="text-blue-400">contact</span> - Show contact information</div>
-              <div><span className="text-blue-400">clear</span> - Clear terminal screen</div>
-            </div>
-          </div>
-        )
+      green: {
+        background: '#001100',
+        surface: '#0A1A0A',
+        primary: '#00FF00',
+        secondary: '#32CD32',
+        accent: '#90EE90',
+        success: '#00FF88',
+        warning: '#FFD700',
+        error: '#FF6B6B',
+        text: '#E0FFE0',
+        textSecondary: '#B0FFB0'
+      },
+      purple: {
+        background: '#1A001A',
+        surface: '#2A0A2A',
+        primary: '#FF00FF',
+        secondary: '#DA70D6',
+        accent: '#DDA0DD',
+        success: '#00FF88',
+        warning: '#FFD700',
+        error: '#FF6B6B',
+        text: '#FFE0FF',
+        textSecondary: '#FFB0FF'
+      },
+      orange: {
+        background: '#2A1A00',
+        surface: '#3A2A10',
+        primary: '#FF8C00',
+        secondary: '#FFA500',
+        accent: '#FFD700',
+        success: '#00FF88',
+        warning: '#FFD700',
+        error: '#FF6B6B',
+        text: '#FFF0E0',
+        textSecondary: '#FFD0B0'
       }
-    ]);
-  }, []);
+    };
+    return palettes[scheme] || palettes.blue;
+  };
 
-  // Focus input when component mounts
+  const colors = getTerminalColors(personalization?.colorScheme || 'blue');
+
+  // Boot sequence
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    const bootMessages = [
+      'Initializing portfolio system...',
+      'Loading user data...',
+      'Mounting file system...',
+      'Starting network services...',
+      'Loading shell environment...',
+      'System ready.'
+    ];
+
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < bootMessages.length) {
+        setBootSequence(prev => [...prev, bootMessages[index]]);
+        index++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => setShowTerminal(true), 1000);
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const executeCommand = (cmd: string) => {
-    const command = cmd.toLowerCase().trim();
-    let output: React.ReactNode;
+  // Initial welcome command
+  useEffect(() => {
+    if (showTerminal) {
+      setTimeout(() => {
+        runCommand('welcome');
+      }, 500);
+    }
+  }, [showTerminal]);
 
-    switch (command) {
-      case 'about':
-        output = (
-          <div className="text-green-400">
-            <div className="text-cyan-400 font-semibold">$ cat about.md</div>
-            <div className="ml-4 p-4 border-l-2 border-green-500">
-              {resumeData.summary || "Professional developer passionate about creating innovative solutions."}
+  // Available commands
+  const commands = {
+    help: () => (
+      <div className="space-y-2">
+        <div style={{ color: colors.accent }}>Available commands:</div>
+        <div className="ml-4 space-y-1">
+          <div><span style={{ color: colors.primary }}>help</span> - Show this help message</div>
+          <div><span style={{ color: colors.primary }}>about</span> - Display personal information</div>
+          <div><span style={{ color: colors.primary }}>ls</span> - List directory contents</div>
+          <div><span style={{ color: colors.primary }}>cat [file]</span> - Display file contents</div>
+          <div><span style={{ color: colors.primary }}>cd [directory]</span> - Change directory</div>
+          <div><span style={{ color: colors.primary }}>clear</span> - Clear terminal</div>
+          <div><span style={{ color: colors.primary }}>tree</span> - Show directory structure</div>
+          <div><span style={{ color: colors.primary }}>contact</span> - Show contact information</div>
+        </div>
+      </div>
+    ),
+
+    welcome: () => (
+      <div className="space-y-4">
+        <div className="text-center">
+          <div style={{ color: colors.primary, fontSize: '24px' }}>
+            ╔══════════════════════════════════════════════════════════════╗
+          </div>
+          <div style={{ color: colors.primary, fontSize: '24px' }}>
+            ║                    DEVELOPER PORTFOLIO v3.0                 ║
+          </div>
+          <div style={{ color: colors.primary, fontSize: '24px' }}>
+            ║                  Welcome, {resumeData.contact?.name || 'Developer'}!                   ║
+          </div>
+          <div style={{ color: colors.primary, fontSize: '24px' }}>
+            ╚══════════════════════════════════════════════════════════════╝
+          </div>
+        </div>
+        <div className="mt-4 space-y-2">
+          <div>System: Portfolio OS v3.0.0</div>
+          <div>Shell: /bin/portfolio-bash</div>
+          <div>Current user: {userName}</div>
+          <div>Last login: {new Date().toLocaleString()}</div>
+          <div className="mt-4" style={{ color: colors.accent }}>
+            Type 'help' for available commands or 'ls' to explore directories.
+          </div>
+        </div>
+      </div>
+    ),
+
+    about: () => (
+      <div className="space-y-4">
+        <div style={{ color: colors.accent }}>Personal Information:</div>
+        <div className="ml-4 space-y-2">
+          <div><span style={{ color: colors.primary }}>Name:</span> {resumeData.contact?.name || 'Developer'}</div>
+          <div><span style={{ color: colors.primary }}>Email:</span> {resumeData.contact?.email || 'N/A'}</div>
+          <div><span style={{ color: colors.primary }}>Phone:</span> {resumeData.contact?.phone || 'N/A'}</div>
+          <div><span style={{ color: colors.primary }}>Location:</span> {resumeData.contact?.location || 'N/A'}</div>
+          {resumeData.summary && (
+            <div><span style={{ color: colors.primary }}>Summary:</span> {resumeData.summary}</div>
+          )}
+        </div>
+      </div>
+    ),
+
+    ls: () => {
+      const directories = [];
+      
+      if (!hiddenSections.includes('experience') && resumeData.experience?.length) {
+        directories.push({ name: 'experience/', type: 'directory', color: colors.accent });
+      }
+      if (!hiddenSections.includes('skills') && resumeData.skills?.length) {
+        directories.push({ name: 'skills/', type: 'directory', color: colors.accent });
+      }
+      if (!hiddenSections.includes('projects') && resumeData.projects?.length) {
+        directories.push({ name: 'projects/', type: 'directory', color: colors.accent });
+      }
+      if (!hiddenSections.includes('education') && resumeData.education?.length) {
+        directories.push({ name: 'education/', type: 'directory', color: colors.accent });
+      }
+      if (!hiddenSections.includes('certifications') && resumeData.certifications?.length) {
+        directories.push({ name: 'certifications/', type: 'directory', color: colors.accent });
+      }
+      
+      // Add custom sections
+      customSections.forEach(section => {
+        if (!hiddenSections.includes(section.id)) {
+          directories.push({ name: `${section.id}/`, type: 'directory', color: colors.accent });
+        }
+      });
+
+      directories.push({ name: 'README.md', type: 'file', color: colors.text });
+      directories.push({ name: 'contact.txt', type: 'file', color: colors.text });
+
+      return (
+        <div className="space-y-1">
+          {directories.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <span style={{ color: item.color }}>{item.name}</span>
             </div>
-          </div>
-        );
-        break;
+          ))}
+        </div>
+      );
+    },
 
-      case 'skills':
-        output = (
-          <div className="text-green-400">
-            <div className="text-cyan-400 font-semibold">$ ls -la skills/</div>
-            <div className="ml-4">
-              {resumeData.skills.map((skillGroup, index) => (
-                <div key={index} className="mb-3">
-                  <div className="text-blue-400 font-semibold">📁 {skillGroup.category}/</div>
-                  <div className="ml-6">
-                    {skillGroup.items.map((skill, skillIndex) => (
-                      <div key={skillIndex} className="py-0.5">
-                        <span className="text-gray-500">-rwxr-xr-x</span> {skill}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+    tree: () => {
+      const generateTree = () => {
+        const tree = ['portfolio/'];
+        
+        if (!hiddenSections.includes('experience') && resumeData.experience?.length) {
+          tree.push('├── experience/');
+          resumeData.experience.forEach((exp, index) => {
+            const isLast = index === resumeData.experience.length - 1;
+            tree.push(`│   ${isLast ? '└──' : '├──'} ${exp.company.toLowerCase().replace(/\s+/g, '-')}.md`);
+          });
+        }
+        
+        if (!hiddenSections.includes('skills') && resumeData.skills?.length) {
+          tree.push('├── skills/');
+          resumeData.skills.forEach((skill, index) => {
+            const isLast = index === resumeData.skills.length - 1;
+            tree.push(`│   ${isLast ? '└──' : '├──'} ${skill.category.toLowerCase().replace(/\s+/g, '-')}.json`);
+          });
+        }
+        
+        if (!hiddenSections.includes('projects') && resumeData.projects?.length) {
+          tree.push('├── projects/');
+          resumeData.projects.forEach((project, index) => {
+            const isLast = index === resumeData.projects.length - 1;
+            tree.push(`│   ${isLast ? '└──' : '├──'} ${project.name.toLowerCase().replace(/\s+/g, '-')}/`);
+          });
+        }
+        
+        tree.push('├── README.md');
+        tree.push('└── contact.txt');
+        
+        return tree;
+      };
+
+      return (
+        <div className="font-mono">
+          {generateTree().map((line, index) => (
+            <div key={index} style={{ color: colors.textSecondary }}>
+              {line}
             </div>
-          </div>
-        );
-        break;
+          ))}
+        </div>
+      );
+    },
 
-      case 'experience':
-        output = (
-          <div className="text-green-400">
-            <div className="text-cyan-400 font-semibold">$ git log --oneline --work</div>
-            <div className="ml-4 space-y-4">
-              {resumeData.experience.map((exp, index) => (
-                <div key={index} className="border-l-2 border-yellow-500 pl-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-yellow-500">●</span>
-                    <span className="text-cyan-400 font-semibold">{exp.position}</span>
-                    <span className="text-gray-500">@</span>
-                    <span className="text-blue-400">{exp.company}</span>
-                  </div>
-                  <div className="text-gray-400 text-sm">
-                    📅 {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
-                  </div>
-                  <div className="space-y-1">
-                    {exp.responsibilities.map((desc, descIndex) => (
-                      <div key={descIndex} className="text-sm">
-                        <span className="text-green-400">→</span> {desc}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+    contact: () => (
+      <div className="space-y-4">
+        <div style={{ color: colors.accent }}>Contact Information:</div>
+        <div className="ml-4 space-y-2">
+          {resumeData.contact?.email && (
+            <div className="flex items-center space-x-2">
+              <Mail className="w-4 h-4" style={{ color: colors.primary }} />
+              <span>{resumeData.contact.email}</span>
             </div>
-          </div>
-        );
-        break;
-
-      case 'projects':
-        output = (
-          <div className="text-green-400">
-            <div className="text-cyan-400 font-semibold">$ find ./projects -name "*.md"</div>
-            <div className="ml-4 space-y-4">
-              {resumeData.projects.map((project, index) => (
-                <div key={index} className="border border-gray-600 rounded p-3">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-blue-400">📂</span>
-                    <span className="text-cyan-400 font-semibold">{project.name}</span>
-                    {(project.link || project.github) && (
-                      <div className="flex space-x-3 ml-auto">
-                        {project.link && (
-                          <a 
-                            href={project.link} 
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center space-x-1 px-3 py-1 bg-green-600 text-black rounded text-xs font-mono font-bold hover:bg-green-500 transition-colors"
-                          >
-                            <span>🚀</span>
-                            <span>LIVE</span>
-                          </a>
-                        )}
-                        {project.github && (
-                          <a 
-                            href={project.github} 
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center space-x-1 px-3 py-1 bg-gray-600 text-white rounded text-xs font-mono font-bold hover:bg-gray-500 transition-colors"
-                          >
-                            <span>💻</span>
-                            <span>CODE</span>
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-sm mb-2">{project.description}</div>
-                  <div className="flex flex-wrap gap-1">
-                    <span className="text-gray-500">Tech:</span>
-                    {project.technologies.map((tech, techIndex) => (
-                      <span key={techIndex} className="text-xs bg-gray-700 px-2 py-1 rounded">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
+          )}
+          {resumeData.contact?.phone && (
+            <div className="flex items-center space-x-2">
+              <Phone className="w-4 h-4" style={{ color: colors.primary }} />
+              <span>{resumeData.contact.phone}</span>
             </div>
-          </div>
-        );
-        break;
-
-      case 'education':
-        output = (
-          <div className="text-green-400">
-            <div className="text-cyan-400 font-semibold">$ cat education.json</div>
-            <div className="ml-4 space-y-4">
-              {resumeData.education.map((edu, index) => (
-                <div key={index} className="border border-gray-600 rounded p-4">
-                  <div className="text-cyan-400 font-semibold text-lg">{edu.degree}</div>
-                  <div className="text-blue-400 mt-1">{edu.institution}</div>
-                  <div className="text-gray-400 text-sm mt-1">
-                    📅 Graduated: {edu.graduationDate}
-                  </div>
-                  {edu.gpa && (
-                    <div className="text-gray-400 text-sm">
-                      🎯 GPA: {edu.gpa}
-                    </div>
-                  )}
-                  {edu.honors && edu.honors.length > 0 && (
-                    <div className="text-yellow-400 text-sm mt-2">
-                      🏆 Honors: {edu.honors.join(', ')}
-                    </div>
-                  )}
-                </div>
-              ))}
+          )}
+          {resumeData.contact?.location && (
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4" style={{ color: colors.primary }} />
+              <span>{resumeData.contact.location}</span>
             </div>
-          </div>
-        );
-        break;
-
-      case 'contact':
-        output = (
-          <div className="text-green-400">
-            <div className="text-cyan-400 font-semibold">$ curl -X GET /api/contact</div>
-            <div className="ml-4 bg-gray-800 rounded p-4">
-              <div>name: {resumeData.contact.name}</div>
-              <div>email: <a href={`mailto:${resumeData.contact.email}`} className="text-blue-400 hover:underline">{resumeData.contact.email}</a></div>
-              <div>phone: {resumeData.contact.phone}</div>
-              {resumeData.contact.linkedin && (
-                <div>linkedin: <a href={resumeData.contact.linkedin} className="text-blue-400 hover:underline">{resumeData.contact.linkedin}</a></div>
-              )}
-              {resumeData.contact.github && (
-                <div>github: <a href={resumeData.contact.github} className="text-blue-400 hover:underline">{resumeData.contact.github}</a></div>
-              )}
+          )}
+          {resumeData.contact?.github && (
+            <div className="flex items-center space-x-2">
+              <Github className="w-4 h-4" style={{ color: colors.primary }} />
+              <span>{resumeData.contact.github}</span>
             </div>
-          </div>
-        );
-        break;
+          )}
+        </div>
+      </div>
+    ),
 
-      case 'clear':
-        setCommandHistory([]);
-        return;
+    clear: () => {
+      setCommandHistory([]);
+      return null;
+    }
+  };
 
-      case 'help':
-        output = (
-          <div className="text-green-400 space-y-2">
-            <div className="text-cyan-400 font-semibold">Available Commands:</div>
-            <div className="ml-4 space-y-1">
-              <div><span className="text-blue-400">about</span> - Display professional summary</div>
-              <div><span className="text-blue-400">skills</span> - List technical skills</div>
-              <div><span className="text-blue-400">experience</span> - Show work experience</div>
-              <div><span className="text-blue-400">projects</span> - Browse projects</div>
-              <div><span className="text-blue-400">education</span> - Display educational background</div>
-              <div><span className="text-blue-400">contact</span> - Show contact information</div>
-              <div><span className="text-blue-400">clear</span> - Clear terminal screen</div>
-            </div>
-          </div>
-        );
-        break;
-
-      default:
-        output = (
-          <div className="text-red-400">
-            bash: {command}: command not found
-            <div className="mt-1 text-gray-500">Type 'help' to see available commands</div>
-          </div>
-        );
+  const runCommand = (cmd: string) => {
+    const trimmedCmd = cmd.trim().toLowerCase();
+    
+    if (trimmedCmd === 'clear') {
+      setCommandHistory([]);
+      return;
     }
 
-    setCommandHistory(prev => [...prev, { command, output }]);
+    const output = commands[trimmedCmd as keyof typeof commands] 
+      ? commands[trimmedCmd as keyof typeof commands]()
+      : (
+        <div>
+          <span style={{ color: colors.error }}>bash: {cmd}: command not found</span>
+          <div className="mt-2">Type 'help' for available commands.</div>
+        </div>
+      );
+
+    setCommandHistory(prev => [...prev, { command: cmd, output }]);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       if (currentCommand.trim()) {
-        executeCommand(currentCommand);
+        runCommand(currentCommand);
+        setCurrentCommand('');
       }
-      setCurrentCommand('');
     }
   };
 
-  const handleCommandClick = (cmd: string) => {
-    setCurrentCommand(cmd);
-    executeCommand(cmd);
-    setCurrentCommand('');
-    // Refocus input after command execution
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 100);
+  const handleTerminalClick = () => {
+    inputRef.current?.focus();
   };
 
-  return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-100'} font-mono text-xs lg:text-sm`}>
-      <div className="container mx-auto p-2 lg:p-4">
-        <div className={`${isDark ? 'bg-black' : 'bg-white'} rounded-lg shadow-2xl border-2 ${isDark ? 'border-gray-700' : 'border-gray-300'}`}>
-          
-          {/* Terminal Header */}
-          <div className={`flex items-center justify-between px-3 lg:px-4 py-2 lg:py-3 ${isDark ? 'bg-gray-800' : 'bg-gray-200'} rounded-t-lg border-b ${isDark ? 'border-gray-700' : 'border-gray-300'}`}>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 lg:w-3 lg:h-3 bg-red-500 rounded-full"></div>
-              <div className="w-2 h-2 lg:w-3 lg:h-3 bg-yellow-500 rounded-full"></div>
-              <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
-            </div>
-            <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} hidden sm:block`}>
-              terminal — portfolio@{userName}
-            </div>
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className={`text-xs px-2 py-1 rounded ${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
-            >
-              {isDark ? '☀️' : '🌙'}
-            </button>
+  if (!showTerminal) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-mono" style={{ backgroundColor: colors.background, color: colors.text }}>
+        <div className="text-center space-y-4">
+          <div className="text-2xl font-bold mb-8" style={{ color: colors.primary }}>
+            Portfolio System Boot
           </div>
+          <div className="space-y-2">
+            {bootSequence.map((message, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <span style={{ color: colors.success }}>[OK]</span>
+                <span>{message}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* Terminal Content */}
-          <div className="p-3 lg:p-6 space-y-3 lg:space-y-4 min-h-[400px] lg:min-h-[600px] max-h-[80vh] overflow-y-auto" onClick={() => inputRef.current?.focus()}>
-            
-            {/* Command History */}
+  return (
+    <div 
+      className="min-h-screen p-4 font-mono text-sm lg:text-base cursor-text"
+      style={{ backgroundColor: colors.background, color: colors.text }}
+      onClick={handleTerminalClick}
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Terminal Header */}
+        <div className="flex items-center justify-between mb-4 p-3 rounded-t-lg border-b" style={{ backgroundColor: colors.surface, borderColor: colors.primary }}>
+          <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <Terminal className="w-4 h-4 ml-4" style={{ color: colors.primary }} />
+            <span className="font-semibold">portfolio-terminal</span>
+          </div>
+          <div className="text-sm" style={{ color: colors.textSecondary }}>
+            {userName}@portfolio-os
+          </div>
+        </div>
+
+        {/* Terminal Content */}
+        <div className="bg-opacity-90 rounded-b-lg p-4 min-h-[calc(100vh-8rem)]" style={{ backgroundColor: colors.surface }}>
+          {/* Command History */}
+          <div className="space-y-4 mb-4">
             {commandHistory.map((entry, index) => (
               <div key={index} className="space-y-2">
-                <div className="text-blue-400 flex items-center space-x-2">
-                  <span className="text-gray-500">{userName}@portfolio:~$</span>
+                <div className="flex items-center space-x-2">
+                  <span style={{ color: colors.success }}>{userName}@portfolio-os</span>
+                  <span style={{ color: colors.textSecondary }}>:</span>
+                  <span style={{ color: colors.primary }}>{currentPath}</span>
+                  <span style={{ color: colors.textSecondary }}>$</span>
                   <span>{entry.command}</span>
                 </div>
                 <div className="ml-4">{entry.output}</div>
               </div>
             ))}
+          </div>
 
-            {/* Current Command Line with Input */}
-            <div className="text-blue-400 flex items-center space-x-2">
-              <span className="text-gray-500">{userName}@portfolio:~$</span>
-              <input
-                ref={inputRef}
-                type="text"
-                value={currentCommand}
-                onChange={(e) => setCurrentCommand(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="bg-transparent border-none outline-none text-green-400 flex-1"
-                placeholder=""
-                autoFocus
-              />
-            </div>
-
-            {/* Quick Commands */}
-            <div className="mt-4 lg:mt-6 p-3 lg:p-4 bg-gray-800/20 rounded border border-gray-600">
-              <div className="text-cyan-400 text-xs lg:text-sm mb-2 lg:mb-3">Quick Commands:</div>
-              <div className="flex flex-wrap gap-1 lg:gap-2">
-                {['about', 'skills', 'experience', 'projects', 'education', 'contact', 'clear'].map((cmd) => (
-                  <button
-                    key={cmd}
-                    onClick={() => handleCommandClick(cmd)}
-                    className="px-2 lg:px-3 py-1 lg:py-2 text-xs lg:text-sm bg-gray-700 text-white rounded border border-gray-600 hover:border-blue-400 hover:bg-blue-400/20 transition-colors"
-                  >
-                    {cmd}
-                  </button>
-                ))}
-              </div>
-            </div>
-
+          {/* Current Command Input */}
+          <div className="flex items-center space-x-2">
+            <span style={{ color: colors.success }}>{userName}@portfolio-os</span>
+            <span style={{ color: colors.textSecondary }}>:</span>
+            <span style={{ color: colors.primary }}>{currentPath}</span>
+            <span style={{ color: colors.textSecondary }}>$</span>
+            <input
+              ref={inputRef}
+              type="text"
+              value={currentCommand}
+              onChange={(e) => setCurrentCommand(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="flex-1 bg-transparent outline-none border-none"
+              style={{ color: colors.text }}
+              autoFocus
+            />
+            <div className="w-2 h-5 animate-pulse" style={{ backgroundColor: colors.primary }}></div>
           </div>
         </div>
       </div>

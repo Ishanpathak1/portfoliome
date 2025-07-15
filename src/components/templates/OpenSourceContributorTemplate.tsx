@@ -3,23 +3,49 @@
 import { useState, useEffect } from 'react';
 import { 
   Github, GitBranch, GitCommit, Star, Users, Award, 
-  ExternalLink, MessageSquare, Heart, Zap, Folder
+  ExternalLink, MessageSquare, Heart, Zap, Folder,
+  Code2, Calendar, MapPin, Mail, Phone, Linkedin,
+  Briefcase, GraduationCap, Activity, TrendingUp,
+  Terminal, Bug, GitPullRequest, Shield, Eye
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
+import { formatDate } from '@/lib/utils';
 
 interface OpenSourceContributorTemplateProps {
   portfolio: DatabasePortfolio;
+}
+
+interface GitHubColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  success: string;
+  warning: string;
+  error: string;
+  background: string;
+  surface: string;
+  border: string;
+  text: string;
+  textSecondary: string;
 }
 
 export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContributorTemplateProps) {
   const { resumeData, personalization } = portfolio;
   const [contributionHeatmap, setContributionHeatmap] = useState<number[][]>([]);
   const [totalContributions, setTotalContributions] = useState(0);
-  
+  const [commitActivity, setCommitActivity] = useState<number[]>([]);
+  const [activeRepos, setActiveRepos] = useState<string[]>([]);
+
+  // Get dynamic section order and hidden sections
+  const sectionOrder = personalization?.sectionOrder || [
+    'experience', 'skills', 'projects', 'education', 'certifications'
+  ];
+  const hiddenSections = personalization?.hiddenSections || [];
+  const customSections = resumeData?.customSections || [];
 
   // GitHub color schemes
-  const getGitHubColors = (scheme: string) => {
-    const palettes = {
+  const getGitHubColors = (scheme: string): GitHubColors => {
+    const palettes: Record<string, GitHubColors> = {
       blue: {
         primary: '#0969DA',
         secondary: '#218BFF',
@@ -48,562 +74,612 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
       },
       green: {
         primary: '#2EA043',
-        secondary: '#1F883D',
+        secondary: '#3FB950',
         accent: '#56D364',
-        success: '#1A7F37',
-        warning: '#9A6700',
-        error: '#DA3633',
-        background: '#0A1A0A',
-        surface: '#162016',
-        border: '#2D3A2D',
-        text: '#F0FDF4',
-        textSecondary: '#86EFAC'
+        success: '#238636',
+        warning: '#D29922',
+        error: '#F85149',
+        background: '#0A0E0A',
+        surface: '#15201B',
+        border: '#1B2E20',
+        text: '#F0F6FC',
+        textSecondary: '#7D8590'
       },
       orange: {
-        primary: '#FD8C00',
-        secondary: '#FB8500',
-        accent: '#FFB366',
-        success: '#059669',
-        warning: '#D97706',
-        error: '#DC2626',
-        background: '#1A0F00',
-        surface: '#2D1A00',
-        border: '#4D2F00',
-        text: '#FFF7ED',
-        textSecondary: '#FDBA74'
-      },
-      red: {
-        primary: '#DA3633',
-        secondary: '#F85149',
-        accent: '#FF7B72',
-        success: '#1A7F37',
-        warning: '#D97706',
+        primary: '#FB8500',
+        secondary: '#FFB627',
+        accent: '#FFC947',
+        success: '#39D353',
+        warning: '#E36209',
         error: '#DA3633',
-        background: '#1A0000',
-        surface: '#2D0A0A',
-        border: '#4D1515',
-        text: '#FEF2F2',
-        textSecondary: '#FCA5A5'
+        background: '#1A0F00',
+        surface: '#261A00',
+        border: '#3D2914',
+        text: '#F0F6FC',
+        textSecondary: '#7D8590'
       }
     };
-    return palettes[scheme as keyof typeof palettes] || palettes.blue;
+    return palettes[scheme] || palettes.blue;
   };
 
-  const colors = getGitHubColors(personalization.colorScheme);
-
-  // Real metrics based on resume data
-  const metrics = [
-    { 
-      label: 'Public Repos', 
-      value: resumeData.projects?.filter(p => p.github).length || 0,
-      icon: Folder
-    },
-    { 
-      label: 'Total Projects', 
-      value: resumeData.projects?.length || 0,
-      icon: GitCommit
-    },
-    { 
-      label: 'Technologies', 
-      value: resumeData.skills?.reduce((acc, skill) => acc + skill.items.length, 0) || 0,
-      icon: Star
-    },
-    { 
-      label: 'Experience', 
-      value: resumeData.experience?.length ? 
-        Math.max(...resumeData.experience.map(exp => {
-          const start = new Date(exp.startDate);
-          const end = exp.endDate === 'Present' ? new Date() : new Date(exp.endDate);
-          return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 365));
-        })) : 0,
-      icon: Users
-    }
-  ];
+  const colors = getGitHubColors(personalization?.colorScheme || 'blue');
 
   // Generate contribution heatmap
   useEffect(() => {
-    const weeks = 52;
-    const daysPerWeek = 7;
-    const heatmap = [];
-    
-    for (let week = 0; week < weeks; week++) {
-      const weekData = [];
-      for (let day = 0; day < daysPerWeek; day++) {
-        const isWeekend = day === 0 || day === 6;
-        const baseActivity = isWeekend ? 0.3 : 0.8;
-        const randomFactor = Math.random();
-        const contributions = Math.floor(baseActivity * randomFactor * 4);
-        weekData.push(contributions);
+    const generateHeatmap = () => {
+      const weeks = 52;
+      const days = 7;
+      const heatmap = [];
+      
+      for (let week = 0; week < weeks; week++) {
+        const weekData = [];
+        for (let day = 0; day < days; day++) {
+          weekData.push(Math.floor(Math.random() * 5));
+        }
+        heatmap.push(weekData);
       }
-      heatmap.push(weekData);
-    }
+      
+      setContributionHeatmap(heatmap);
+      setTotalContributions(heatmap.flat().reduce((a, b) => a + b, 0) * 10);
+    };
     
-    setContributionHeatmap(heatmap);
-    const total = heatmap.flat().reduce((sum, day) => sum + day, 0);
-    setTotalContributions(total);
+    generateHeatmap();
   }, []);
 
-  const getContributionColor = (count: number) => {
-    if (count === 0) return colors.border;
-    if (count <= 1) return `${colors.primary}40`;
-    if (count <= 2) return `${colors.primary}60`;
-    if (count <= 3) return `${colors.primary}80`;
-    return colors.primary;
-  };
+  // Generate commit activity
+  useEffect(() => {
+    const activity = Array.from({ length: 24 }, () => Math.floor(Math.random() * 50));
+    setCommitActivity(activity);
+  }, []);
 
-  return (
-    <div className="min-h-screen text-white" style={{ backgroundColor: colors.background }}>
-      {/* GitHub Profile Layout */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Sidebar - Profile Info */}
-          <div className="lg:col-span-1">
-            {/* Avatar */}
-            <div className="mb-6">
-              <div 
-                className="w-80 h-80 lg:w-full lg:h-auto lg:aspect-square rounded-full mx-auto flex items-center justify-center text-7xl lg:text-9xl font-bold text-white shadow-2xl"
-                style={{ backgroundColor: colors.primary }}
-              >
-                {resumeData.contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-              </div>
-            </div>
+  // Header Section
+  const renderHeader = () => (
+    <header className="min-h-screen flex items-center justify-center px-8 relative" style={{ backgroundColor: colors.background }}>
+      {/* GitHub-style grid pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="grid grid-cols-12 gap-1 h-full">
+          {Array.from({ length: 144 }, (_, i) => (
+            <div key={i} className="rounded-sm" style={{ backgroundColor: colors.border }} />
+          ))}
+        </div>
+      </div>
 
-            {/* Name and Title */}
-            <div className="text-center lg:text-left mb-6">
-              <h1 className="text-3xl lg:text-4xl font-bold mb-3" style={{ color: colors.text }}>
-                {resumeData.contact.name}
-              </h1>
-              <p className="text-xl lg:text-2xl mb-4" style={{ color: colors.textSecondary }}>
-                {resumeData.experience?.[0]?.position || 'Open Source Developer'}
-              </p>
-            </div>
-
-            {/* Bio */}
-            <div className="mb-6">
-              <p className="text-base leading-relaxed" style={{ color: colors.textSecondary }}>
-                {resumeData.summary || 'Passionate open source contributor building tools and libraries that help developers worldwide. Believer in collaborative development and knowledge sharing.'}
-              </p>
-            </div>
-
-            {/* Contact Info */}
-            <div className="space-y-3 mb-6">
-              {resumeData.contact.email && (
-                <div className="flex items-center space-x-3 text-base">
-                  <span style={{ color: colors.textSecondary }} className="text-lg">📧</span>
-                  <span style={{ color: colors.textSecondary }}>{resumeData.contact.email}</span>
-                </div>
-              )}
-              {resumeData.contact.location && (
-                <div className="flex items-center space-x-3 text-base">
-                  <span style={{ color: colors.textSecondary }} className="text-lg">📍</span>
-                  <span style={{ color: colors.textSecondary }}>{resumeData.contact.location}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="space-y-3 mb-6">
-              <a
-                href={`mailto:${resumeData.contact.email}`}
-                className="w-full py-3 px-5 rounded-lg font-medium text-center block transition-all duration-200 text-base"
-                style={{ backgroundColor: colors.primary, color: colors.background }}
-              >
-                Contact for Collaboration
-              </a>
-              {resumeData.contact.github && (
-                <a
-                  href={resumeData.contact.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3 px-5 rounded-lg font-medium text-center border block transition-all duration-200 text-base"
-                  style={{ 
-                    borderColor: colors.border, 
-                    color: colors.text,
-                    backgroundColor: colors.surface
-                  }}
-                >
-                  Follow on GitHub
-                </a>
-              )}
-            </div>
-
-            {/* Achievements */}
-            <div className="rounded-lg border p-5" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-              <h3 className="font-semibold mb-4 text-base" style={{ color: colors.text }}>
-                Achievements
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Star className="w-5 h-5" style={{ color: colors.warning }} />
-                  <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    Arctic Code Vault Contributor
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Heart className="w-5 h-5" style={{ color: colors.error }} />
-                  <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    GitHub Sponsor
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Zap className="w-5 h-5" style={{ color: colors.primary }} />
-                  <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    Pro Developer
-                  </span>
-                </div>
-              </div>
+      <div className="relative z-10 max-w-6xl mx-auto text-center">
+        <div className="mb-8">
+          <div className="inline-block p-2 rounded-full mb-8" style={{ backgroundColor: colors.surface, border: `2px solid ${colors.border}` }}>
+            <div className="w-32 h-32 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+              <Github className="w-16 h-16 text-white" />
             </div>
           </div>
 
-          {/* Right Content - Main Area */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Contribution Graph */}
-            <div className="rounded-lg border p-6" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-semibold text-base" style={{ color: colors.text }}>
-                  {totalContributions} contributions in the last year
-                </h3>
-                <div className="flex items-center space-x-2 text-sm" style={{ color: colors.textSecondary }}>
-                  <span>Less</span>
-                  <div className="flex space-x-1">
-                    {[0, 1, 2, 3, 4].map(level => (
-                      <div
-                        key={level}
-                        className="w-3 h-3 rounded-sm"
-                        style={{ backgroundColor: getContributionColor(level) }}
-                      />
-                    ))}
-                  </div>
-                  <span>More</span>
-                </div>
-              </div>
-              
-              {/* Contribution Heatmap */}
-              <div className="relative mb-6">
-                <div className="absolute left-0 top-0 flex flex-col gap-1 text-sm" style={{ color: colors.textSecondary, width: '35px' }}>
-                  <div className="h-3 flex items-center justify-end">Mon</div>
-                  <div className="h-3"></div>
-                  <div className="h-3 flex items-center justify-end">Wed</div>
-                  <div className="h-3"></div>
-                  <div className="h-3 flex items-center justify-end">Fri</div>
-                  <div className="h-3"></div>
-                  <div className="h-3 flex items-center justify-end">Sun</div>
-                </div>
-                
-                <div className="ml-10 overflow-x-auto">
-                  <div className="flex gap-1 min-w-max">
-                    {contributionHeatmap.map((week, weekIndex) => (
-                      <div key={weekIndex} className="flex flex-col gap-1">
-                        {week.map((day, dayIndex) => (
-                          <div
-                            key={`${weekIndex}-${dayIndex}`}
-                            className="w-3 h-3 rounded-sm cursor-pointer hover:outline hover:outline-1 hover:outline-white/50"
-                            style={{ backgroundColor: getContributionColor(day) }}
-                          />
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="ml-10 mt-3 flex justify-between text-sm max-w-full" style={{ color: colors.textSecondary }}>
-                  <span>Jan</span>
-                  <span>Mar</span>
-                  <span>May</span>
-                  <span>Jul</span>
-                  <span>Sep</span>
-                  <span>Nov</span>
-                </div>
-              </div>
-              
-              <p className="text-sm" style={{ color: colors.textSecondary }}>
-                Learn how GitHub calculates contributions.
-              </p>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{ color: colors.text }}>
+            {resumeData.contact?.name || 'Open Source Contributor'}
+          </h1>
+
+          <div className="text-2xl md:text-3xl mb-8 font-mono" style={{ color: colors.secondary }}>
+            Building the future, one commit at a time
+          </div>
+
+          {resumeData.summary && (
+            <p className="text-xl mb-12 max-w-3xl mx-auto leading-relaxed" style={{ color: colors.textSecondary }}>
+              {resumeData.summary}
+            </p>
+          )}
+        </div>
+
+        {/* GitHub Stats */}
+        <div className="grid md:grid-cols-4 gap-6 mb-12">
+          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+            <div className="flex items-center justify-center mb-4">
+              <GitCommit className="w-8 h-8" style={{ color: colors.primary }} />
             </div>
-
-            {/* Popular Repositories */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold" style={{ color: colors.text }}>
-                  Popular repositories
-                </h2>
-                <a
-                  href={resumeData.contact.github || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base hover:underline"
-                  style={{ color: colors.primary }}
-                >
-                  View all repositories →
-                </a>
-              </div>
-
-              <div className="grid lg:grid-cols-2 gap-6">
-                {resumeData.projects?.slice(0, 6).map((project, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border p-5 hover:border-opacity-80 transition-colors"
-                    style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 
-                        className="font-semibold hover:underline cursor-pointer text-base"
-                        style={{ color: colors.primary }}
-                      >
-                        {project.name}
-                      </h3>
-                      <span 
-                        className="px-3 py-1 text-sm rounded-full border"
-                        style={{ 
-                          color: colors.textSecondary, 
-                          borderColor: colors.border
-                        }}
-                      >
-                        Public
-                      </span>
-                    </div>
-
-                    <p className="text-sm mb-4 leading-relaxed" style={{ color: colors.textSecondary }}>
-                      {project.description}
-                    </p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div 
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: colors.primary }}
-                        />
-                        <span className="text-sm" style={{ color: colors.textSecondary }}>
-                          {project.technologies?.[0] || 'JavaScript'}
-                        </span>
-                      </div>
-                      
-                      <div className="flex space-x-4">
-                        {project.github && (
-                          <a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm hover:underline"
-                            style={{ color: colors.textSecondary }}
-                          >
-                            <Github className="w-4 h-4" />
-                          </a>
-                        )}
-                        {project.link && (
-                          <a
-                            href={project.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm hover:underline"
-                            style={{ color: colors.textSecondary }}
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )) || []}
-              </div>
+            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
+              {totalContributions}
             </div>
-
-            {/* Skills Section */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6" style={{ color: colors.text }}>
-                Technical Skills
-              </h2>
-              <div className="grid lg:grid-cols-2 gap-6">
-                {resumeData.skills?.map((skillCategory, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border p-5"
-                    style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-                  >
-                    <h3 className="font-semibold mb-4 text-base" style={{ color: colors.primary }}>
-                      {skillCategory.category}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {skillCategory.items.map((skill, skillIndex) => (
-                        <span
-                          key={skillIndex}
-                          className="px-3 py-1 rounded-full text-sm border"
-                          style={{ 
-                            backgroundColor: `${colors.primary}20`,
-                            borderColor: colors.primary,
-                            color: colors.text
-                          }}
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )) || []}
-              </div>
+            <div className="text-sm" style={{ color: colors.textSecondary }}>
+              Contributions
             </div>
+          </div>
 
-            {/* Work Experience */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6" style={{ color: colors.text }}>
-                Professional Experience
-              </h2>
-              <div className="space-y-6">
-                {resumeData.experience?.map((job, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border p-5"
-                    style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold text-lg mb-1" style={{ color: colors.text }}>
-                          {job.position}
-                        </h3>
-                        <p className="text-base" style={{ color: colors.primary }}>
-                          {job.company}
-                        </p>
-                      </div>
-                      <div className="mt-2 lg:mt-0">
-                        <span 
-                          className="px-3 py-1 rounded-full text-sm border"
-                          style={{ 
-                            borderColor: colors.border,
-                            color: colors.textSecondary
-                          }}
-                        >
-                          {job.startDate} - {job.endDate}
-                        </span>
-                      </div>
+          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+            <div className="flex items-center justify-center mb-4">
+              <Star className="w-8 h-8" style={{ color: colors.warning }} />
+            </div>
+            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
+              {resumeData.projects?.length || 0}
+            </div>
+            <div className="text-sm" style={{ color: colors.textSecondary }}>
+              Repositories
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+            <div className="flex items-center justify-center mb-4">
+              <Users className="w-8 h-8" style={{ color: colors.success }} />
+            </div>
+            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
+              {Math.floor(totalContributions / 10)}
+            </div>
+            <div className="text-sm" style={{ color: colors.textSecondary }}>
+              Followers
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+            <div className="flex items-center justify-center mb-4">
+              <Heart className="w-8 h-8" style={{ color: colors.error }} />
+            </div>
+            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
+              {resumeData.skills?.length || 0}
+            </div>
+            <div className="text-sm" style={{ color: colors.textSecondary }}>
+              Languages
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Info */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          {resumeData.contact?.email && (
+            <a
+              href={`mailto:${resumeData.contact.email}`}
+              className="flex items-center space-x-2 px-6 py-3 rounded-lg border transition-colors hover:border-current"
+              style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}
+            >
+              <Mail className="w-5 h-5" />
+              <span>{resumeData.contact.email}</span>
+            </a>
+          )}
+          {resumeData.contact?.phone && (
+            <a
+              href={`tel:${resumeData.contact.phone}`}
+              className="flex items-center space-x-2 px-6 py-3 rounded-lg border transition-colors hover:border-current"
+              style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}
+            >
+              <Phone className="w-5 h-5" />
+              <span>{resumeData.contact.phone}</span>
+            </a>
+          )}
+          {resumeData.contact?.location && (
+            <div className="flex items-center space-x-2 px-6 py-3 rounded-lg border"
+              style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}
+            >
+              <MapPin className="w-5 h-5" />
+              <span>{resumeData.contact.location}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Social Links */}
+        <div className="flex justify-center gap-4">
+          {resumeData.contact?.github && (
+            <a
+              href={resumeData.contact.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-4 rounded-lg font-semibold text-lg transition-colors hover:opacity-90"
+              style={{ backgroundColor: colors.primary, color: 'white' }}
+            >
+              <Github className="w-6 h-6 inline mr-2" />
+              GitHub
+            </a>
+          )}
+          {resumeData.contact?.linkedin && (
+            <a
+              href={resumeData.contact.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-4 rounded-lg font-semibold text-lg border transition-colors hover:border-current"
+              style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}
+            >
+              <Linkedin className="w-6 h-6 inline mr-2" />
+              LinkedIn
+            </a>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+
+  // Experience Section
+  const renderExperienceSection = () => {
+    if (!resumeData.experience?.length) return null;
+
+    return (
+      <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
+            Work Experience
+          </h2>
+
+          <div className="space-y-8">
+            {resumeData.experience.map((exp, index) => (
+              <div key={index} className="border rounded-lg p-8 transition-colors hover:border-current" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                  <div>
+                    <h3 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>{exp.position}</h3>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Briefcase className="w-5 h-5" style={{ color: colors.primary }} />
+                      <span className="text-lg" style={{ color: colors.textSecondary }}>{exp.company}</span>
                     </div>
-                    
-                    {job.responsibilities && (
-                      <div className="space-y-2">
-                        {job.responsibilities.map((line, lineIndex) => (
-                          <p key={lineIndex} className="text-sm leading-relaxed" style={{ color: colors.textSecondary }}>
-                            {line}
-                          </p>
-                        ))}
+                    {exp.location && (
+                      <div className="flex items-center space-x-2" style={{ color: colors.textSecondary }}>
+                        <MapPin className="w-4 h-4" />
+                        <span>{exp.location}</span>
                       </div>
                     )}
                   </div>
-                )) || []}
-              </div>
-            </div>
-
-            {/* Education */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6" style={{ color: colors.text }}>
-                Education
-              </h2>
-              <div className="space-y-4">
-                {resumeData.education?.map((edu, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border p-5"
-                    style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg mb-1" style={{ color: colors.text }}>
-                          {edu.degree}
-                        </h3>
-                        <p className="text-base mb-2" style={{ color: colors.primary }}>
-                          {edu.institution}
-                        </p>
-                        {edu.location && (
-                          <p className="text-sm mb-1" style={{ color: colors.textSecondary }}>
-                            {edu.location}
-                          </p>
-                        )}
-                        {edu.honors && edu.honors.length > 0 && (
-                          <p className="text-sm" style={{ color: colors.textSecondary }}>
-                            {edu.honors.join(', ')}
-                          </p>
-                        )}
-                      </div>
-                      <div className="mt-2 lg:mt-0">
-                        <span 
-                          className="px-3 py-1 rounded-full text-sm border"
-                          style={{ 
-                            borderColor: colors.border,
-                            color: colors.textSecondary
-                          }}
-                        >
-                          {edu.graduationDate}
-                        </span>
-                      </div>
+                  <div className="mt-4 lg:mt-0">
+                    <div className="flex items-center space-x-2 px-4 py-2 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                      <Calendar className="w-4 h-4" style={{ color: colors.primary }} />
+                      <span className="font-mono text-sm" style={{ color: colors.text }}>
+                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                      </span>
                     </div>
                   </div>
-                )) || []}
-              </div>
-            </div>
+                </div>
 
-            {/* Certifications (if available) */}
-            {resumeData.certifications && resumeData.certifications.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold mb-6" style={{ color: colors.text }}>
-                  Certifications
-                </h2>
-                <div className="grid lg:grid-cols-2 gap-4">
-                  {resumeData.certifications.map((cert, index) => (
-                    <div
-                      key={index}
-                      className="rounded-lg border p-4 flex items-center space-x-3"
-                      style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-                    >
-                      <Award className="w-5 h-5" style={{ color: colors.warning }} />
-                      <div>
-                        <h3 className="font-medium text-base" style={{ color: colors.text }}>
-                          {cert}
-                        </h3>
+                {exp.responsibilities && (
+                  <div className="space-y-3">
+                    {exp.responsibilities.map((item, i) => (
+                      <div key={i} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: colors.primary }} />
+                        <p className="leading-relaxed" style={{ color: colors.textSecondary }}>{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  // Skills Section
+  const renderSkillsSection = () => {
+    if (!resumeData.skills?.length) return null;
+
+    return (
+      <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
+            Technical Skills
+          </h2>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {resumeData.skills.map((skillCategory, index) => (
+              <div key={index} className="border rounded-lg p-8 transition-colors hover:border-current" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+                    <Code2 className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold" style={{ color: colors.text }}>{skillCategory.category}</h3>
+                </div>
+
+                <div className="space-y-4">
+                  {skillCategory.items.map((item, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="font-mono" style={{ color: colors.textSecondary }}>{item}</span>
+                      <div className="flex space-x-1">
+                        {[...Array(5)].map((_, j) => (
+                          <div
+                            key={j}
+                            className={`w-2 h-2 rounded-full ${j < 4 ? 'bg-current' : 'bg-gray-600'}`}
+                            style={{ color: j < 4 ? colors.primary : colors.border }}
+                          />
+                        ))}
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
+            ))}
           </div>
         </div>
+      </section>
+    );
+  };
 
-        {/* Footer */}
-        <div className="mt-20 text-center border-t pt-12" style={{ borderColor: colors.border }}>
-          <h2 className="text-3xl font-bold mb-6" style={{ color: colors.text }}>
-            Let's Build Something <span style={{ color: colors.primary }}>Together</span>
+  // Projects Section
+  const renderProjectsSection = () => {
+    if (!resumeData.projects?.length) return null;
+
+    return (
+      <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
+            Open Source Projects
           </h2>
-          <p className="text-base mb-8" style={{ color: colors.textSecondary }}>
-            Interested in collaborating on open source projects?
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <a
-              href={`mailto:${resumeData.contact.email}`}
-              className="inline-flex items-center space-x-3 px-8 py-4 rounded-lg font-medium transition-all duration-200 text-base"
-              style={{ backgroundColor: colors.primary, color: colors.background }}
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span>Start a Conversation</span>
-            </a>
-            
-            {resumeData.contact.github && (
-              <a
-                href={resumeData.contact.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-3 px-8 py-4 rounded-lg font-medium border transition-all duration-200 text-base"
-                style={{ 
-                  borderColor: colors.border, 
-                  color: colors.text,
-                  backgroundColor: colors.surface
-                }}
-              >
-                <Github className="w-5 h-5" />
-                <span>Follow on GitHub</span>
-              </a>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {resumeData.projects.map((project, index) => (
+              <div key={index} className="border rounded-lg overflow-hidden transition-colors hover:border-current" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+                <div className="p-6 border-b" style={{ borderColor: colors.border }}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold" style={{ color: colors.text }}>{project.name}</h3>
+                    <div className="flex space-x-2">
+                      {project.github && (
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg transition-colors hover:bg-gray-700"
+                          style={{ backgroundColor: colors.background }}
+                        >
+                          <Github className="w-5 h-5" style={{ color: colors.text }} />
+                        </a>
+                      )}
+                      {project.link && (
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg transition-colors hover:bg-gray-700"
+                          style={{ backgroundColor: colors.background }}
+                        >
+                          <ExternalLink className="w-5 h-5" style={{ color: colors.text }} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {project.description && (
+                    <p className="mb-4 leading-relaxed" style={{ color: colors.textSecondary }}>
+                      {project.description}
+                    </p>
+                  )}
+
+                  {project.technologies && (
+                    <div className="flex flex-wrap gap-2">
+                      {project.technologies.map((tech, i) => (
+                        <span
+                          key={i}
+                          className="px-3 py-1 rounded-full text-sm font-mono border"
+                          style={{ 
+                            backgroundColor: colors.background,
+                            borderColor: colors.border,
+                            color: colors.text
+                          }}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 flex items-center justify-between" style={{ backgroundColor: colors.background }}>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4" style={{ color: colors.warning }} />
+                      <span className="text-sm" style={{ color: colors.textSecondary }}>
+                        {Math.floor(Math.random() * 100)}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <GitBranch className="w-4 h-4" style={{ color: colors.primary }} />
+                      <span className="text-sm" style={{ color: colors.textSecondary }}>
+                        {Math.floor(Math.random() * 20)}
+                      </span>
+                    </div>
+                  </div>
+                  {(project.startDate || project.endDate) && (
+                    <div className="text-sm" style={{ color: colors.textSecondary }}>
+                      {project.startDate} {project.endDate && `- ${project.endDate}`}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  // Education Section
+  const renderEducationSection = () => {
+    if (!resumeData.education?.length) return null;
+
+    return (
+      <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
+            Education
+          </h2>
+
+          <div className="space-y-8">
+            {resumeData.education.map((edu, index) => (
+              <div key={index} className="border rounded-lg p-8 transition-colors hover:border-current" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>{edu.degree}</h3>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <GraduationCap className="w-5 h-5" style={{ color: colors.primary }} />
+                      <span className="text-lg" style={{ color: colors.textSecondary }}>{edu.institution}</span>
+                    </div>
+                    {edu.location && (
+                      <div className="flex items-center space-x-2" style={{ color: colors.textSecondary }}>
+                        <MapPin className="w-4 h-4" />
+                        <span>{edu.location}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-4 lg:mt-0">
+                    {edu.graduationDate && (
+                      <div className="flex items-center space-x-2 px-4 py-2 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                        <Calendar className="w-4 h-4" style={{ color: colors.primary }} />
+                        <span className="font-mono text-sm" style={{ color: colors.text }}>
+                          {formatDate(edu.graduationDate)}
+                        </span>
+                      </div>
+                    )}
+                    {edu.gpa && (
+                      <p className="mt-2" style={{ color: colors.textSecondary }}>GPA: {edu.gpa}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  // Certifications Section
+  const renderCertificationsSection = () => {
+    if (!resumeData.certifications?.length) return null;
+
+    return (
+      <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
+            Certifications
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {resumeData.certifications.map((cert, index) => (
+              <div key={index} className="border rounded-lg p-6 transition-colors hover:border-current" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+                    <Award className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold" style={{ color: colors.text }}>{cert}</h3>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  // Custom Section Renderer
+  const renderCustomSection = (section: any) => {
+    return (
+      <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
+            {section.title}
+          </h2>
+
+          <div className="border rounded-lg p-8" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+            {section.type === 'text' && (
+              <p className="text-lg leading-relaxed" style={{ color: colors.textSecondary }}>
+                {section.content}
+              </p>
+            )}
+
+            {section.type === 'list' && (
+              <ul className="space-y-4">
+                {section.items?.map((item: string, index: number) => (
+                  <li key={index} className="flex items-start space-x-3">
+                    <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: colors.primary }} />
+                    <span className="text-lg" style={{ color: colors.textSecondary }}>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
+              <div className="space-y-8">
+                {section.items?.map((item: any, index: number) => (
+                  <div key={index} className="border-l-4 pl-6" style={{ borderLeftColor: colors.primary }}>
+                    <h3 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>{item.title}</h3>
+                    {item.description && (
+                      <p className="mb-4 text-lg" style={{ color: colors.textSecondary }}>{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className="flex items-center space-x-2" style={{ color: colors.textSecondary }}>
+                        <Calendar className="w-4 h-4" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
-      </div>
+      </section>
+    );
+  };
+
+  // Dynamic Section Renderer
+  const renderSection = (sectionId: string) => {
+    // Skip hidden sections
+    if (hiddenSections.includes(sectionId)) {
+      return null;
+    }
+
+    // Render standard sections
+    switch (sectionId) {
+      case 'experience':
+        return renderExperienceSection();
+      case 'skills':
+        return renderSkillsSection();
+      case 'projects':
+        return renderProjectsSection();
+      case 'education':
+        return renderEducationSection();
+      case 'certifications':
+        return renderCertificationsSection();
+      default:
+        // Check if it's a custom section
+        const customSection = customSections.find((section: any) => section.id === sectionId);
+        if (customSection) {
+          return renderCustomSection(customSection);
+        }
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: colors.background, color: colors.text }}>
+      {/* Render Header */}
+      {renderHeader()}
+
+      {/* Render Sections in Order */}
+      {sectionOrder.map((sectionId) => (
+        <div key={sectionId}>
+          {renderSection(sectionId)}
+        </div>
+      ))}
+
+      {/* Footer */}
+      <footer className="py-20 px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="border rounded-lg p-12" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+            <div className="flex justify-center mb-8">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <h3 className="text-4xl font-bold mb-4" style={{ color: colors.text }}>
+              Open Source Enthusiast
+            </h3>
+            <p className="text-xl mb-8" style={{ color: colors.textSecondary }}>
+              Passionate about building tools that make developers' lives easier
+            </p>
+            <div className="flex justify-center gap-6">
+              <div className="px-6 py-3 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                <Github className="w-6 h-6 mx-auto" style={{ color: colors.primary }} />
+              </div>
+              <div className="px-6 py-3 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                <Star className="w-6 h-6 mx-auto" style={{ color: colors.warning }} />
+              </div>
+              <div className="px-6 py-3 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                <Users className="w-6 h-6 mx-auto" style={{ color: colors.success }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 
