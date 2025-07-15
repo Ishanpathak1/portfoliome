@@ -120,13 +120,15 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
 
     initParticles();
     const interval = setInterval(() => {
-      setParticles(prev => prev.map(particle => ({
-        ...particle,
-        x: particle.x + particle.vx,
-        y: particle.y + particle.vy,
-        x: particle.x > window.innerWidth ? 0 : particle.x < 0 ? window.innerWidth : particle.x,
-        y: particle.y > window.innerHeight ? 0 : particle.y < 0 ? window.innerHeight : particle.y
-      })));
+      setParticles(prev => prev.map(particle => {
+        const newX = particle.x + particle.vx;
+        const newY = particle.y + particle.vy;
+        return {
+          ...particle,
+          x: newX > window.innerWidth ? 0 : newX < 0 ? window.innerWidth : newX,
+          y: newY > window.innerHeight ? 0 : newY < 0 ? window.innerHeight : newY
+        };
+      }));
     }, 16);
 
     return () => clearInterval(interval);
