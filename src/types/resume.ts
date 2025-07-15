@@ -1,7 +1,7 @@
 export interface Contact {
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   location?: string;
   linkedin?: string;
   github?: string;
@@ -9,22 +9,21 @@ export interface Contact {
 }
 
 export interface Experience {
-  title: string;
+  position: string;
   company: string;
   location?: string;
   startDate: string;
   endDate: string;
   current: boolean;
-  description: string[];
+  responsibilities: string[];
 }
 
 export interface Education {
   degree: string;
   institution: string;
-  location?: string;
+  field: string;
   graduationDate: string;
   gpa?: string;
-  honors?: string[];
 }
 
 export interface Project {
@@ -37,18 +36,21 @@ export interface Project {
   endDate?: string;
 }
 
-export interface Skill {
+export interface SkillCategory {
   category: string;
   items: string[];
 }
 
+// Legacy alias for backward compatibility
+export interface Skill extends SkillCategory {}
+
 export interface ResumeData {
   contact: Contact;
-  summary?: string;
+  summary: string;
   experience: Experience[];
   education: Education[];
   projects: Project[];
-  skills: Skill[];
+  skills: SkillCategory[];
   certifications?: string[];
 }
 

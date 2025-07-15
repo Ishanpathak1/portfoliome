@@ -54,8 +54,14 @@ AWS_S3_BUCKET_NAME=""
 REDIS_URL="redis://localhost:6379"
 
 # App Configuration
-NEXT_PUBLIC_APP_URL="http://localhost:3000"  # Change to your domain
+NEXT_PUBLIC_APP_URL="http://localhost:3000"  # Change to your domain (e.g., https://unifieddata.app)
 NODE_ENV="development"  # Change to "production" when deploying
+
+# Important: Update NEXT_PUBLIC_APP_URL for production
+# Examples:
+# NEXT_PUBLIC_APP_URL="https://unifieddata.app"
+# NEXT_PUBLIC_APP_URL="https://yourdomain.com"
+# This ensures portfolio links use the correct domain instead of localhost
 ```
 
 ### 2. Database Setup

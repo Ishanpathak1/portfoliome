@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { AuthWrapper } from '@/components/FirebaseAuthWrapper';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { ResumeData, PersonalizationData } from '@/types/resume';
+import { ResumeData, PersonalizationData, Experience, Education, Project, SkillCategory, Contact } from '@/types/resume';
 import { ToastContainer, useToast } from '@/components/Toast';
+import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
 import { 
   Settings, 
   Eye, 
@@ -19,7 +20,23 @@ import {
   Save,
   RefreshCw,
   Copy,
-  Check
+  Check,
+  Plus,
+  Trash2,
+  Edit,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Briefcase,
+  GraduationCap,
+  Code,
+  FolderOpen,
+  Github,
+  Linkedin,
+  Globe,
+  Building,
+  X
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -47,8 +64,32 @@ function DashboardContent() {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
 
+  // Content editing states
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
   // Toast notifications
   const { toasts, removeToast, showSuccess, showError } = useToast();
+
+  // Helper function to ensure resume data has all required arrays
+  const ensureResumeDataStructure = (resumeData: any): ResumeData => {
+    return {
+      ...resumeData,
+      experience: resumeData?.experience || [],
+      education: resumeData?.education || [],
+      projects: resumeData?.projects || [],
+      skills: resumeData?.skills || [],
+      summary: resumeData?.summary || '',
+      contact: {
+        name: resumeData?.contact?.name || '',
+        email: resumeData?.contact?.email || '',
+        phone: resumeData?.contact?.phone || '',
+        location: resumeData?.contact?.location || '',
+        linkedin: resumeData?.contact?.linkedin || '',
+        website: resumeData?.contact?.website || ''
+      }
+    };
+  };
 
   useEffect(() => {
     if (user) {
@@ -69,7 +110,7 @@ function DashboardContent() {
         setPortfolio(data.portfolio);
         setEditedSlug(data.portfolio?.slug || '');
         setEditedPersonalization(data.portfolio?.personalization || null);
-        setEditedResumeData(data.portfolio?.resumeData || null);
+        setEditedResumeData(data.portfolio?.resumeData ? ensureResumeDataStructure(data.portfolio.resumeData) : null);
       } else if (response.status === 404) {
         // User doesn't have a portfolio yet
         setPortfolio(null);
@@ -133,9 +174,11 @@ function DashboardContent() {
         const data = await response.json();
         setPortfolio(data.portfolio);
         setEditedSlug(data.portfolio.slug); // Update slug if changed
-        setEditedResumeData(data.portfolio.resumeData);
+        setEditedResumeData(ensureResumeDataStructure(data.portfolio.resumeData));
         setPreviewKey(prev => prev + 1); // Force iframe refresh
         showSuccess('Portfolio updated successfully!');
+        setEditingSection(null);
+        setEditingIndex(null);
       } else {
         const error = await response.json();
         if (error.field === 'slug') {
@@ -160,7 +203,7 @@ function DashboardContent() {
   const copyPortfolioUrl = async () => {
     if (!portfolio) return;
     
-    const url = `${window.location.origin}/${portfolio.slug}`;
+    const url = getPortfolioUrl(portfolio.slug);
     try {
       await navigator.clipboard.writeText(url);
       setCopiedUrl(true);
@@ -168,6 +211,146 @@ function DashboardContent() {
     } catch (error) {
       console.error('Failed to copy URL:', error);
     }
+  };
+
+  // Content editing functions
+  const addExperience = () => {
+    if (!editedResumeData) return;
+    const newExperience: Experience = {
+      company: '',
+      position: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      current: false,
+      responsibilities: []
+    };
+    setEditedResumeData({
+      ...editedResumeData,
+      experience: [...editedResumeData.experience, newExperience]
+    });
+    setEditingSection('experience');
+    setEditingIndex(editedResumeData.experience.length);
+  };
+
+  const updateExperience = (index: number, field: keyof Experience, value: any) => {
+    if (!editedResumeData) return;
+    const updated = [...editedResumeData.experience];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditedResumeData({ ...editedResumeData, experience: updated });
+  };
+
+  const deleteExperience = (index: number) => {
+    if (!editedResumeData) return;
+    const updated = editedResumeData.experience.filter((_, i) => i !== index);
+    setEditedResumeData({ ...editedResumeData, experience: updated });
+  };
+
+  const addEducation = () => {
+    if (!editedResumeData) return;
+    const newEducation: Education = {
+      institution: '',
+      degree: '',
+      field: '',
+      graduationDate: '',
+      gpa: ''
+    };
+    setEditedResumeData({
+      ...editedResumeData,
+      education: [...editedResumeData.education, newEducation]
+    });
+    setEditingSection('education');
+    setEditingIndex(editedResumeData.education.length);
+  };
+
+  const updateEducation = (index: number, field: keyof Education, value: any) => {
+    if (!editedResumeData) return;
+    const updated = [...editedResumeData.education];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditedResumeData({ ...editedResumeData, education: updated });
+  };
+
+  const deleteEducation = (index: number) => {
+    if (!editedResumeData) return;
+    const updated = editedResumeData.education.filter((_, i) => i !== index);
+    setEditedResumeData({ ...editedResumeData, education: updated });
+  };
+
+  const addProject = () => {
+    if (!editedResumeData) return;
+    const newProject: Project = {
+      name: '',
+      description: '',
+      technologies: [],
+      link: '',
+      github: ''
+    };
+    setEditedResumeData({
+      ...editedResumeData,
+      projects: [...editedResumeData.projects, newProject]
+    });
+    setEditingSection('projects');
+    setEditingIndex(editedResumeData.projects.length);
+  };
+
+  const updateProject = (index: number, field: keyof Project, value: any) => {
+    if (!editedResumeData) return;
+    const updated = [...editedResumeData.projects];
+    
+    // Validate and fix URLs for link and github fields
+    if (field === 'link' || field === 'github') {
+      value = validateAndFixUrl(value);
+    }
+    
+    updated[index] = { ...updated[index], [field]: value };
+    setEditedResumeData({ ...editedResumeData, projects: updated });
+  };
+
+  const deleteProject = (index: number) => {
+    if (!editedResumeData) return;
+    const updated = editedResumeData.projects.filter((_, i) => i !== index);
+    setEditedResumeData({ ...editedResumeData, projects: updated });
+  };
+
+  const addSkillCategory = () => {
+    if (!editedResumeData) return;
+    const newCategory: SkillCategory = {
+      category: '',
+      items: []
+    };
+    setEditedResumeData({
+      ...editedResumeData,
+      skills: [...editedResumeData.skills, newCategory]
+    });
+    setEditingSection('skills');
+    setEditingIndex(editedResumeData.skills.length);
+  };
+
+  const updateSkillCategory = (index: number, field: keyof SkillCategory, value: any) => {
+    if (!editedResumeData) return;
+    const updated = [...editedResumeData.skills];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditedResumeData({ ...editedResumeData, skills: updated });
+  };
+
+  const deleteSkillCategory = (index: number) => {
+    if (!editedResumeData) return;
+    const updated = editedResumeData.skills.filter((_, i) => i !== index);
+    setEditedResumeData({ ...editedResumeData, skills: updated });
+  };
+
+  const updateContact = (field: keyof Contact, value: string) => {
+    if (!editedResumeData) return;
+    
+    // Validate and fix URLs for website and linkedin fields
+    if (field === 'website' || field === 'linkedin') {
+      value = validateAndFixUrl(value);
+    }
+    
+    setEditedResumeData({
+      ...editedResumeData,
+      contact: { ...editedResumeData.contact, [field]: value }
+    });
   };
 
   const tabs = [
@@ -313,13 +496,13 @@ function DashboardContent() {
                       </div>
                     </button>
                     <button
-                      onClick={() => setActiveTab('settings')}
+                      onClick={() => setActiveTab('content')}
                       className="flex items-center space-x-3 bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-300"
                     >
-                      <Link className="w-6 h-6 text-blue-400" />
+                      <Edit className="w-6 h-6 text-green-400" />
                       <div className="text-left">
-                        <div className="text-white font-medium">Edit URL</div>
-                        <div className="text-gray-300 text-sm">Customize your portfolio URL</div>
+                        <div className="text-white font-medium">Edit Content</div>
+                        <div className="text-gray-300 text-sm">Update your information</div>
                       </div>
                     </button>
                   </div>
@@ -331,7 +514,7 @@ function DashboardContent() {
                   <div className="flex items-center space-x-3">
                     <div className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3">
                       <code className="text-purple-300 text-sm break-all">
-                        {window.location.origin}/{portfolio.slug}
+                        {getPortfolioUrl(portfolio.slug)}
                       </code>
                     </div>
                     <button
@@ -410,84 +593,625 @@ function DashboardContent() {
             )}
 
             {activeTab === 'content' && editedResumeData && (
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-6">Content & Information</h2>
-                <div className="space-y-6">
-                  <div className="bg-white/5 rounded-xl p-4">
-                    <h3 className="text-white font-medium mb-2">Current Information</h3>
-                    <div className="text-gray-300 space-y-1">
-                      <p><strong>Name:</strong> {portfolio.resumeData.contact.name}</p>
-                      <p><strong>Email:</strong> {portfolio.resumeData.contact.email}</p>
-                      <p><strong>Experience:</strong> {portfolio.resumeData.experience.length} positions</p>
-                      <p><strong>Projects:</strong> {portfolio.resumeData.projects.length} projects</p>
-                      <p><strong>Skills:</strong> {portfolio.resumeData.skills.length} categories</p>
+              <div className="space-y-6">
+                {/* Contact Information */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                      <User className="w-6 h-6" />
+                      <span>Contact Information</span>
+                    </h2>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-gray-300 text-sm mb-2">Full Name</label>
+                      <input
+                        type="text"
+                        value={editedResumeData.contact.name}
+                        onChange={(e) => updateContact('name', e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Your full name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-300 text-sm mb-2">Email</label>
+                      <input
+                        type="email"
+                        value={editedResumeData.contact.email}
+                        onChange={(e) => updateContact('email', e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="your.email@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-300 text-sm mb-2">Phone</label>
+                      <input
+                        type="tel"
+                        value={editedResumeData.contact.phone || ''}
+                        onChange={(e) => updateContact('phone', e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-300 text-sm mb-2">Location</label>
+                      <input
+                        type="text"
+                        value={editedResumeData.contact.location || ''}
+                        onChange={(e) => updateContact('location', e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="City, State/Country"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-300 text-sm mb-2">LinkedIn URL</label>
+                      <input
+                        type="url"
+                        value={editedResumeData.contact.linkedin || ''}
+                        onChange={(e) => updateContact('linkedin', e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://linkedin.com/in/yourprofile"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-300 text-sm mb-2">Website/Portfolio</label>
+                      <input
+                        type="url"
+                        value={editedResumeData.contact.website || ''}
+                        onChange={(e) => updateContact('website', e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://yourwebsite.com"
+                      />
                     </div>
                   </div>
 
-                  {/* Project Links Editor */}
-                  <div className="bg-white/5 rounded-xl p-4">
-                    <h3 className="text-white font-medium mb-4">Project Links</h3>
-                    <p className="text-gray-300 text-sm mb-4">Add or edit links for your projects (live demos, GitHub repositories, etc.)</p>
-                    <div className="space-y-4">
-                      {editedResumeData.projects.map((project, index) => (
-                        <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
-                          <h4 className="text-white font-medium mb-3">{project.name}</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-gray-300 text-sm mb-2">Live Demo URL</label>
-                              <input
-                                type="url"
-                                value={project.link || ''}
-                                onChange={(e) => {
-                                  const updatedProjects = [...editedResumeData.projects];
-                                  updatedProjects[index] = { ...project, link: e.target.value || undefined };
-                                  setEditedResumeData({ ...editedResumeData, projects: updatedProjects });
-                                }}
-                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                placeholder="https://your-project-demo.com"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-gray-300 text-sm mb-2">GitHub Repository URL</label>
-                              <input
-                                type="url"
-                                value={project.github || ''}
-                                onChange={(e) => {
-                                  const updatedProjects = [...editedResumeData.projects];
-                                  updatedProjects[index] = { ...project, github: e.target.value || undefined };
-                                  setEditedResumeData({ ...editedResumeData, projects: updatedProjects });
-                                }}
-                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                placeholder="https://github.com/username/repo"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="mt-6">
+                    <label className="block text-gray-300 text-sm mb-2">Professional Summary</label>
+                    <textarea
+                      value={editedResumeData.summary}
+                      onChange={(e) => setEditedResumeData({ ...editedResumeData, summary: e.target.value })}
+                      rows={4}
+                      className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Write a brief professional summary..."
+                    />
+                  </div>
+
+                  <button
+                    onClick={saveChanges}
+                    disabled={saving}
+                    className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors mt-6"
+                  >
+                    {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    <span>{saving ? 'Saving...' : 'Save Contact Info'}</span>
+                  </button>
+                </div>
+
+                {/* Work Experience */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                      <Briefcase className="w-6 h-6" />
+                      <span>Work Experience</span>
+                    </h2>
                     <button
-                      onClick={saveChanges}
-                      disabled={saving}
-                      className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors mt-4"
+                      onClick={addExperience}
+                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                     >
-                      {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                      <span>{saving ? 'Saving...' : 'Save Project Links'}</span>
+                      <Plus className="w-4 h-4" />
+                      <span>Add Experience</span>
                     </button>
                   </div>
 
-                  <div className="bg-blue-500/20 border border-blue-400/30 rounded-xl p-4">
-                    <h4 className="text-blue-300 font-medium mb-2">Update Content</h4>
-                    <p className="text-blue-200 text-sm">
-                      To update your portfolio content, upload a new resume from the main page. 
-                      Your template and design settings will be preserved.
-                    </p>
-                    <a
-                      href="/"
-                      className="inline-flex items-center space-x-2 mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  <div className="space-y-4">
+                    {editedResumeData.experience.map((exp, index) => (
+                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                        {editingSection === 'experience' && editingIndex === index ? (
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Company</label>
+                                <input
+                                  type="text"
+                                  value={exp.company}
+                                  onChange={(e) => updateExperience(index, 'company', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Company name"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Position</label>
+                                <input
+                                  type="text"
+                                  value={exp.position}
+                                  onChange={(e) => updateExperience(index, 'position', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Job title"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Location</label>
+                                <input
+                                  type="text"
+                                  value={exp.location}
+                                  onChange={(e) => updateExperience(index, 'location', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="City, State/Country"
+                                />
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  checked={exp.current}
+                                  onChange={(e) => updateExperience(index, 'current', e.target.checked)}
+                                  className="rounded"
+                                />
+                                <label className="text-gray-300 text-sm">Current position</label>
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Start Date</label>
+                                <input
+                                  type="text"
+                                  value={exp.startDate}
+                                  onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="January 2023"
+                                />
+                              </div>
+                              {!exp.current && (
+                                <div>
+                                  <label className="block text-gray-300 text-sm mb-2">End Date</label>
+                                  <input
+                                    type="text"
+                                    value={exp.endDate}
+                                    onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
+                                    className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    placeholder="December 2023"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                                                          <div>
+                                <label className="block text-gray-300 text-sm mb-2">Responsibilities (one per line)</label>
+                                <textarea
+                                  value={(exp.responsibilities || []).join('\n')}
+                                  onChange={(e) => updateExperience(index, 'responsibilities', e.target.value.split('\n').filter(r => r.trim()))}
+                                  rows={4}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="• Developed and maintained web applications&#10;• Collaborated with cross-functional teams&#10;• Improved system performance by 40%"
+                                />
+                              </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection(null);
+                                  setEditingIndex(null);
+                                }}
+                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                                <span>Cancel</span>
+                              </button>
+                              <button
+                                onClick={saveChanges}
+                                disabled={saving}
+                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                <span>{saving ? 'Saving...' : 'Save'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="text-white font-medium">{exp.position || 'New Position'}</h4>
+                              <p className="text-gray-300">{exp.company} {exp.location && `• ${exp.location}`}</p>
+                              <p className="text-gray-400 text-sm">
+                                {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                              </p>
+                              {exp.responsibilities && exp.responsibilities.length > 0 && (
+                                <ul className="text-gray-300 text-sm mt-2 space-y-1">
+                                  {exp.responsibilities.slice(0, 2).map((resp, i) => (
+                                    <li key={i}>• {resp}</li>
+                                  ))}
+                                  {exp.responsibilities.length > 2 && (
+                                    <li className="text-gray-400">... and {exp.responsibilities.length - 2} more</li>
+                                  )}
+                                </ul>
+                              )}
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection('experience');
+                                  setEditingIndex(index);
+                                }}
+                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => deleteExperience(index)}
+                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Projects */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                      <FolderOpen className="w-6 h-6" />
+                      <span>Projects</span>
+                    </h2>
+                    <button
+                      onClick={addProject}
+                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                     >
-                      <Upload className="w-4 h-4" />
-                      <span>Upload New Resume</span>
-                    </a>
+                      <Plus className="w-4 h-4" />
+                      <span>Add Project</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {editedResumeData.projects.map((project, index) => (
+                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                        {editingSection === 'projects' && editingIndex === index ? (
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Project Name</label>
+                                <input
+                                  type="text"
+                                  value={project.name}
+                                  onChange={(e) => updateProject(index, 'name', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Project name"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Technologies (comma separated)</label>
+                                <input
+                                  type="text"
+                                  value={(project.technologies || []).join(', ')}
+                                  onChange={(e) => updateProject(index, 'technologies', e.target.value.split(',').map(t => t.trim()).filter(t => t))}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="React, Node.js, MongoDB"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Live Demo URL</label>
+                                <input
+                                  type="url"
+                                  value={project.link || ''}
+                                  onChange={(e) => updateProject(index, 'link', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="https://project-demo.com"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">GitHub URL</label>
+                                <input
+                                  type="url"
+                                  value={project.github || ''}
+                                  onChange={(e) => updateProject(index, 'github', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="https://github.com/username/repo"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-gray-300 text-sm mb-2">Description</label>
+                              <textarea
+                                value={project.description}
+                                onChange={(e) => updateProject(index, 'description', e.target.value)}
+                                rows={3}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="Describe your project..."
+                              />
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection(null);
+                                  setEditingIndex(null);
+                                }}
+                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                                <span>Cancel</span>
+                              </button>
+                              <button
+                                onClick={saveChanges}
+                                disabled={saving}
+                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                <span>{saving ? 'Saving...' : 'Save'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="text-white font-medium">{project.name || 'New Project'}</h4>
+                              <p className="text-gray-300 text-sm mt-1">{project.description}</p>
+                              {project.technologies && project.technologies.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {project.technologies.map((tech, i) => (
+                                    <span key={i} className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">
+                                      {tech}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              <div className="flex space-x-4 mt-2">
+                                {project.link && (
+                                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm flex items-center space-x-1">
+                                    <Globe className="w-3 h-3" />
+                                    <span>Demo</span>
+                                  </a>
+                                )}
+                                {project.github && (
+                                  <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 text-sm flex items-center space-x-1">
+                                    <Github className="w-3 h-3" />
+                                    <span>Code</span>
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection('projects');
+                                  setEditingIndex(index);
+                                }}
+                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => deleteProject(index)}
+                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Education */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                      <GraduationCap className="w-6 h-6" />
+                      <span>Education</span>
+                    </h2>
+                    <button
+                      onClick={addEducation}
+                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add Education</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {editedResumeData.education.map((edu, index) => (
+                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                        {editingSection === 'education' && editingIndex === index ? (
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Institution</label>
+                                <input
+                                  type="text"
+                                  value={edu.institution}
+                                  onChange={(e) => updateEducation(index, 'institution', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="University/School name"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Degree</label>
+                                <input
+                                  type="text"
+                                  value={edu.degree}
+                                  onChange={(e) => updateEducation(index, 'degree', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Bachelor's, Master's, etc."
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Field of Study</label>
+                                <input
+                                  type="text"
+                                  value={edu.field}
+                                  onChange={(e) => updateEducation(index, 'field', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Computer Science, Business, etc."
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">Graduation Date</label>
+                                <input
+                                  type="text"
+                                  value={edu.graduationDate}
+                                  onChange={(e) => updateEducation(index, 'graduationDate', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="May 2023"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-gray-300 text-sm mb-2">GPA (optional)</label>
+                                <input
+                                  type="text"
+                                  value={edu.gpa || ''}
+                                  onChange={(e) => updateEducation(index, 'gpa', e.target.value)}
+                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  placeholder="3.8/4.0"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection(null);
+                                  setEditingIndex(null);
+                                }}
+                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                                <span>Cancel</span>
+                              </button>
+                              <button
+                                onClick={saveChanges}
+                                disabled={saving}
+                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                <span>{saving ? 'Saving...' : 'Save'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="text-white font-medium">{edu.degree || 'New Degree'} {edu.field && `in ${edu.field}`}</h4>
+                              <p className="text-gray-300">{edu.institution}</p>
+                              <p className="text-gray-400 text-sm">{edu.graduationDate} {edu.gpa && `• GPA: ${edu.gpa}`}</p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection('education');
+                                  setEditingIndex(index);
+                                }}
+                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => deleteEducation(index)}
+                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Skills */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                      <Code className="w-6 h-6" />
+                      <span>Skills</span>
+                    </h2>
+                    <button
+                      onClick={addSkillCategory}
+                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add Category</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {editedResumeData.skills.map((skillGroup, index) => (
+                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                        {editingSection === 'skills' && editingIndex === index ? (
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-gray-300 text-sm mb-2">Category Name</label>
+                              <input
+                                type="text"
+                                value={skillGroup.category}
+                                onChange={(e) => updateSkillCategory(index, 'category', e.target.value)}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="Programming Languages, Frameworks, etc."
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-gray-300 text-sm mb-2">Skills (comma separated)</label>
+                              <textarea
+                                value={(skillGroup.items || []).join(', ')}
+                                onChange={(e) => updateSkillCategory(index, 'items', e.target.value.split(',').map(s => s.trim()).filter(s => s))}
+                                rows={3}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder="JavaScript, React, Node.js, Python, etc."
+                              />
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection(null);
+                                  setEditingIndex(null);
+                                }}
+                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                                <span>Cancel</span>
+                              </button>
+                              <button
+                                onClick={saveChanges}
+                                disabled={saving}
+                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                              >
+                                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                <span>{saving ? 'Saving...' : 'Save'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="text-white font-medium">{skillGroup.category || 'New Skill Category'}</h4>
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {(skillGroup.items || []).map((skill, i) => (
+                                  <span key={i} className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-sm">
+                                    {skill}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingSection('skills');
+                                  setEditingIndex(index);
+                                }}
+                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => deleteSkillCategory(index)}
+                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -507,7 +1231,7 @@ function DashboardContent() {
                         <div className="flex-1">
                           <div className="flex">
                             <div className="bg-white/5 border border-white/20 border-r-0 rounded-l-lg px-3 py-2 text-gray-300 text-sm">
-                              {window.location.origin}/
+                              {getBaseUrl()}/
                             </div>
                             <input
                               type="text"

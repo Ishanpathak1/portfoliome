@@ -1,7 +1,7 @@
 import { getPortfolioBySlug } from '@/lib/portfolio-db';
 import { PortfolioRenderer } from '@/components/PortfolioRenderer';
 import { notFound } from 'next/navigation';
-import { Metadata } from 'next/dist/lib/metadata/types/metadata-interface';
+import { Metadata } from 'next';
 
 interface PortfolioPageProps {
   params: {

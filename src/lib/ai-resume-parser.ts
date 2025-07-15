@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { ResumeData } from '@/types/resume';
+import { validateAndFixUrl } from './utils';
 
 const openai = new OpenAI({
   apiKey: process.env.OPEN_KEY,
