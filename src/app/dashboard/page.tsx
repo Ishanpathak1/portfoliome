@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { AuthWrapper } from '@/components/FirebaseAuthWrapper';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
@@ -8,6 +8,7 @@ import { ResumeData, PersonalizationData, Experience, Education, Project, SkillC
 import { ToastContainer, useToast } from '@/components/Toast';
 import { SectionManager } from '@/components/SectionManager';
 import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
+import QRCode from 'qrcode';
 import { 
   Settings, 
   Eye, 
@@ -38,7 +39,9 @@ import {
   Globe,
   Building,
   X,
-  Layers
+  Layers,
+  QrCode,
+  Smartphone
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -65,6 +68,7 @@ function DashboardContent() {
   const [editedResumeData, setEditedResumeData] = useState<ResumeData | null>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
 
   // Content editing states
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -98,6 +102,47 @@ function DashboardContent() {
       loadUserPortfolio();
     }
   }, [user]);
+
+  // Generate QR code when portfolio changes
+  useEffect(() => {
+    if (portfolio?.slug) {
+      generateQRCode();
+    }
+  }, [portfolio?.slug]);
+
+  const generateQRCode = async () => {
+    try {
+      if (portfolio?.slug) {
+        const url = getPortfolioUrl(portfolio.slug);
+        
+        // Get theme colors based on selected color scheme
+        const getThemeQRColors = (colorScheme: string) => {
+          const themeColors: Record<string, { dark: string; light: string }> = {
+            blue: { dark: '#3B82F6', light: '#EFF6FF' },
+            green: { dark: '#10B981', light: '#ECFDF5' },
+            purple: { dark: '#8B5CF6', light: '#F3E8FF' },
+            orange: { dark: '#F59E0B', light: '#FFF7ED' }
+          };
+          return themeColors[colorScheme] || themeColors.blue;
+        };
+
+        const colorScheme = portfolio.personalization?.colorScheme || 'blue';
+        const qrColors = getThemeQRColors(colorScheme);
+        
+        const qrDataUrl = await QRCode.toDataURL(url, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: qrColors.dark,
+            light: qrColors.light,
+          },
+        });
+        setQrCodeUrl(qrDataUrl);
+      }
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    }
+  };
 
   const loadUserPortfolio = async () => {
     try {
@@ -514,7 +559,7 @@ function DashboardContent() {
                 {/* Portfolio URL */}
                 <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
                   <h3 className="text-lg font-bold text-white mb-4">Your Portfolio URL</h3>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 mb-6">
                     <div className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3">
                       <code className="text-purple-300 text-sm break-all">
                         {getPortfolioUrl(portfolio.slug)}
@@ -527,6 +572,40 @@ function DashboardContent() {
                       {copiedUrl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       <span>{copiedUrl ? 'Copied!' : 'Copy'}</span>
                     </button>
+                  </div>
+                  
+                  {/* QR Code Section */}
+                  <div className="border-t border-white/10 pt-6">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <QrCode className="w-5 h-5 text-purple-400" />
+                      <h4 className="text-md font-semibold text-white">QR Code</h4>
+                      <div className="flex items-center space-x-1 bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full text-xs">
+                        <Smartphone className="w-3 h-3" />
+                        <span>Scan to open on mobile</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                      <div className="bg-white p-4 rounded-xl shadow-lg">
+                        {qrCodeUrl ? (
+                          <img 
+                            src={qrCodeUrl} 
+                            alt="QR Code for Portfolio" 
+                            className="w-32 h-32 block"
+                          />
+                        ) : (
+                          <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 text-center sm:text-left">
+                        <p className="text-gray-300 text-sm">
+                          Scan this QR code with your phone camera to quickly access your portfolio on mobile devices.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
