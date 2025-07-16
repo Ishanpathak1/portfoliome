@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import ConditionalAuthWrapper from '@/components/ConditionalAuthWrapper';
 import { GoogleAnalyticsWrapper } from '@/components/GoogleAnalytics';
-import { Navigation } from '@/components/Navigation';
+import ConditionalNavigation from '@/components/ConditionalNavigation';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -107,8 +107,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <GoogleAnalyticsWrapper />
         <ConditionalAuthWrapper>
-          <Navigation />
-          <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black pt-16 md:pt-20">
+          <ConditionalNavigation />
+          <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
             {children}
           </div>
         </ConditionalAuthWrapper>
