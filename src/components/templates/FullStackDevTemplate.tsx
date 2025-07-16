@@ -118,16 +118,26 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
     // Generate constellation nodes
     const nodes: ConstellationNode[] = [];
     const skills = resumeData.skills?.flatMap(s => s.items) || [];
     const projects = resumeData.projects?.map(p => p.name) || [];
     
+    // Adjust node count based on screen size
+    const isMobile = window.innerWidth < 768;
+    const skillCount = isMobile ? 5 : 8;
+    const projectCount = isMobile ? 3 : 5;
+    
     // Create skill nodes
-    skills.slice(0, 8).forEach((skill, i) => {
+    skills.slice(0, skillCount).forEach((skill, i) => {
       nodes.push({
         id: `skill-${i}`,
         x: Math.random() * canvas.width,
@@ -140,7 +150,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     });
 
     // Create project nodes
-    projects.slice(0, 5).forEach((project, i) => {
+    projects.slice(0, projectCount).forEach((project, i) => {
       nodes.push({
         id: `project-${i}`,
         x: Math.random() * canvas.width,
@@ -153,13 +163,14 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     });
 
     // Create connections between nearby nodes
+    const maxDistance = isMobile ? 150 : 200;
     nodes.forEach(node => {
       nodes.forEach(other => {
         if (node.id !== other.id) {
           const distance = Math.sqrt(
             Math.pow(node.x - other.x, 2) + Math.pow(node.y - other.y, 2)
           );
-          if (distance < 200) {
+          if (distance < maxDistance) {
             node.connections.push(other.id);
           }
         }
@@ -215,21 +226,25 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     };
 
     animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
   }, [hologramEffect, resumeData]);
 
   // Terminal Header Component
   const TerminalHeader = () => (
-    <div className="bg-black border-b border-cyan-500 p-4">
+    <div className="bg-black border-b border-cyan-500 p-3 md:p-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 md:space-x-4">
           <div className="flex space-x-2">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           </div>
-          <span className="text-cyan-400 font-mono text-sm">dev@portfolio-system</span>
+          <span className="text-cyan-400 font-mono text-xs md:text-sm">dev@portfolio-system</span>
         </div>
-        <div className="flex items-center space-x-4 text-xs text-cyan-400 font-mono">
+        <div className="hidden md:flex items-center space-x-4 text-xs text-cyan-400 font-mono">
           <span>CPU: {systemStats.cpu}%</span>
           <span>MEM: {systemStats.memory}%</span>
           <span>NET: {systemStats.network}%</span>
@@ -284,8 +299,8 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
       
       {/* Matrix-like background pattern */}
       <div className="absolute inset-0 opacity-10">
-        <div className="grid grid-cols-20 grid-rows-20 w-full h-full">
-          {Array.from({ length: 400 }).map((_, i) => (
+        <div className="grid grid-cols-12 md:grid-cols-20 grid-rows-12 md:grid-rows-20 w-full h-full">
+          {Array.from({ length: window.innerWidth > 768 ? 400 : 144 }).map((_, i) => (
             <div
               key={i}
               className="border border-cyan-500/20 flex items-center justify-center"
@@ -300,25 +315,25 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
         </div>
       </div>
 
-      <div className="relative z-10 min-h-screen flex items-center px-8">
+      <div className="relative z-10 min-h-screen flex items-center px-4 md:px-8">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start lg:items-center">
             {/* Left: Profile Terminal */}
-            <div className="space-y-8">
+            <div className="space-y-6 lg:space-y-8">
               <HolographicCard>
                 <TerminalHeader />
-                <div className="p-6 space-y-4">
+                <div className="p-4 md:p-6 space-y-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-cyan-400">
-                      <span className="text-white font-mono font-bold text-lg">
+                    <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-cyan-400">
+                      <span className="text-white font-mono font-bold text-sm md:text-lg">
                         {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 'FS'}
                       </span>
                     </div>
                     <div>
-                      <h1 className="text-2xl font-mono font-bold text-cyan-400">
+                      <h1 className="text-lg md:text-2xl font-mono font-bold text-cyan-400">
                         {resumeData.contact?.name || 'Full Stack Developer'}
                       </h1>
-                      <p className="text-purple-400 font-mono">
+                      <p className="text-purple-400 font-mono text-sm md:text-base">
                         {resumeData.experience?.[0]?.position || 'System Architect'}
                       </p>
                     </div>
@@ -328,10 +343,10 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                     {terminalLines.map((line, index) => (
                       <div key={index} className="space-y-1">
                         <div className="flex items-center space-x-2">
-                          <span className="text-green-400 font-mono text-sm">{line.prompt}</span>
-                          <span className="text-white font-mono text-sm">{line.command}</span>
+                          <span className="text-green-400 font-mono text-xs md:text-sm">{line.prompt}</span>
+                          <span className="text-white font-mono text-xs md:text-sm">{line.command}</span>
                         </div>
-                        <div className="text-cyan-400 font-mono text-sm ml-4">
+                        <div className="text-cyan-400 font-mono text-xs md:text-sm ml-4">
                           {line.output}
                         </div>
                       </div>
@@ -339,8 +354,8 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                     
                     {isTyping && (
                       <div className="flex items-center space-x-2">
-                        <span className="text-green-400 font-mono text-sm">dev@portfolio:~$</span>
-                        <span className="text-white font-mono text-sm">
+                        <span className="text-green-400 font-mono text-xs md:text-sm">dev@portfolio:~$</span>
+                        <span className="text-white font-mono text-xs md:text-sm">
                           <span className="animate-pulse">▊</span>
                         </span>
                       </div>
@@ -351,19 +366,19 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
               {/* Contact Matrix */}
               <HolographicCard>
-                <div className="p-6">
-                  <h3 className="text-cyan-400 font-mono text-lg mb-4 flex items-center">
-                    <Command className="w-5 h-5 mr-2" />
+                <div className="p-4 md:p-6">
+                  <h3 className="text-cyan-400 font-mono text-base md:text-lg mb-4 flex items-center">
+                    <Command className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                     CONTACT_MATRIX
                   </h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     {resumeData.contact?.email && (
                       <a
                         href={`mailto:${resumeData.contact.email}`}
-                        className="flex items-center space-x-2 p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group"
+                        className="flex items-center space-x-2 p-3 md:p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group min-h-[48px] touch-manipulation"
                       >
                         <Mail className="w-4 h-4 text-cyan-400 group-hover:text-purple-400" />
-                        <span className="text-cyan-400 font-mono text-sm group-hover:text-purple-400">
+                        <span className="text-cyan-400 font-mono text-xs md:text-sm group-hover:text-purple-400">
                           EMAIL
                         </span>
                       </a>
@@ -371,10 +386,10 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                     {resumeData.contact?.phone && (
                       <a
                         href={`tel:${resumeData.contact.phone}`}
-                        className="flex items-center space-x-2 p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group"
+                        className="flex items-center space-x-2 p-3 md:p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group min-h-[48px] touch-manipulation"
                       >
                         <Phone className="w-4 h-4 text-cyan-400 group-hover:text-purple-400" />
-                        <span className="text-cyan-400 font-mono text-sm group-hover:text-purple-400">
+                        <span className="text-cyan-400 font-mono text-xs md:text-sm group-hover:text-purple-400">
                           PHONE
                         </span>
                       </a>
@@ -384,10 +399,10 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                         href={resumeData.contact.linkedin}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-2 p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group"
+                        className="flex items-center space-x-2 p-3 md:p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group min-h-[48px] touch-manipulation"
                       >
                         <Linkedin className="w-4 h-4 text-cyan-400 group-hover:text-purple-400" />
-                        <span className="text-cyan-400 font-mono text-sm group-hover:text-purple-400">
+                        <span className="text-cyan-400 font-mono text-xs md:text-sm group-hover:text-purple-400">
                           LINKEDIN
                         </span>
                       </a>
@@ -397,10 +412,10 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                         href={resumeData.contact.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-2 p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group"
+                        className="flex items-center space-x-2 p-3 md:p-3 border border-cyan-500/50 hover:border-cyan-400 transition-colors group min-h-[48px] touch-manipulation"
                       >
                         <Github className="w-4 h-4 text-cyan-400 group-hover:text-purple-400" />
-                        <span className="text-cyan-400 font-mono text-sm group-hover:text-purple-400">
+                        <span className="text-cyan-400 font-mono text-xs md:text-sm group-hover:text-purple-400">
                           GITHUB
                         </span>
                       </a>
@@ -411,20 +426,20 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
             </div>
 
             {/* Right: System Dashboard */}
-            <div className="space-y-8">
+            <div className="space-y-6 lg:space-y-8">
               <HolographicCard>
-                <div className="p-6">
-                  <h3 className="text-cyan-400 font-mono text-lg mb-4 flex items-center">
-                    <Activity className="w-5 h-5 mr-2" />
+                <div className="p-4 md:p-6">
+                  <h3 className="text-cyan-400 font-mono text-base md:text-lg mb-4 flex items-center">
+                    <Activity className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                     SYSTEM_OVERVIEW
                   </h3>
                   
                   {resumeData.summary && (
                     <div className="space-y-4">
-                      <div className="text-green-400 font-mono text-sm">
+                      <div className="text-green-400 font-mono text-xs md:text-sm">
                         &gt; cat /profile/summary.txt
                       </div>
-                      <div className="text-cyan-400 font-mono text-sm leading-relaxed border-l-2 border-cyan-500 pl-4">
+                      <div className="text-cyan-400 font-mono text-xs md:text-sm leading-relaxed border-l-2 border-cyan-500 pl-4">
                         {resumeData.summary}
                       </div>
                     </div>
@@ -434,15 +449,15 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
               {/* Tech Stack Radar */}
               <HolographicCard>
-                <div className="p-6">
-                  <h3 className="text-cyan-400 font-mono text-lg mb-4 flex items-center">
-                    <Cpu className="w-5 h-5 mr-2" />
+                <div className="p-4 md:p-6">
+                  <h3 className="text-cyan-400 font-mono text-base md:text-lg mb-4 flex items-center">
+                    <Cpu className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                     TECH_STACK_RADAR
                   </h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     {resumeData.skills?.slice(0, 4).map((skillCategory, index) => (
                       <div key={index} className="border border-cyan-500/30 p-3">
-                        <div className="text-purple-400 font-mono text-sm mb-2">
+                        <div className="text-purple-400 font-mono text-xs md:text-sm mb-2">
                           {skillCategory.category.toUpperCase()}
                         </div>
                         <div className="space-y-1">
@@ -461,32 +476,32 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
               {/* Performance Metrics */}
               <HolographicCard>
-                <div className="p-6">
-                  <h3 className="text-cyan-400 font-mono text-lg mb-4 flex items-center">
-                    <TrendingUp className="w-5 h-5 mr-2" />
+                <div className="p-4 md:p-6">
+                  <h3 className="text-cyan-400 font-mono text-base md:text-lg mb-4 flex items-center">
+                    <TrendingUp className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                     PERFORMANCE_METRICS
                   </h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-mono font-bold text-green-400">
+                      <div className="text-xl md:text-2xl font-mono font-bold text-green-400">
                         {resumeData.projects?.length || 0}
                       </div>
                       <div className="text-cyan-400 font-mono text-xs">PROJECTS</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-mono font-bold text-purple-400">
+                      <div className="text-xl md:text-2xl font-mono font-bold text-purple-400">
                         {resumeData.experience?.length || 0}
                       </div>
                       <div className="text-cyan-400 font-mono text-xs">POSITIONS</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-mono font-bold text-yellow-400">
+                      <div className="text-xl md:text-2xl font-mono font-bold text-yellow-400">
                         {resumeData.skills?.reduce((acc, cat) => acc + cat.items.length, 0) || 0}
                       </div>
                       <div className="text-cyan-400 font-mono text-xs">SKILLS</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-mono font-bold text-red-400">
+                      <div className="text-xl md:text-2xl font-mono font-bold text-red-400">
                         {resumeData.certifications?.length || 0}
                       </div>
                       <div className="text-cyan-400 font-mono text-xs">CERTS</div>
@@ -506,13 +521,13 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     if (!resumeData.experience?.length) return null;
 
     return (
-      <section className="py-20 bg-black relative overflow-hidden">
+      <section className="py-12 md:py-20 bg-black relative overflow-hidden">
         {/* Code Matrix Background */}
         <div className="absolute inset-0 opacity-5">
           <div className="font-mono text-xs text-cyan-400 leading-4 overflow-hidden">
-            {Array.from({ length: 50 }).map((_, i) => (
+            {Array.from({ length: window.innerWidth > 768 ? 50 : 25 }).map((_, i) => (
               <div key={i} className="whitespace-nowrap">
-                {Array.from({ length: 100 }).map((_, j) => (
+                {Array.from({ length: window.innerWidth > 768 ? 100 : 50 }).map((_, j) => (
                   <span key={j} className="inline-block animate-pulse" style={{ animationDelay: `${(i + j) * 0.1}s` }}>
                     {Math.random() > 0.5 ? '1' : '0'}
                   </span>
@@ -522,25 +537,25 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
           </div>
         </div>
 
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-mono font-bold text-cyan-400 mb-4">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
               &gt; ls -la /experience/
             </h2>
-            <div className="w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
+            <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
 
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
             {resumeData.experience.map((exp, index) => (
-              <HolographicCard key={index} className="p-8">
-                <div className="grid lg:grid-cols-3 gap-8">
+              <HolographicCard key={index} className="p-4 md:p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
                   <div className="lg:col-span-2">
-                    <div className="flex items-start space-x-4 mb-6">
-                      <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-purple-500 rounded border-2 border-cyan-400 flex items-center justify-center">
-                        <Briefcase className="w-6 h-6 text-white" />
+                    <div className="flex items-start space-x-3 md:space-x-4 mb-6">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-cyan-500 to-purple-500 rounded border-2 border-cyan-400 flex items-center justify-center">
+                        <Briefcase className="w-4 h-4 md:w-6 md:h-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-mono font-bold text-cyan-400">
+                        <h3 className="text-lg md:text-xl font-mono font-bold text-cyan-400">
                           {exp.position}
                         </h3>
                         <div className="text-purple-400 font-mono text-sm">
@@ -556,13 +571,13 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
                     {exp.responsibilities && (
                       <div className="space-y-3">
-                        <div className="text-green-400 font-mono text-sm">
+                        <div className="text-green-400 font-mono text-xs md:text-sm">
                           &gt; cat responsibilities.log
                         </div>
                         {exp.responsibilities.map((item, i) => (
                           <div key={i} className="flex items-start space-x-3">
                             <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-cyan-400 font-mono text-sm leading-relaxed">
+                            <span className="text-cyan-400 font-mono text-xs md:text-sm leading-relaxed">
                               {item}
                             </span>
                           </div>
@@ -572,11 +587,11 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                   </div>
 
                   <div className="lg:col-span-1">
-                    <div className="border-l-2 border-cyan-500 pl-6">
-                      <div className="text-purple-400 font-mono text-sm mb-2">
+                    <div className="border-l-2 border-cyan-500 pl-4 md:pl-6 mt-6 lg:mt-0">
+                      <div className="text-purple-400 font-mono text-xs md:text-sm mb-2">
                         DURATION
                       </div>
-                      <div className="text-cyan-400 font-mono text-sm">
+                      <div className="text-cyan-400 font-mono text-xs md:text-sm">
                         {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'PRESENT'}
                       </div>
                     </div>
@@ -595,36 +610,36 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     if (!resumeData.skills?.length) return null;
 
     return (
-      <section className="py-20 bg-black relative overflow-hidden">
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-mono font-bold text-cyan-400 mb-4">
+      <section className="py-12 md:py-20 bg-black relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
               &gt; ./skills --list-all
             </h2>
-            <div className="w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
+            <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
 
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {resumeData.skills.map((skillCategory, index) => (
-                <HolographicCard key={index} className="p-6">
+                <HolographicCard key={index} className="p-4 md:p-6">
                   <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-purple-500 rounded border-2 border-cyan-400 flex items-center justify-center">
-                      <Code2 className="w-5 h-5 text-white" />
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-cyan-500 to-purple-500 rounded border-2 border-cyan-400 flex items-center justify-center">
+                      <Code2 className="w-4 h-4 md:w-5 md:h-5 text-white" />
                     </div>
-                    <h3 className="text-lg font-mono font-bold text-cyan-400">
+                    <h3 className="text-sm md:text-lg font-mono font-bold text-cyan-400">
                       {skillCategory.category.toUpperCase()}
                     </h3>
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="text-green-400 font-mono text-sm">
+                    <div className="text-green-400 font-mono text-xs md:text-sm">
                       &gt; cat {skillCategory.category.toLowerCase()}.txt
                     </div>
                     {skillCategory.items.map((item, i) => (
                       <div key={i} className="flex items-center space-x-3">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                        <span className="text-cyan-400 font-mono text-sm">
+                        <span className="text-cyan-400 font-mono text-xs md:text-sm">
                           {item}
                         </span>
                       </div>
@@ -644,29 +659,29 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     if (!resumeData.projects?.length) return null;
 
     return (
-      <section className="py-20 bg-black relative overflow-hidden">
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-mono font-bold text-cyan-400 mb-4">
+      <section className="py-12 md:py-20 bg-black relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
               &gt; git log --graph --oneline
             </h2>
-            <div className="w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
+            <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
 
           <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
               {resumeData.projects.map((project, index) => (
-                <HolographicCard key={index} className="p-8">
+                <HolographicCard key={index} className="p-4 md:p-8">
                   <div className="flex items-start justify-between mb-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-cyan-500 rounded border-2 border-purple-400 flex items-center justify-center">
-                        <Rocket className="w-6 h-6 text-white" />
+                    <div className="flex items-start space-x-3 md:space-x-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-500 to-cyan-500 rounded border-2 border-purple-400 flex items-center justify-center">
+                        <Rocket className="w-4 h-4 md:w-6 md:h-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-mono font-bold text-purple-400">
+                        <h3 className="text-lg md:text-xl font-mono font-bold text-purple-400">
                           {project.name}
                         </h3>
-                        <div className="text-cyan-400 font-mono text-sm">
+                        <div className="text-cyan-400 font-mono text-xs md:text-sm">
                           PROJECT_ID: {index + 1}
                         </div>
                       </div>
@@ -678,7 +693,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                           href={project.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 border border-cyan-500/50 hover:border-cyan-400 transition-colors"
+                          className="p-2 border border-cyan-500/50 hover:border-cyan-400 transition-colors min-h-[40px] min-w-[40px] touch-manipulation"
                         >
                           <ExternalLink className="w-4 h-4 text-cyan-400" />
                         </a>
@@ -688,7 +703,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 border border-purple-500/50 hover:border-purple-400 transition-colors"
+                          className="p-2 border border-purple-500/50 hover:border-purple-400 transition-colors min-h-[40px] min-w-[40px] touch-manipulation"
                         >
                           <Github className="w-4 h-4 text-purple-400" />
                         </a>
@@ -698,14 +713,14 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
                   {project.technologies && (
                     <div className="mb-6">
-                      <div className="text-green-400 font-mono text-sm mb-2">
+                      <div className="text-green-400 font-mono text-xs md:text-sm mb-2">
                         &gt; cat package.json | grep dependencies
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {project.technologies.map((tech, i) => (
                           <span
                             key={i}
-                            className="px-3 py-1 text-xs font-mono bg-cyan-500/20 border border-cyan-500/50 text-cyan-400"
+                            className="px-2 py-1 text-xs font-mono bg-cyan-500/20 border border-cyan-500/50 text-cyan-400"
                           >
                             {tech}
                           </span>
@@ -716,10 +731,10 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
                   {project.description && (
                     <div className="mb-6">
-                      <div className="text-green-400 font-mono text-sm mb-2">
+                      <div className="text-green-400 font-mono text-xs md:text-sm mb-2">
                         &gt; cat README.md
                       </div>
-                      <p className="text-cyan-400 font-mono text-sm leading-relaxed border-l-2 border-cyan-500 pl-4">
+                      <p className="text-cyan-400 font-mono text-xs md:text-sm leading-relaxed border-l-2 border-cyan-500 pl-4">
                         {project.description}
                       </p>
                     </div>
@@ -727,7 +742,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
                   {(project.startDate || project.endDate) && (
                     <div className="border-t border-cyan-500/30 pt-4">
-                      <div className="text-purple-400 font-mono text-sm">
+                      <div className="text-purple-400 font-mono text-xs md:text-sm">
                         TIMELINE: {project.startDate} {project.endDate && `- ${project.endDate}`}
                       </div>
                     </div>
@@ -746,27 +761,27 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     if (!resumeData.education?.length) return null;
 
     return (
-      <section className="py-20 bg-black relative overflow-hidden">
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-mono font-bold text-cyan-400 mb-4">
+      <section className="py-12 md:py-20 bg-black relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
               &gt; find /education -type f
             </h2>
-            <div className="w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
+            <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
             {resumeData.education.map((edu, index) => (
-              <HolographicCard key={index} className="p-8">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-purple-500 rounded border-2 border-cyan-400 flex items-center justify-center">
-                    <GraduationCap className="w-6 h-6 text-white" />
+              <HolographicCard key={index} className="p-4 md:p-8">
+                <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-cyan-500 to-purple-500 rounded border-2 border-cyan-400 flex items-center justify-center">
+                    <GraduationCap className="w-4 h-4 md:w-6 md:h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-mono font-bold text-cyan-400">
+                    <h3 className="text-lg md:text-xl font-mono font-bold text-cyan-400">
                       {edu.degree}
                     </h3>
-                    <div className="text-purple-400 font-mono text-sm">
+                    <div className="text-purple-400 font-mono text-sm md:text-sm">
                       {edu.institution}
                     </div>
                     {edu.location && (
@@ -775,9 +790,9 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                       </div>
                     )}
                   </div>
-                  <div className="text-right">
+                  <div className="text-left md:text-right">
                     {edu.graduationDate && (
-                      <div className="text-green-400 font-mono text-sm">
+                      <div className="text-green-400 font-mono text-xs md:text-sm">
                         {formatDate(edu.graduationDate)}
                       </div>
                     )}
@@ -801,25 +816,25 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     if (!resumeData.certifications?.length) return null;
 
     return (
-      <section className="py-20 bg-black relative overflow-hidden">
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-mono font-bold text-cyan-400 mb-4">
+      <section className="py-12 md:py-20 bg-black relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
               &gt; openssl verify /certs/*
             </h2>
-            <div className="w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
+            <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {resumeData.certifications.map((cert, index) => (
-                <HolographicCard key={index} className="p-6">
+                <HolographicCard key={index} className="p-4 md:p-6">
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-cyan-500 rounded border-2 border-purple-400 flex items-center justify-center">
-                      <Award className="w-5 h-5 text-white" />
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-cyan-500 rounded border-2 border-purple-400 flex items-center justify-center">
+                      <Award className="w-4 h-4 md:w-5 md:h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-mono font-bold text-purple-400">
+                      <h3 className="text-sm md:text-lg font-mono font-bold text-purple-400">
                         {cert}
                       </h3>
                       <div className="text-green-400 font-mono text-xs">
@@ -839,23 +854,23 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
   // Enhanced Custom Section Renderer
   const renderCustomSection = (section: any) => {
     return (
-      <section className="py-20 bg-black relative overflow-hidden">
-        <div className="container mx-auto px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-mono font-bold text-cyan-400 mb-4">
+      <section className="py-12 md:py-20 bg-black relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
               &gt; cat /{section.title.toLowerCase()}.txt
             </h2>
-            <div className="w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
+            <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <HolographicCard className="p-8">
+            <HolographicCard className="p-4 md:p-8">
               {section.type === 'text' && (
                 <div>
-                  <div className="text-green-400 font-mono text-sm mb-4">
+                  <div className="text-green-400 font-mono text-xs md:text-sm mb-4">
                     &gt; cat {section.title.toLowerCase()}.md
                   </div>
-                  <p className="text-cyan-400 font-mono text-sm leading-relaxed border-l-2 border-cyan-500 pl-4">
+                  <p className="text-cyan-400 font-mono text-xs md:text-sm leading-relaxed border-l-2 border-cyan-500 pl-4">
                     {section.content}
                   </p>
                 </div>
@@ -863,14 +878,14 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
               {section.type === 'list' && (
                 <div>
-                  <div className="text-green-400 font-mono text-sm mb-4">
+                  <div className="text-green-400 font-mono text-xs md:text-sm mb-4">
                     &gt; ls -la {section.title.toLowerCase()}/
                   </div>
                   <ul className="space-y-3">
                     {section.items?.map((item: string, index: number) => (
                       <li key={index} className="flex items-start space-x-3">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0" />
-                        <span className="text-cyan-400 font-mono text-sm">{item}</span>
+                        <span className="text-cyan-400 font-mono text-xs md:text-sm">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -879,17 +894,17 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
               {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
                 <div>
-                  <div className="text-green-400 font-mono text-sm mb-4">
+                  <div className="text-green-400 font-mono text-xs md:text-sm mb-4">
                     &gt; cat {section.title.toLowerCase()}.log
                   </div>
                   <div className="space-y-6">
                     {section.items?.map((item: any, index: number) => (
-                      <div key={index} className="border-l-2 border-cyan-500 pl-6">
-                        <h3 className="text-lg font-mono font-bold text-purple-400 mb-2">
+                      <div key={index} className="border-l-2 border-cyan-500 pl-4 md:pl-6">
+                        <h3 className="text-sm md:text-lg font-mono font-bold text-purple-400 mb-2">
                           {item.title}
                         </h3>
                         {item.description && (
-                          <p className="text-cyan-400 font-mono text-sm mb-3">
+                          <p className="text-cyan-400 font-mono text-xs md:text-sm mb-3">
                             {item.description}
                           </p>
                         )}
@@ -942,10 +957,10 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
   return (
     <div className="min-h-screen bg-black text-cyan-400 font-mono overflow-hidden">
       {/* Terminal Boot Sequence */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-2 right-2 md:top-4 md:right-4 z-50">
         <div className="bg-black border border-cyan-500 p-2 text-xs">
           <div className="text-green-400">SYSTEM_STATUS: ONLINE</div>
-          <div className="text-cyan-400">PORTFOLIO_VERSION: 3.14.159</div>
+          <div className="text-cyan-400 hidden md:block">PORTFOLIO_VERSION: 3.14.159</div>
         </div>
       </div>
 
@@ -960,17 +975,17 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
       ))}
 
       {/* Terminal Footer */}
-      <footer className="py-12 bg-black border-t border-cyan-500">
-        <div className="container mx-auto px-8 text-center">
-          <HolographicCard className="p-6 max-w-3xl mx-auto">
+      <footer className="py-8 md:py-12 bg-black border-t border-cyan-500">
+        <div className="container mx-auto px-4 md:px-8 text-center">
+          <HolographicCard className="p-4 md:p-6 max-w-3xl mx-auto">
             <div className="space-y-4">
               <div className="flex items-center justify-center space-x-4">
-                <Terminal className="w-8 h-8 text-cyan-400" />
-                <span className="text-xl font-mono font-bold text-cyan-400">
+                <Terminal className="w-6 h-6 md:w-8 md:h-8 text-cyan-400" />
+                <span className="text-lg md:text-xl font-mono font-bold text-cyan-400">
                   END_OF_TRANSMISSION
                 </span>
               </div>
-              <div className="text-purple-400 font-mono text-sm">
+              <div className="text-purple-400 font-mono text-xs md:text-sm">
                 Thank you for exploring my digital portfolio matrix
               </div>
               <div className="text-cyan-400 font-mono text-xs">
