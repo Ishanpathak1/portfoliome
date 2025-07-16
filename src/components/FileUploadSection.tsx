@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { ResumeData } from '@/types/resume';
+import { trackResumeUpload } from '@/lib/utils';
 // Using API route for resume parsing
 
 interface FileUploadSectionProps {
@@ -19,6 +20,7 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
     setError(null);
     setUploadedFile(file);
     try {
+      trackResumeUpload(file.size, file.type);
       await onFileUpload(file);
     } catch (error) {
       setError('Failed to process file. Please try again.');

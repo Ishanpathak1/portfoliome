@@ -81,3 +81,49 @@ export function safeUrl(url: string | undefined): string {
   if (!url) return '';
   return isValidUrl(url) ? url : validateAndFixUrl(url);
 } 
+
+// Analytics Event Tracking
+export const trackEvent = (eventName: string, eventParams?: Record<string, any>) => {
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', eventName, eventParams);
+  }
+};
+
+export const analyticsEvents = {
+  TEMPLATE_SELECTED: 'template_selected',
+  RESUME_UPLOADED: 'resume_uploaded',
+  PORTFOLIO_GENERATED: 'portfolio_generated',
+  SECTION_EDITED: 'section_edited',
+  PORTFOLIO_PUBLISHED: 'portfolio_published',
+  PERSONALIZATION_UPDATED: 'personalization_updated',
+} as const;
+
+// Analytics helper functions
+export const trackTemplateSelection = (templateName: string) => {
+  trackEvent(analyticsEvents.TEMPLATE_SELECTED, { template_name: templateName });
+};
+
+export const trackResumeUpload = (fileSize: number, fileType: string) => {
+  trackEvent(analyticsEvents.RESUME_UPLOADED, { file_size: fileSize, file_type: fileType });
+};
+
+export const trackPortfolioGeneration = (success: boolean, error?: string) => {
+  trackEvent(analyticsEvents.PORTFOLIO_GENERATED, { 
+    success,
+    error_message: error || undefined 
+  });
+};
+
+export const trackSectionEdit = (sectionName: string) => {
+  trackEvent(analyticsEvents.SECTION_EDITED, { section_name: sectionName });
+};
+
+export const trackPortfolioPublish = (portfolioId: string) => {
+  trackEvent(analyticsEvents.PORTFOLIO_PUBLISHED, { portfolio_id: portfolioId });
+};
+
+export const trackPersonalizationUpdate = (updatedFields: string[]) => {
+  trackEvent(analyticsEvents.PERSONALIZATION_UPDATED, { 
+    fields_updated: updatedFields.join(',') 
+  });
+}; 

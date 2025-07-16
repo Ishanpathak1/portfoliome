@@ -8,6 +8,7 @@ import { PortfolioPreview } from '@/components/PortfolioPreview';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { ResumeData, PersonalizationData } from '@/types/resume';
 import { Upload, Palette, Eye, Sparkles, Settings, FileText } from 'lucide-react';
+import { HomepageStructuredData } from '@/components/StructuredData';
 
 export default function HomePage() {
   const { user, signInWithGoogle, signOut } = useAuth();
@@ -486,6 +487,7 @@ export default function HomePage() {
           )}
         </div>
       </div>
+      <HomepageStructuredData />
     </div>
   );
 } 

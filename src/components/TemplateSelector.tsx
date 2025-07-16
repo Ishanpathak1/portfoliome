@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AVAILABLE_TEMPLATES, TemplateId, TemplateConfig } from '@/types/templates';
 import { Check, Palette, Sparkles, Monitor, Code, Briefcase } from 'lucide-react';
+import { trackTemplateSelection } from '@/lib/utils';
 
 interface TemplateSelectorProps {
   selectedTemplate: TemplateId;
@@ -34,6 +35,11 @@ const getCategoryColor = (category: string) => {
 export function TemplateSelector({ selectedTemplate, onTemplateChange }: TemplateSelectorProps) {
   const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
 
+  const handleTemplateChange = (templateId: TemplateId) => {
+    trackTemplateSelection(templateId);
+    onTemplateChange(templateId);
+  };
+
   return (
     <div className="w-full">
       <div className="mb-8">
@@ -50,7 +56,7 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange }: Templat
                 ? 'scale-105 ring-2 ring-blue-400' 
                 : 'hover:scale-102'
             }`}
-            onClick={() => onTemplateChange(template.id as TemplateId)}
+            onClick={() => handleTemplateChange(template.id as TemplateId)}
             onMouseEnter={() => setHoveredTemplate(template.id)}
             onMouseLeave={() => setHoveredTemplate(null)}
           >
