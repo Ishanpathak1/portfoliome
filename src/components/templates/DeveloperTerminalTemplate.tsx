@@ -144,12 +144,31 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
         <div className="ml-4 space-y-1">
           <div><span style={{ color: colors.primary }}>help</span> - Show this help message</div>
           <div><span style={{ color: colors.primary }}>about</span> - Display personal information</div>
-          <div><span style={{ color: colors.primary }}>ls</span> - List directory contents</div>
-          <div><span style={{ color: colors.primary }}>cat [file]</span> - Display file contents</div>
-          <div><span style={{ color: colors.primary }}>cd [directory]</span> - Change directory</div>
-          <div><span style={{ color: colors.primary }}>clear</span> - Clear terminal</div>
-          <div><span style={{ color: colors.primary }}>tree</span> - Show directory structure</div>
+          <div><span style={{ color: colors.primary }}>experience</span> - View work experience</div>
+          <div><span style={{ color: colors.primary }}>skills</span> - View technical skills</div>
+          <div><span style={{ color: colors.primary }}>projects</span> - View projects</div>
+          <div><span style={{ color: colors.primary }}>education</span> - View education history</div>
+          <div><span style={{ color: colors.primary }}>certifications</span> - View certifications</div>
           <div><span style={{ color: colors.primary }}>contact</span> - Show contact information</div>
+          <div><span style={{ color: colors.primary }}>clear</span> - Clear terminal</div>
+        </div>
+      </div>
+    ),
+
+    about: () => (
+      <div className="space-y-4">
+        <div style={{ color: colors.accent }}>Personal Information:</div>
+        <div className="ml-4 space-y-2">
+          <div><span style={{ color: colors.primary }}>Name:</span> {resumeData.contact?.name || 'Developer'}</div>
+          {resumeData.contact?.location && (
+            <div><span style={{ color: colors.primary }}>Location:</span> {resumeData.contact.location}</div>
+          )}
+          {resumeData.summary && (
+            <div className="mt-2">
+              <div style={{ color: colors.primary }}>Summary:</div>
+              <div className="mt-1" style={{ color: colors.text }}>{resumeData.summary}</div>
+            </div>
+          )}
         </div>
       </div>
     ),
@@ -161,7 +180,7 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
             ╔══════════════════════════════════════════════════════════════╗
           </div>
           <div style={{ color: colors.primary, fontSize: '24px' }}>
-            ║                    DEVELOPER PORTFOLIO v3.0                 ║
+            ║                    DEVELOPER PORTFOLIO v3.0                   ║
           </div>
           <div style={{ color: colors.primary, fontSize: '24px' }}>
             ║                  Welcome, {resumeData.contact?.name || 'Developer'}!                   ║
@@ -172,142 +191,166 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
         </div>
         <div className="mt-4 space-y-2">
           <div>System: Portfolio OS v3.0.0</div>
-          <div>Shell: /bin/portfolio-bash</div>
           <div>Current user: {userName}</div>
           <div>Last login: {new Date().toLocaleString()}</div>
           <div className="mt-4" style={{ color: colors.accent }}>
-            Type 'help' for available commands or 'ls' to explore directories.
+            Type 'help' to see all available commands.
           </div>
         </div>
       </div>
     ),
 
-    about: () => (
+    experience: () => (
       <div className="space-y-4">
-        <div style={{ color: colors.accent }}>Personal Information:</div>
+        <div style={{ color: colors.accent }}>Work Experience:</div>
+        {resumeData.experience?.map((exp, index) => (
+          <div key={index} className="ml-4 space-y-2 pb-4">
+            <div style={{ color: colors.primary }}>{exp.company}</div>
+            <div className="ml-2">
+              <div style={{ color: colors.secondary }}>{exp.position}</div>
+              <div style={{ color: colors.textSecondary }}>
+                {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
+              </div>
+              <div className="mt-2" style={{ color: colors.text }}>
+                {exp.responsibilities?.map((responsibility: string, i: number) => (
+                  <div key={i} className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>{responsibility}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+
+    skills: () => (
+      <div className="space-y-4">
+        <div style={{ color: colors.accent }}>Technical Skills:</div>
         <div className="ml-4 space-y-2">
-          <div><span style={{ color: colors.primary }}>Name:</span> {resumeData.contact?.name || 'Developer'}</div>
-          <div><span style={{ color: colors.primary }}>Email:</span> {resumeData.contact?.email || 'N/A'}</div>
-          <div><span style={{ color: colors.primary }}>Phone:</span> {resumeData.contact?.phone || 'N/A'}</div>
-          <div><span style={{ color: colors.primary }}>Location:</span> {resumeData.contact?.location || 'N/A'}</div>
-          {resumeData.summary && (
-            <div><span style={{ color: colors.primary }}>Summary:</span> {resumeData.summary}</div>
-          )}
+          {resumeData.skills?.map((skill, index) => (
+            <div key={index}>
+              <span style={{ color: colors.primary }}>{skill.category}:</span>
+              <span className="ml-2" style={{ color: colors.text }}>{skill.items.join(', ')}</span>
+            </div>
+          ))}
         </div>
       </div>
     ),
 
-    ls: () => {
-      const directories = [];
-      
-      if (!hiddenSections.includes('experience') && resumeData.experience?.length) {
-        directories.push({ name: 'experience/', type: 'directory', color: colors.accent });
-      }
-      if (!hiddenSections.includes('skills') && resumeData.skills?.length) {
-        directories.push({ name: 'skills/', type: 'directory', color: colors.accent });
-      }
-      if (!hiddenSections.includes('projects') && resumeData.projects?.length) {
-        directories.push({ name: 'projects/', type: 'directory', color: colors.accent });
-      }
-      if (!hiddenSections.includes('education') && resumeData.education?.length) {
-        directories.push({ name: 'education/', type: 'directory', color: colors.accent });
-      }
-      if (!hiddenSections.includes('certifications') && resumeData.certifications?.length) {
-        directories.push({ name: 'certifications/', type: 'directory', color: colors.accent });
-      }
-      
-      // Add custom sections
-      customSections.forEach(section => {
-        if (!hiddenSections.includes(section.id)) {
-          directories.push({ name: `${section.id}/`, type: 'directory', color: colors.accent });
-        }
-      });
-
-      directories.push({ name: 'README.md', type: 'file', color: colors.text });
-      directories.push({ name: 'contact.txt', type: 'file', color: colors.text });
-
-      return (
-        <div className="space-y-1">
-          {directories.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <span style={{ color: item.color }}>{item.name}</span>
+    projects: () => (
+      <div className="space-y-4">
+        <div style={{ color: colors.accent }}>Projects:</div>
+        {resumeData.projects?.map((project, index) => (
+          <div key={index} className="ml-4 space-y-2 pb-4">
+            <div style={{ color: colors.primary }}>{project.name}</div>
+            <div className="ml-2">
+              {project.description && (
+                <div style={{ color: colors.text }}>{project.description}</div>
+              )}
+              {project.technologies && (
+                <div style={{ color: colors.secondary }}>
+                  Technologies: {project.technologies.join(', ')}
+                </div>
+              )}
+              {project.link && (
+                <div style={{ color: colors.accent }}>
+                  URL: <a href={project.link} target="_blank" rel="noopener noreferrer">{project.link}</a>
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      );
-    },
+          </div>
+        ))}
+      </div>
+    ),
 
-    tree: () => {
-      const generateTree = () => {
-        const tree = ['portfolio/'];
-        
-        if (!hiddenSections.includes('experience') && resumeData.experience?.length) {
-          tree.push('├── experience/');
-          resumeData.experience.forEach((exp, index) => {
-            const isLast = index === resumeData.experience.length - 1;
-            tree.push(`│   ${isLast ? '└──' : '├──'} ${exp.company.toLowerCase().replace(/\s+/g, '-')}.md`);
-          });
-        }
-        
-        if (!hiddenSections.includes('skills') && resumeData.skills?.length) {
-          tree.push('├── skills/');
-          resumeData.skills.forEach((skill, index) => {
-            const isLast = index === resumeData.skills.length - 1;
-            tree.push(`│   ${isLast ? '└──' : '├──'} ${skill.category.toLowerCase().replace(/\s+/g, '-')}.json`);
-          });
-        }
-        
-        if (!hiddenSections.includes('projects') && resumeData.projects?.length) {
-          tree.push('├── projects/');
-          resumeData.projects.forEach((project, index) => {
-            const isLast = index === resumeData.projects.length - 1;
-            tree.push(`│   ${isLast ? '└──' : '├──'} ${project.name.toLowerCase().replace(/\s+/g, '-')}/`);
-          });
-        }
-        
-        tree.push('├── README.md');
-        tree.push('└── contact.txt');
-        
-        return tree;
-      };
-
-      return (
-        <div className="font-mono">
-          {generateTree().map((line, index) => (
-            <div key={index} style={{ color: colors.textSecondary }}>
-              {line}
+    education: () => (
+      <div className="space-y-4">
+        <div style={{ color: colors.accent }}>Education:</div>
+        {resumeData.education?.map((edu, index) => (
+          <div key={index} className="ml-4 space-y-2 pb-4">
+            <div style={{ color: colors.primary }}>{edu.institution}</div>
+            <div className="ml-2">
+              <div style={{ color: colors.secondary }}>{edu.degree} in {edu.field}</div>
+              <div style={{ color: colors.textSecondary }}>
+                Graduated: {formatDate(edu.graduationDate)}
+              </div>
+              {edu.gpa && (
+                <div style={{ color: colors.text }}>GPA: {edu.gpa}</div>
+              )}
+              {edu.honors && edu.honors.length > 0 && (
+                <div style={{ color: colors.text }}>
+                  Honors: {edu.honors.join(', ')}
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      );
-    },
+          </div>
+        ))}
+      </div>
+    ),
+
+    certifications: () => (
+      <div className="space-y-4">
+        <div style={{ color: colors.accent }}>Certifications:</div>
+        {resumeData.certifications?.map((cert, index) => (
+          <div key={index} className="ml-4 space-y-2 pb-4">
+            <div style={{ color: colors.primary }}>{cert}</div>
+          </div>
+        ))}
+      </div>
+    ),
 
     contact: () => (
       <div className="space-y-4">
         <div style={{ color: colors.accent }}>Contact Information:</div>
         <div className="ml-4 space-y-2">
           {resumeData.contact?.email && (
-            <div className="flex items-center space-x-2">
-              <Mail className="w-4 h-4" style={{ color: colors.primary }} />
-              <span>{resumeData.contact.email}</span>
+            <div>
+              <span style={{ color: colors.primary }}>Email:</span>
+              <span className="ml-2" style={{ color: colors.text }}>{resumeData.contact.email}</span>
             </div>
           )}
           {resumeData.contact?.phone && (
-            <div className="flex items-center space-x-2">
-              <Phone className="w-4 h-4" style={{ color: colors.primary }} />
-              <span>{resumeData.contact.phone}</span>
+            <div>
+              <span style={{ color: colors.primary }}>Phone:</span>
+              <span className="ml-2" style={{ color: colors.text }}>{resumeData.contact.phone}</span>
             </div>
           )}
           {resumeData.contact?.location && (
-            <div className="flex items-center space-x-2">
-              <MapPin className="w-4 h-4" style={{ color: colors.primary }} />
-              <span>{resumeData.contact.location}</span>
+            <div>
+              <span style={{ color: colors.primary }}>Location:</span>
+              <span className="ml-2" style={{ color: colors.text }}>{resumeData.contact.location}</span>
+            </div>
+          )}
+          {resumeData.contact?.website && (
+            <div>
+              <span style={{ color: colors.primary }}>Website:</span>
+              <span className="ml-2" style={{ color: colors.text }}>
+                <a href={resumeData.contact.website} target="_blank" rel="noopener noreferrer">
+                  {resumeData.contact.website}
+                </a>
+              </span>
+            </div>
+          )}
+          {resumeData.contact?.linkedin && (
+            <div>
+              <span style={{ color: colors.primary }}>LinkedIn:</span>
+              <span className="ml-2" style={{ color: colors.text }}>
+                <a href={resumeData.contact.linkedin} target="_blank" rel="noopener noreferrer">
+                  {resumeData.contact.linkedin}
+                </a>
+              </span>
             </div>
           )}
           {resumeData.contact?.github && (
-            <div className="flex items-center space-x-2">
-              <Github className="w-4 h-4" style={{ color: colors.primary }} />
-              <span>{resumeData.contact.github}</span>
+            <div>
+              <span style={{ color: colors.primary }}>GitHub:</span>
+              <span className="ml-2" style={{ color: colors.text }}>
+                <a href={resumeData.contact.github} target="_blank" rel="noopener noreferrer">
+                  {resumeData.contact.github}
+                </a>
+              </span>
             </div>
           )}
         </div>
