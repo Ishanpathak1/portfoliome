@@ -1,6 +1,6 @@
+import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import './globals.css';
 import ConditionalAuthWrapper from '@/components/ConditionalAuthWrapper';
 import { GoogleAnalyticsWrapper } from '@/components/GoogleAnalytics';
 import ConditionalNavigation from '@/components/ConditionalNavigation';
