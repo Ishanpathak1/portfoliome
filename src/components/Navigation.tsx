@@ -17,7 +17,21 @@ import {
 
 export function Navigation() {
   const pathname = usePathname();
-  const { user, signInWithGoogle, signOut } = useAuth();
+  
+  // Handle cases where auth context might not be available (during SSR)
+  let user = null;
+  let signInWithGoogle = () => {};
+  let signOut = () => {};
+  
+  try {
+    const auth = useAuth();
+    user = auth.user;
+    signInWithGoogle = auth.signInWithGoogle;
+    signOut = auth.signOut;
+  } catch (error) {
+    // Auth context not available (during SSR)
+    console.log('Auth context not available, using defaults');
+  }
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },

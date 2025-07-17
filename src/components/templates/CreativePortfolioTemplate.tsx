@@ -126,8 +126,8 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
       const splatters = [];
       for (let i = 0; i < 20; i++) {
         splatters.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
+          x: Math.random() * 1200,
+                      y: Math.random() * 800,
           color: [colors.paint, colors.accent, '#ff6b6b', '#4ecdc4', '#ffe66d'][Math.floor(Math.random() * 5)],
           size: Math.random() * 15 + 5
         });
@@ -974,8 +974,8 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
       <canvas
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-50"
-        width={typeof window !== 'undefined' ? window.innerWidth : 0}
-        height={typeof window !== 'undefined' ? window.innerHeight : 0}
+        width={1200}
+                  height={800}
       />
       
       {/* Paint splatters */}

@@ -114,6 +114,8 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
   // Constellation network
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -121,12 +123,16 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     if (!ctx) return;
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if (typeof window !== 'undefined') {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     };
 
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', resizeCanvas);
+    }
 
     // Generate constellation nodes
     const nodes: ConstellationNode[] = [];
@@ -134,7 +140,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     const projects = resumeData.projects?.map(p => p.name) || [];
     
     // Adjust node count based on screen size
-    const isMobile = window.innerWidth < 768;
+    const isMobile = canvas.width < 768;
     const skillCount = isMobile ? 5 : 8;
     const projectCount = isMobile ? 3 : 5;
     
@@ -230,7 +236,9 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
     animate();
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', resizeCanvas);
+      }
     };
   }, [hologramEffect, resumeData]);
 
@@ -302,7 +310,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
       {/* Matrix-like background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="grid grid-cols-12 md:grid-cols-20 grid-rows-12 md:grid-rows-20 w-full h-full">
-          {Array.from({ length: window.innerWidth > 768 ? 400 : 144 }).map((_, i) => (
+          {Array.from({ length: 144 }).map((_, i) => (
             <div
               key={i}
               className="border border-cyan-500/20 flex items-center justify-center"
@@ -527,9 +535,9 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
         {/* Code Matrix Background */}
         <div className="absolute inset-0 opacity-5">
           <div className="font-mono text-xs text-cyan-400 leading-4 overflow-hidden">
-            {Array.from({ length: window.innerWidth > 768 ? 50 : 25 }).map((_, i) => (
+            {Array.from({ length: 25 }).map((_, i) => (
               <div key={i} className="whitespace-nowrap">
-                {Array.from({ length: window.innerWidth > 768 ? 100 : 50 }).map((_, j) => (
+                {Array.from({ length: 50 }).map((_, j) => (
                   <span key={j} className="inline-block animate-pulse" style={{ animationDelay: `${(i + j) * 0.1}s` }}>
                     {Math.random() > 0.5 ? '1' : '0'}
                   </span>

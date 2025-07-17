@@ -104,8 +104,8 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
       const newParticles = [];
       for (let i = 0; i < 100; i++) {
         newParticles.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
+          x: Math.random() * 1200,
+                      y: Math.random() * 800,
           vx: (Math.random() - 0.5) * 0.5,
           vy: (Math.random() - 0.5) * 0.5,
           size: Math.random() * 3 + 1,
@@ -122,8 +122,8 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
         const newY = particle.y + particle.vy;
         return {
           ...particle,
-          x: newX > window.innerWidth ? 0 : newX < 0 ? window.innerWidth : newX,
-          y: newY > window.innerHeight ? 0 : newY < 0 ? window.innerHeight : newY
+          x: newX > 1200 ? 0 : newX < 0 ? 1200 : newX,
+                      y: newY > 800 ? 0 : newY < 0 ? 800 : newY
         };
       }));
     }, 16);
@@ -190,7 +190,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
   const QuantumGrid = () => (
     <div className="absolute inset-0 opacity-20 pointer-events-none">
       <div className="grid grid-cols-10 grid-rows-10 md:grid-cols-20 md:grid-rows-20 h-full w-full">
-        {Array.from({ length: window.innerWidth < 768 ? 100 : 400 }).map((_, i) => (
+                    {Array.from({ length: 400 }).map((_, i) => (
           <div
             key={i}
             className="border border-current animate-pulse"

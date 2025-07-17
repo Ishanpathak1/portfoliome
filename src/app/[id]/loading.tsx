@@ -1,68 +1,93 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+
+interface LoadingData {
+  name: string;
+  colorScheme: string;
+  templateId: string;
+}
+
 export default function PortfolioLoading() {
+  const params = useParams();
+  const [loadingData, setLoadingData] = useState<LoadingData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const slug = params.id as string;
+
+  useEffect(() => {
+    if (slug) {
+      fetchLoadingData();
+    }
+  }, [slug]);
+
+  const fetchLoadingData = async () => {
+    try {
+      const response = await fetch(`/api/portfolio-loading?slug=${slug}`);
+      if (response.ok) {
+        const data = await response.json();
+        setLoadingData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching loading data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Color scheme mapping
+  const getColorScheme = (colorScheme: string) => {
+    const schemes = {
+      blue: {
+        gradient: 'from-blue-900 via-slate-900 to-blue-900',
+        text: 'text-blue-300'
+      },
+      green: {
+        gradient: 'from-green-900 via-slate-900 to-green-900',
+        text: 'text-green-300'
+      },
+      purple: {
+        gradient: 'from-purple-900 via-slate-900 to-purple-900',
+        text: 'text-purple-300'
+      },
+      orange: {
+        gradient: 'from-orange-900 via-slate-900 to-orange-900',
+        text: 'text-orange-300'
+      }
+    };
+    return schemes[colorScheme as keyof typeof schemes] || schemes.blue;
+  };
+
+  const colors = getColorScheme(loadingData?.colorScheme || 'blue');
+  
+  // Show loading state until we have the data
+  if (isLoading || !loadingData) {
+    return (
+      <div className={`min-h-screen bg-gradient-to-br ${colors.gradient} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-white/20 border-t-white/80 rounded-full animate-spin mb-6"></div>
+          <h1 className={`text-3xl font-bold ${colors.text} mb-2`}>
+            Loading Portfolio
+          </h1>
+          <p className="text-white/60">
+            Please wait...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show with actual name once data is loaded
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header Skeleton */}
-      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20 p-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-white/20 rounded-full animate-pulse"></div>
-            <div>
-              <div className="w-32 h-6 bg-white/20 rounded animate-pulse mb-2"></div>
-              <div className="w-24 h-4 bg-white/20 rounded animate-pulse"></div>
-            </div>
-          </div>
-          <div className="flex space-x-4">
-            <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
-            <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content Skeleton */}
-      <div className="max-w-6xl mx-auto p-6 space-y-8">
-        {/* About Section */}
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-          <div className="w-24 h-6 bg-white/20 rounded animate-pulse mb-4"></div>
-          <div className="space-y-2">
-            <div className="w-full h-4 bg-white/20 rounded animate-pulse"></div>
-            <div className="w-3/4 h-4 bg-white/20 rounded animate-pulse"></div>
-            <div className="w-5/6 h-4 bg-white/20 rounded animate-pulse"></div>
-          </div>
-        </div>
-
-        {/* Experience Section */}
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-          <div className="w-32 h-6 bg-white/20 rounded animate-pulse mb-6"></div>
-          <div className="space-y-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="border-l-2 border-white/20 pl-6">
-                <div className="w-48 h-5 bg-white/20 rounded animate-pulse mb-2"></div>
-                <div className="w-36 h-4 bg-white/20 rounded animate-pulse mb-3"></div>
-                <div className="space-y-2">
-                  <div className="w-full h-3 bg-white/20 rounded animate-pulse"></div>
-                  <div className="w-4/5 h-3 bg-white/20 rounded animate-pulse"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Skills Section */}
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-          <div className="w-20 h-6 bg-white/20 rounded animate-pulse mb-4"></div>
-          <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="w-20 h-8 bg-white/20 rounded-full animate-pulse"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="bg-black/40 border-t border-white/10 p-6 mt-16">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="w-48 h-4 bg-white/20 rounded animate-pulse mx-auto"></div>
-        </div>
+    <div className={`min-h-screen bg-gradient-to-br ${colors.gradient} flex items-center justify-center`}>
+      <div className="text-center">
+        <div className="inline-block w-8 h-8 border-4 border-white/20 border-t-white/80 rounded-full animate-spin mb-6"></div>
+        <h1 className={`text-3xl font-bold ${colors.text} mb-2`}>
+          Loading {loadingData.name}'s Portfolio
+        </h1>
+        <p className="text-white/60">
+          Please wait...
+        </p>
       </div>
     </div>
   );
