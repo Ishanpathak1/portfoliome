@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface CreativePortfolioTemplateProps {
   portfolio: DatabasePortfolio;
@@ -29,6 +31,7 @@ interface ArtisticColors {
 
 export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTemplateProps) {
   const { resumeData, personalization } = portfolio;
+  const { sectionHeadings, templateText } = personalization;
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
   const [paintSplatters, setPaintSplatters] = useState<Array<{x: number, y: number, color: string, size: number}>>([]);
@@ -230,7 +233,8 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
                 <div className={`absolute inset-0 bg-gradient-to-br ${colors.primary} opacity-20`} />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-6xl font-black" style={{ color: colors.ink }}>
-                    {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 'CP'}
+                    {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 
+                     getTemplateText(templateText, 'creative-portfolio', 'fallbackName').split(' ').map(n => n[0]).join('')}
                   </span>
                 </div>
                 <div className="absolute top-2 right-2 w-6 h-6 bg-red-500 rounded-full shadow-md" />
@@ -251,7 +255,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
           <div className="relative mb-8">
             <h1 className="text-6xl md:text-8xl font-black mb-4 relative" style={{ color: colors.ink }}>
               <span className="relative z-10">
-                {resumeData.contact?.name || 'Creative Portfolio'}
+                {resumeData.contact?.name || getTemplateText(templateText, 'creative-portfolio', 'fallbackName')}
               </span>
               <div className="absolute -inset-2 bg-gradient-to-r from-yellow-300 to-pink-300 opacity-30 transform -rotate-1 rounded-lg z-0" />
             </h1>
@@ -276,15 +280,13 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
               <div className="flex items-center justify-center gap-4 mb-4">
                 <Paintbrush className="w-8 h-8" style={{ color: colors.paint }} />
                 <span className="text-2xl md:text-3xl font-bold" style={{ color: colors.ink }}>
-                  Creative Developer & Designer
+                  {getTemplateText(templateText, 'creative-portfolio', 'tagline')}
                 </span>
                 <PenTool className="w-8 h-8" style={{ color: colors.accent }} />
               </div>
-              {resumeData.summary && (
-                <p className="text-lg leading-relaxed" style={{ color: colors.sketch }}>
-                  {resumeData.summary}
-                </p>
-              )}
+              <p className="text-lg leading-relaxed" style={{ color: colors.sketch }}>
+                {resumeData.summary || getTemplateText(templateText, 'creative-portfolio', 'fallbackSummary')}
+              </p>
             </div>
             
             {/* Decorative elements */}
@@ -431,7 +433,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
           <div className="text-center mb-20">
             <div className="relative inline-block">
               <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: colors.ink }}>
-                My Journey
+                {getSectionHeading(sectionHeadings, 'experience')}
               </h2>
               <div className="absolute -inset-4 bg-gradient-to-r from-blue-200 to-purple-200 opacity-40 transform -rotate-2 rounded-lg -z-10" />
             </div>
@@ -539,7 +541,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
           <div className="text-center mb-20">
             <div className="relative inline-block">
               <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: colors.ink }}>
-                My Toolkit
+                {getSectionHeading(sectionHeadings, 'skills')}
               </h2>
               <div className="absolute -inset-4 bg-gradient-to-r from-green-200 to-blue-200 opacity-40 transform rotate-2 rounded-lg -z-10" />
             </div>
@@ -623,7 +625,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
           <div className="text-center mb-20">
             <div className="relative inline-block">
               <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: colors.ink }}>
-                My Creations
+                {getSectionHeading(sectionHeadings, 'projects')}
               </h2>
               <div className="absolute -inset-4 bg-gradient-to-r from-pink-200 to-yellow-200 opacity-40 transform -rotate-1 rounded-lg -z-10" />
             </div>
@@ -734,7 +736,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
           <div className="text-center mb-20">
             <div className="relative inline-block">
               <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: colors.ink }}>
-                Learning Path
+                {getSectionHeading(sectionHeadings, 'education')}
               </h2>
               <div className="absolute -inset-4 bg-gradient-to-r from-green-200 to-blue-200 opacity-40 transform rotate-1 rounded-lg -z-10" />
             </div>
@@ -821,7 +823,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
           <div className="text-center mb-20">
             <div className="relative inline-block">
               <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: colors.ink }}>
-                Achievements
+                {getSectionHeading(sectionHeadings, 'certifications')}
               </h2>
               <div className="absolute -inset-4 bg-gradient-to-r from-yellow-200 to-orange-200 opacity-40 transform -rotate-2 rounded-lg -z-10" />
             </div>

@@ -29,7 +29,7 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
     onPersonalizationChange(newData);
   };
 
-  const handleSectionHeadingsUpdate = (headings: SectionHeadings) => {
+  const handleSectionHeadingsUpdate = async (headings: SectionHeadings) => {
     updateFormData({ sectionHeadings: headings });
   };
 

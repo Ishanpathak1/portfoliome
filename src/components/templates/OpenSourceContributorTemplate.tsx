@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface OpenSourceContributorTemplateProps {
   portfolio: DatabasePortfolio;
@@ -153,11 +155,11 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{ color: colors.text }}>
-            {resumeData.contact?.name || 'Open Source Contributor'}
+            {resumeData.contact?.name || getTemplateText(personalization?.templateText, 'open-source-contributor', 'fallbackName') || 'Open Source Contributor'}
           </h1>
 
           <div className="text-2xl md:text-3xl mb-8 font-mono" style={{ color: colors.secondary }}>
-            Building the future, one commit at a time
+            {getTemplateText(personalization?.templateText, 'open-source-contributor', 'tagline') || 'Building the future, one commit at a time'}
           </div>
 
           {resumeData.summary && (
@@ -289,7 +291,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
       <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
-            Work Experience
+            {getSectionHeading(personalization?.sectionHeadings, 'experience')}
           </h2>
 
           <div className="space-y-8">
@@ -345,7 +347,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
       <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
-            Technical Skills
+            {getSectionHeading(personalization?.sectionHeadings, 'skills')}
           </h2>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -390,7 +392,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
       <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
-            Open Source Projects
+            {getSectionHeading(personalization?.sectionHeadings, 'projects')}
           </h2>
 
           <div className="grid lg:grid-cols-2 gap-8">
@@ -487,7 +489,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
       <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
-            Education
+            {getSectionHeading(personalization?.sectionHeadings, 'education')}
           </h2>
 
           <div className="space-y-8">
@@ -537,7 +539,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
       <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16" style={{ color: colors.text }}>
-            Certifications
+            {getSectionHeading(personalization?.sectionHeadings, 'certifications')}
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -661,10 +663,10 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
               </div>
             </div>
             <h3 className="text-4xl font-bold mb-4" style={{ color: colors.text }}>
-              Open Source Enthusiast
+              {getTemplateText(personalization?.templateText, 'open-source-contributor', 'footerTitle') || 'Open Source Enthusiast'}
             </h3>
             <p className="text-xl mb-8" style={{ color: colors.textSecondary }}>
-              Passionate about building tools that make developers' lives easier
+              {getTemplateText(personalization?.templateText, 'open-source-contributor', 'footerDescription') || 'Passionate about building tools that make developers\' lives easier'}
             </p>
             <div className="flex justify-center gap-6">
               <div className="px-6 py-3 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>

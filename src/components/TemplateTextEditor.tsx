@@ -8,7 +8,7 @@ import { DEFAULT_TEMPLATE_TEXT, getAllTemplateText } from '@/lib/template-text';
 interface TemplateTextEditorProps {
   templateId: string;
   templateText: TemplateText | undefined;
-  onUpdate: (text: TemplateText) => void;
+  onUpdate: (text: TemplateText) => Promise<void>;
   onClose: () => void;
 }
 
@@ -29,6 +29,62 @@ const TEMPLATE_CONFIGS: Record<string, { name: string; fields: Array<{ key: stri
       { key: 'tagline', label: 'Tagline', description: 'Main tagline under your name', type: 'text' },
       { key: 'ctaTitle', label: 'CTA Title', description: 'Call-to-action section title', type: 'text' },
       { key: 'ctaDescription', label: 'CTA Description', description: 'Call-to-action description', type: 'textarea' },
+      { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
+      { key: 'fallbackPosition', label: 'Fallback Position', description: 'Displayed when no position is available', type: 'text' },
+    ],
+  },
+  'creative-gradient': {
+    name: 'Creative Gradient',
+    fields: [
+      { key: 'tagline', label: 'Tagline', description: 'Main tagline under your name', type: 'text' },
+      { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
+      { key: 'fallbackSummary', label: 'Fallback Summary', description: 'Displayed when no summary is available', type: 'textarea' },
+    ],
+  },
+  'creative-portfolio': {
+    name: 'Creative Portfolio',
+    fields: [
+      { key: 'tagline', label: 'Tagline', description: 'Main tagline under your name', type: 'text' },
+      { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
+      { key: 'fallbackSummary', label: 'Fallback Summary', description: 'Displayed when no summary is available', type: 'textarea' },
+    ],
+  },
+  'developer-terminal': {
+    name: 'Developer Terminal',
+    fields: [], // No customizable text for this template
+  },
+  'full-stack-dev': {
+    name: 'Full Stack Dev',
+    fields: [
+      { key: 'endMessage', label: 'End Message', description: 'Message displayed at the end of the portfolio', type: 'text' },
+      { key: 'footerMessage', label: 'Footer Message', description: 'Thank you message in the footer', type: 'text' },
+      { key: 'techStack', label: 'Tech Stack', description: 'Technology stack description', type: 'text' },
+    ],
+  },
+  'minimalist-clean': {
+    name: 'Minimalist Clean',
+    fields: [
+      { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
+      { key: 'fallbackPosition', label: 'Fallback Position', description: 'Displayed when no position is available', type: 'text' },
+      { key: 'fallbackSummary', label: 'Fallback Summary', description: 'Displayed when no summary is available', type: 'textarea' },
+    ],
+  },
+  'tech-innovator': {
+    name: 'Tech Innovator',
+    fields: [
+      { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
+      { key: 'tagline', label: 'Tagline', description: 'Main tagline under the prompt', type: 'text' },
+      { key: 'ctaTitle', label: 'CTA Title', description: 'Call-to-action title in footer', type: 'text' },
+      { key: 'ctaDescription', label: 'CTA Description', description: 'Call-to-action description in footer', type: 'textarea' },
+    ],
+  },
+  'open-source-contributor': {
+    name: 'Open Source Contributor',
+    fields: [
+      { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
+      { key: 'tagline', label: 'Tagline', description: 'Main tagline under the name', type: 'text' },
+      { key: 'footerTitle', label: 'Footer Title', description: 'Title in the footer section', type: 'text' },
+      { key: 'footerDescription', label: 'Footer Description', description: 'Description in the footer section', type: 'textarea' },
     ],
   },
 };
@@ -74,8 +130,8 @@ export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose
     }));
   };
 
-  const handleSave = () => {
-    onUpdate(editedText);
+  const handleSave = async () => {
+    await onUpdate(editedText);
     onClose();
   };
 

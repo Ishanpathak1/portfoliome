@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface FullStackDevTemplateProps {
   portfolio: DatabasePortfolio;
@@ -540,7 +542,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
-              &gt; ls -la /experience/
+              &gt; ls -la /{getSectionHeading(personalization?.sectionHeadings, 'experience').toLowerCase()}/
             </h2>
             <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
@@ -614,7 +616,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
-              &gt; ./skills --list-all
+              &gt; ./{getSectionHeading(personalization?.sectionHeadings, 'skills').toLowerCase()} --list-all
             </h2>
             <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
@@ -663,7 +665,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
-              &gt; git log --graph --oneline
+              &gt; git log --{getSectionHeading(personalization?.sectionHeadings, 'projects').toLowerCase()} --oneline
             </h2>
             <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
@@ -765,7 +767,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
-              &gt; find /education -type f
+              &gt; find /{getSectionHeading(personalization?.sectionHeadings, 'education').toLowerCase()} -type f
             </h2>
             <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
@@ -820,7 +822,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
-              &gt; openssl verify /certs/*
+              &gt; openssl verify /{getSectionHeading(personalization?.sectionHeadings, 'certifications').toLowerCase()}/*
             </h2>
             <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
           </div>
@@ -982,14 +984,14 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
               <div className="flex items-center justify-center space-x-4">
                 <Terminal className="w-6 h-6 md:w-8 md:h-8 text-cyan-400" />
                 <span className="text-lg md:text-xl font-mono font-bold text-cyan-400">
-                  END_OF_TRANSMISSION
+                  {getTemplateText(personalization?.templateText, 'full-stack-dev', 'endMessage') || 'END_OF_TRANSMISSION'}
                 </span>
               </div>
               <div className="text-purple-400 font-mono text-xs md:text-sm">
-                Thank you for exploring my digital portfolio matrix
+                {getTemplateText(personalization?.templateText, 'full-stack-dev', 'footerMessage') || 'Thank you for exploring my digital portfolio matrix'}
               </div>
               <div className="text-cyan-400 font-mono text-xs">
-                Built with: React • TypeScript • Next.js • Tailwind CSS
+                {getTemplateText(personalization?.templateText, 'full-stack-dev', 'techStack') || 'Built with: React • TypeScript • Next.js • Tailwind CSS'}
               </div>
             </div>
           </HolographicCard>

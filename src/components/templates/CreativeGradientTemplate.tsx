@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Mail, Phone, Github, Linkedin, Calendar, Award, Code, Briefcase, Star, Zap, Heart, Target, Sparkles, ExternalLink, Sun, Moon, Palette, GraduationCap, MapPin } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface CreativeGradientTemplateProps {
   portfolio: DatabasePortfolio;
@@ -11,6 +13,7 @@ interface CreativeGradientTemplateProps {
 
 export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplateProps) {
   const { resumeData, personalization } = portfolio;
+  const { sectionHeadings, templateText } = personalization;
   const [isDark, setIsDark] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
@@ -59,7 +62,9 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
           <h2 className={`text-3xl md:text-4xl lg:text-5xl font-black text-center mb-8 md:mb-12 lg:mb-16 ${
             isDark ? 'text-white' : 'text-gray-900'
           }`}>
-            Professional <span className={`bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>Experience</span>
+            <span className={`bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
+              {getSectionHeading(sectionHeadings, 'experience')}
+            </span>
           </h2>
           
           <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
@@ -132,7 +137,9 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
           <h2 className={`text-3xl md:text-4xl lg:text-5xl font-black text-center mb-8 md:mb-12 lg:mb-16 ${
             isDark ? 'text-white' : 'text-gray-900'
           }`}>
-            Technical <span className={`bg-gradient-to-r ${colors.secondary} bg-clip-text text-transparent`}>Skills</span>
+            <span className={`bg-gradient-to-r ${colors.secondary} bg-clip-text text-transparent`}>
+              {getSectionHeading(sectionHeadings, 'skills')}
+            </span>
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -197,7 +204,9 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
           <h2 className={`text-3xl md:text-4xl lg:text-5xl font-black text-center mb-8 md:mb-12 lg:mb-16 ${
             isDark ? 'text-white' : 'text-gray-900'
           }`}>
-            Creative <span className={`bg-gradient-to-r ${colors.secondary} bg-clip-text text-transparent`}>Projects</span>
+            <span className={`bg-gradient-to-r ${colors.secondary} bg-clip-text text-transparent`}>
+              {getSectionHeading(sectionHeadings, 'projects')}
+            </span>
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -283,7 +292,9 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
           <h2 className={`text-3xl md:text-4xl lg:text-5xl font-black text-center mb-8 md:mb-12 lg:mb-16 ${
             isDark ? 'text-white' : 'text-gray-900'
           }`}>
-            Educational <span className={`bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>Background</span>
+            <span className={`bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
+              {getSectionHeading(sectionHeadings, 'education')}
+            </span>
           </h2>
           
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
@@ -342,7 +353,9 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
           <h2 className={`text-3xl md:text-4xl lg:text-5xl font-black text-center mb-8 md:mb-12 lg:mb-16 ${
             isDark ? 'text-white' : 'text-gray-900'
           }`}>
-            Professional <span className={`bg-gradient-to-r ${colors.secondary} bg-clip-text text-transparent`}>Certifications</span>
+            <span className={`bg-gradient-to-r ${colors.secondary} bg-clip-text text-transparent`}>
+              {getSectionHeading(sectionHeadings, 'certifications')}
+            </span>
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -483,13 +496,23 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
             }`}>
               Hey, I'm{' '}
               <span className={`bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent animate-pulse`}>
-                {resumeData.contact?.name || 'Creative Mind'}
+                {resumeData.contact?.name || getTemplateText(templateText, 'creative-gradient', 'fallbackName')}
               </span>
             </h1>
+            
+            {/* Tagline */}
+            <div className="mb-4">
+              <p className={`text-xl md:text-2xl font-light italic ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                {getTemplateText(templateText, 'creative-gradient', 'tagline')}
+              </p>
+            </div>
+            
             <p className={`text-lg md:text-xl lg:text-2xl leading-relaxed ${
               isDark ? 'text-gray-300' : 'text-gray-600'
             } max-w-3xl mx-auto`}>
-              {resumeData.summary || 'Passionate about creating amazing experiences through innovative design and technology'}
+              {resumeData.summary || getTemplateText(templateText, 'creative-gradient', 'fallbackSummary')}
             </p>
           </div>
           

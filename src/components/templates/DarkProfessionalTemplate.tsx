@@ -4,6 +4,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink, Briefcase, GraduationCap, Code, Award, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
 
 interface DarkProfessionalTemplateProps {
   portfolio: DatabasePortfolio;
@@ -11,6 +12,7 @@ interface DarkProfessionalTemplateProps {
 
 export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplateProps) {
   const { resumeData, personalization } = portfolio;
+  const { sectionHeadings } = personalization;
   const { contact, summary, experience, education, skills, projects, certifications } = resumeData;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -38,7 +40,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
       <section className="mb-12">
         <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700 flex items-center">
           <Briefcase className="w-8 h-8 mr-3" style={{ color: currentColors.accent }} />
-          Experience
+          {getSectionHeading(sectionHeadings, 'experience')}
         </h2>
         <div className="space-y-8">
           {experience.map((job, index) => (
@@ -81,7 +83,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
       <section className="mb-12">
         <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700 flex items-center">
           <Code className="w-8 h-8 mr-3" style={{ color: currentColors.accent }} />
-          Skills
+          {getSectionHeading(sectionHeadings, 'skills')}
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {skills.map((skillCategory, index) => (
@@ -113,7 +115,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
       <section className="mb-12">
         <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700 flex items-center">
           <Code className="w-8 h-8 mr-3" style={{ color: currentColors.accent }} />
-          Projects
+          {getSectionHeading(sectionHeadings, 'projects')}
         </h2>
         <div className="grid lg:grid-cols-2 gap-8">
           {projects.map((project, index) => (
@@ -175,7 +177,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
       <section className="mb-12">
         <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700 flex items-center">
           <GraduationCap className="w-8 h-8 mr-3" style={{ color: currentColors.accent }} />
-          Education
+          {getSectionHeading(sectionHeadings, 'education')}
         </h2>
         <div className="space-y-6">
           {education.map((edu, index) => (
@@ -213,7 +215,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
       <section className="mb-12">
         <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700 flex items-center">
           <Award className="w-8 h-8 mr-3" style={{ color: currentColors.accent }} />
-          Certifications
+          {getSectionHeading(sectionHeadings, 'certifications')}
         </h2>
         <div className="grid md:grid-cols-2 gap-6">
           {certifications.map((cert, index) => (
@@ -396,7 +398,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
           {/* Skills in Sidebar */}
           {skills && skills.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-4 pb-2 border-b border-gray-600">Skills</h3>
+              <h3 className="text-lg font-semibold mb-4 pb-2 border-b border-gray-600">{getSectionHeading(sectionHeadings, 'skills')}</h3>
               <div className="space-y-4">
                 {skills.map((skillCategory, index) => (
                   <div key={index}>

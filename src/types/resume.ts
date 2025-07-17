@@ -87,6 +87,20 @@ export interface TemplateText {
     tagline?: string;
     ctaTitle?: string;
     ctaDescription?: string;
+    fallbackName?: string;
+    fallbackPosition?: string;
+  };
+  // Creative Gradient template
+  creativeGradient?: {
+    tagline?: string;
+    fallbackName?: string;
+    fallbackSummary?: string;
+  };
+  // Creative Portfolio template
+  creativePortfolio?: {
+    tagline?: string;
+    fallbackName?: string;
+    fallbackSummary?: string;
   };
   // Add more templates as needed
   [templateId: string]: {

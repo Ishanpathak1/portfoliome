@@ -6,7 +6,7 @@ import { Edit2, Save, X, RotateCcw } from 'lucide-react';
 
 interface SectionHeadingEditorProps {
   sectionHeadings: SectionHeadings | undefined;
-  onUpdate: (headings: SectionHeadings) => void;
+  onUpdate: (headings: SectionHeadings) => Promise<void>;
   onClose: () => void;
 }
 
@@ -85,8 +85,8 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
     }));
   };
 
-  const handleSave = () => {
-    onUpdate(editedHeadings);
+  const handleSave = async () => {
+    await onUpdate(editedHeadings);
     onClose();
   };
 

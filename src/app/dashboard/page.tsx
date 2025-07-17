@@ -269,20 +269,69 @@ function DashboardContent() {
     }
   };
 
-  const handleSectionHeadingsUpdate = (headings: SectionHeadings) => {
-    if (!editedPersonalization) return;
-    setEditedPersonalization({
-      ...editedPersonalization,
-      sectionHeadings: headings
-    });
+  // Save personalization changes immediately
+  const savePersonalizationChanges = async (updatedPersonalization: PersonalizationData) => {
+    if (!portfolio || !user) return;
+
+    setSaving(true);
+    try {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), 12000);
+      });
+
+      const fetchPromise = fetch('/api/update-portfolio', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await user.getIdToken()}`
+        },
+        body: JSON.stringify({
+          personalization: updatedPersonalization
+        })
+      });
+
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
+
+      if (response.ok) {
+        const data = await response.json();
+        setPortfolio(data.portfolio);
+        setEditedPersonalization(data.portfolio.personalization);
+        setPreviewKey(prev => prev + 1);
+        showSuccess('Changes saved successfully!');
+      } else {
+        const error = await response.json();
+        showError(`Error: ${error.error || error.message}`);
+      }
+    } catch (error: any) {
+      console.error('Error saving personalization:', error);
+      showError('Failed to save changes. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleTemplateTextUpdate = (templateText: TemplateText) => {
+  const handleSectionHeadingsUpdate = async (headings: SectionHeadings) => {
     if (!editedPersonalization) return;
-    setEditedPersonalization({
+    
+    const updatedPersonalization = {
+      ...editedPersonalization,
+      sectionHeadings: headings
+    };
+    
+    setEditedPersonalization(updatedPersonalization);
+    await savePersonalizationChanges(updatedPersonalization);
+  };
+
+  const handleTemplateTextUpdate = async (templateText: TemplateText) => {
+    if (!editedPersonalization) return;
+    
+    const updatedPersonalization = {
       ...editedPersonalization,
       templateText: templateText
-    });
+    };
+    
+    setEditedPersonalization(updatedPersonalization);
+    await savePersonalizationChanges(updatedPersonalization);
   };
 
   // Content editing functions
@@ -1379,15 +1428,26 @@ function DashboardContent() {
                         <Edit className="w-5 h-5 text-purple-400" />
                         <span>Section Headings</span>
                       </h3>
-                      <p className="text-gray-300 mt-1">Customize section headings to match your profession</p>
+                      <p className="text-gray-300 mt-1">
+                        {editedPersonalization?.templateId === 'developer-terminal' 
+                          ? 'Section headings are not customizable for this template'
+                          : 'Customize section headings to match your profession'
+                        }
+                      </p>
                     </div>
-                    <button
-                      onClick={() => setShowHeadingEditor(true)}
-                      className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
-                    >
-                      <Edit className="w-4 h-4" />
-                      <span>Edit Headings</span>
-                    </button>
+                    {editedPersonalization?.templateId === 'developer-terminal' ? (
+                      <span className="text-gray-400 px-4 py-2 rounded-lg bg-gray-500/20">
+                        Not customizable
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setShowHeadingEditor(true)}
+                        className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span>Edit Headings</span>
+                      </button>
+                    )}
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
@@ -1408,15 +1468,26 @@ function DashboardContent() {
                         <Type className="w-5 h-5 text-purple-400" />
                         <span>Template Text</span>
                       </h3>
-                      <p className="text-gray-300 mt-1">Customize template-specific text content</p>
+                      <p className="text-gray-300 mt-1">
+                        {editedPersonalization?.templateId === 'developer-terminal' 
+                          ? 'Template text is not customizable for this template'
+                          : 'Customize template-specific text content'
+                        }
+                      </p>
                     </div>
-                    <button
-                      onClick={() => setShowTemplateTextEditor(true)}
-                      className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
-                    >
-                      <Type className="w-4 h-4" />
-                      <span>Edit Text</span>
-                    </button>
+                    {editedPersonalization?.templateId === 'developer-terminal' ? (
+                      <span className="text-gray-400 px-4 py-2 rounded-lg bg-gray-500/20">
+                        Not customizable
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setShowTemplateTextEditor(true)}
+                        className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                      >
+                        <Type className="w-4 h-4" />
+                        <span>Edit Text</span>
+                      </button>
+                    )}
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

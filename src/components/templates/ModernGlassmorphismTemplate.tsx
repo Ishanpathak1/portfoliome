@@ -9,6 +9,7 @@ import {
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface ModernGlassmorphismTemplateProps {
   portfolio: DatabasePortfolio;
@@ -28,7 +29,7 @@ interface ThemeColors {
 
 export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTemplateProps) {
   const { resumeData, personalization } = portfolio;
-  const { sectionHeadings } = personalization;
+  const { sectionHeadings, templateText } = personalization;
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -159,21 +160,29 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
             <div className="flex justify-center mb-6">
               <div className={`w-32 h-32 rounded-full bg-gradient-to-r ${themeColors.primary} p-1 animate-pulse`}>
                 <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-white">
-                    {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 'JD'}
-                  </span>
+                                  <span className="text-4xl font-bold text-white">
+                  {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 
+                   getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName').split(' ').map(n => n[0]).join('')}
+                </span>
                 </div>
               </div>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight">
               <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
-                {resumeData.contact?.name || 'Your Name'}
+                {resumeData.contact?.name || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName')}
               </span>
             </h1>
 
+            {/* Tagline */}
+            <div className="mb-4">
+              <p className="text-xl md:text-2xl text-gray-400 font-light italic">
+                {getTemplateText(templateText, 'modern-glassmorphism', 'tagline')}
+              </p>
+            </div>
+
             <p className="text-2xl md:text-3xl text-gray-300 mb-8 font-light">
-              {resumeData.experience?.[0]?.position || 'Professional Portfolio'}
+              {resumeData.experience?.[0]?.position || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackPosition')}
             </p>
 
             {/* Enhanced Summary */}
@@ -601,7 +610,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
           <div className="text-center mb-16">
             <h2 className="text-6xl font-black text-white mb-6">
               <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
-                Certifications
+                {getSectionHeading(sectionHeadings, 'certifications')}
               </span>
             </h2>
             <div className={`w-32 h-2 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />

@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface TechInnovatorTemplateProps {
   portfolio: DatabasePortfolio;
@@ -298,7 +300,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
           <div className="mb-6 md:mb-8 relative">
             <h1 className="text-4xl md:text-7xl lg:text-9xl font-black mb-6 relative">
               <span className="bg-gradient-to-r from-white via-current to-white bg-clip-text text-transparent animate-pulse" style={{ color: colors.hologram }}>
-                {resumeData.contact?.name || 'Tech Innovator'}
+                {resumeData.contact?.name || getTemplateText(personalization?.templateText, 'tech-innovator', 'fallbackName') || 'Tech Innovator'}
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 animate-pulse" style={{ color: colors.primary }} />
             </h1>
@@ -308,7 +310,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
               <div className="text-xl md:text-3xl lg:text-4xl font-bold text-white mb-4 font-mono">
                 <span className="text-gray-400">&gt;</span>
                 <span className="animate-pulse ml-2" style={{ color: colors.primary }}>
-                  Pioneering Tomorrow's Technology
+                  {getTemplateText(personalization?.templateText, 'tech-innovator', 'tagline') || 'Pioneering Tomorrow\'s Technology'}
                 </span>
               </div>
               <div className="text-lg md:text-xl lg:text-2xl text-gray-300 mb-8">
@@ -487,7 +489,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
           <div className="text-center mb-12 md:mb-20">
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8">
               <span className="bg-gradient-to-r from-white via-current to-white bg-clip-text text-transparent" style={{ color: colors.hologram }}>
-                Experience
+                {getSectionHeading(personalization?.sectionHeadings, 'experience')}
               </span>
               <span className="text-white"> Matrix</span>
             </h2>
@@ -574,7 +576,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
           <div className="text-center mb-12 md:mb-20">
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8">
               <span className="bg-gradient-to-r from-white via-current to-white bg-clip-text text-transparent" style={{ color: colors.hologram }}>
-                Neural
+                {getSectionHeading(personalization?.sectionHeadings, 'skills')}
               </span>
               <span className="text-white"> Network</span>
             </h2>
@@ -652,7 +654,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
           <div className="text-center mb-12 md:mb-20">
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8">
               <span className="bg-gradient-to-r from-white via-current to-white bg-clip-text text-transparent" style={{ color: colors.hologram }}>
-                Innovation
+                {getSectionHeading(personalization?.sectionHeadings, 'projects')}
               </span>
               <span className="text-white"> Lab</span>
             </h2>
@@ -758,7 +760,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
           <div className="text-center mb-12 md:mb-20">
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8">
               <span className="bg-gradient-to-r from-white via-current to-white bg-clip-text text-transparent" style={{ color: colors.hologram }}>
-                Knowledge
+                {getSectionHeading(personalization?.sectionHeadings, 'education')}
               </span>
               <span className="text-white"> Base</span>
             </h2>
@@ -839,7 +841,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
           <div className="text-center mb-12 md:mb-20">
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8">
               <span className="bg-gradient-to-r from-white via-current to-white bg-clip-text text-transparent" style={{ color: colors.hologram }}>
-                Digital
+                {getSectionHeading(personalization?.sectionHeadings, 'certifications')}
               </span>
               <span className="text-white"> Credentials</span>
             </h2>
@@ -1007,10 +1009,10 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
               </div>
               
               <h3 className="text-3xl md:text-5xl font-black text-white mb-4 md:mb-6">
-                Ready to Innovate the Future?
+                {getTemplateText(personalization?.templateText, 'tech-innovator', 'ctaTitle') || 'Ready to Innovate the Future?'}
               </h3>
               <p className="text-lg md:text-xl text-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto">
-                Let's collaborate to build tomorrow's technology with AI, quantum computing, and neural networks
+                {getTemplateText(personalization?.templateText, 'tech-innovator', 'ctaDescription') || 'Let\'s collaborate to build tomorrow\'s technology with AI, quantum computing, and neural networks'}
               </p>
               
               <div className="flex justify-center gap-4 md:gap-8">

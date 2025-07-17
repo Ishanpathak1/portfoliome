@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Mail, Phone, Github, Linkedin, MapPin, ExternalLink, Sun, Moon, Code, Briefcase, User, Award, FolderOpen, GraduationCap, Menu, X, Calendar, Building, Trophy } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface MinimalistCleanTemplateProps {
   portfolio: DatabasePortfolio;
@@ -200,10 +202,10 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
             className="w-6 h-6 lg:w-8 lg:h-8 mr-2 lg:mr-3"
             style={{ color: colors.primary }}
           />
-          About Me
+          {getSectionHeading(personalization?.sectionHeadings, 'summary') || 'About Me'}
         </h2>
         <p className={`text-base lg:text-lg leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-          {resumeData.summary || 'Passionate professional dedicated to creating exceptional solutions and delivering outstanding results.'}
+          {resumeData.summary || getTemplateText(personalization?.templateText, 'minimalist-clean', 'fallbackSummary') || 'Passionate professional dedicated to creating exceptional solutions and delivering outstanding results.'}
         </p>
       </div>
     </section>
@@ -222,7 +224,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
             className="w-8 h-8 mr-3"
             style={{ color: colors.primary }}
           />
-          Experience
+          {getSectionHeading(personalization?.sectionHeadings, 'experience')}
         </h2>
         <div className="space-y-6">
           {resumeData.experience.map((exp, index) => (
@@ -298,7 +300,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
             className="w-8 h-8 mr-3"
             style={{ color: colors.primary }}
           />
-          Skills & Expertise
+          {getSectionHeading(personalization?.sectionHeadings, 'skills')}
         </h2>
         <div className="grid md:grid-cols-2 gap-6">
           {resumeData.skills.map((skillGroup, index) => (
@@ -337,7 +339,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
             className="w-6 h-6 lg:w-8 lg:h-8 mr-2 lg:mr-3"
             style={{ color: colors.primary }}
           />
-          Featured Projects
+          {getSectionHeading(personalization?.sectionHeadings, 'projects')}
         </h2>
         <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {resumeData.projects.map((project, index) => (
@@ -415,7 +417,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
             className="w-8 h-8 mr-3"
             style={{ color: colors.primary }}
           />
-          Education
+          {getSectionHeading(personalization?.sectionHeadings, 'education')}
         </h2>
         <div className="space-y-6">
           {resumeData.education.map((edu, index) => (
@@ -477,7 +479,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
             className="w-8 h-8 mr-3"
             style={{ color: colors.primary }}
           />
-          Certifications
+          {getSectionHeading(personalization?.sectionHeadings, 'certifications')}
         </h2>
         <div className="grid md:grid-cols-2 gap-6">
           {resumeData.certifications.map((cert, index) => (
@@ -642,13 +644,13 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                 {resumeData.contact?.name?.charAt(0) || 'U'}
               </div>
               <h1 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                {resumeData.contact?.name || 'Your Name'}
+                {resumeData.contact?.name || getTemplateText(personalization?.templateText, 'minimalist-clean', 'fallbackName') || 'Your Name'}
               </h1>
               <p 
                 className="text-sm font-medium"
                 style={{ color: colors.primary }}
               >
-                {resumeData.experience?.[0]?.position || 'Professional'}
+                {resumeData.experience?.[0]?.position || getTemplateText(personalization?.templateText, 'minimalist-clean', 'fallbackPosition') || 'Professional'}
               </p>
             </div>
           </div>
