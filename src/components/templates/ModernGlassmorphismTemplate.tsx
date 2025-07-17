@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
 
 interface ModernGlassmorphismTemplateProps {
   portfolio: DatabasePortfolio;
@@ -27,6 +28,7 @@ interface ThemeColors {
 
 export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTemplateProps) {
   const { resumeData, personalization } = portfolio;
+  const { sectionHeadings } = personalization;
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -281,7 +283,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
           <div className="text-center mb-16">
             <h2 className="text-6xl font-black text-white mb-6">
               <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
-                Experience
+                {getSectionHeading(sectionHeadings, 'experience')}
               </span>
             </h2>
             <div className={`w-32 h-2 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
@@ -360,7 +362,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
           <div className="text-center mb-16">
             <h2 className="text-6xl font-black text-white mb-6">
               <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
-                Skills
+                {getSectionHeading(sectionHeadings, 'skills')}
               </span>
             </h2>
             <div className={`w-32 h-2 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
@@ -420,7 +422,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
           <div className="text-center mb-16">
             <h2 className="text-6xl font-black text-white mb-6">
               <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
-                Projects
+                {getSectionHeading(sectionHeadings, 'projects')}
               </span>
             </h2>
             <div className={`w-32 h-2 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />
@@ -524,7 +526,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
           <div className="text-center mb-16">
             <h2 className="text-6xl font-black text-white mb-6">
               <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
-                Education
+                {getSectionHeading(sectionHeadings, 'education')}
               </span>
             </h2>
             <div className={`w-32 h-2 bg-gradient-to-r ${themeColors.primary} mx-auto rounded-full`} />

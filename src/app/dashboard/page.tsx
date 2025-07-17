@@ -4,10 +4,15 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { AuthWrapper } from '@/components/FirebaseAuthWrapper';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { ResumeData, PersonalizationData, Experience, Education, Project, SkillCategory, Contact } from '@/types/resume';
+import { ResumeData, PersonalizationData, Experience, Education, Project, SkillCategory, Contact, SectionHeadings, TemplateText } from '@/types/resume';
 import { ToastContainer, useToast } from '@/components/Toast';
 import { SectionManager } from '@/components/SectionManager';
+import { SectionHeadingEditor } from '@/components/SectionHeadingEditor';
+import { TemplateTextEditor } from '@/components/TemplateTextEditor';
 import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
+import { getAllSectionHeadings } from '@/lib/section-headings';
+import { getAllTemplateText } from '@/lib/template-text';
+import { PortfolioRenderer } from '@/components/PortfolioRenderer';
 import QRCode from 'qrcode';
 import { 
   Settings, 
@@ -41,7 +46,8 @@ import {
   X,
   Layers,
   QrCode,
-  Smartphone
+  Smartphone,
+  Type
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -73,6 +79,8 @@ function DashboardContent() {
   // Content editing states
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [showHeadingEditor, setShowHeadingEditor] = useState(false);
+  const [showTemplateTextEditor, setShowTemplateTextEditor] = useState(false);
 
   // Toast notifications
   const { toasts, removeToast, showSuccess, showError } = useToast();
@@ -222,6 +230,7 @@ function DashboardContent() {
         setPortfolio(data.portfolio);
         setEditedSlug(data.portfolio.slug); // Update slug if changed
         setEditedResumeData(ensureResumeDataStructure(data.portfolio.resumeData));
+        setEditedPersonalization(data.portfolio.personalization); // Update personalization state
         setPreviewKey(prev => prev + 1); // Force iframe refresh
         showSuccess('Portfolio updated successfully!');
         setEditingSection(null);
@@ -258,6 +267,22 @@ function DashboardContent() {
     } catch (error) {
       console.error('Failed to copy URL:', error);
     }
+  };
+
+  const handleSectionHeadingsUpdate = (headings: SectionHeadings) => {
+    if (!editedPersonalization) return;
+    setEditedPersonalization({
+      ...editedPersonalization,
+      sectionHeadings: headings
+    });
+  };
+
+  const handleTemplateTextUpdate = (templateText: TemplateText) => {
+    if (!editedPersonalization) return;
+    setEditedPersonalization({
+      ...editedPersonalization,
+      templateText: templateText
+    });
   };
 
   // Content editing functions
@@ -1346,6 +1371,64 @@ function DashboardContent() {
                   </div>
                 </div>
 
+                {/* Section Headings Customization */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-white flex items-center space-x-3">
+                        <Edit className="w-5 h-5 text-purple-400" />
+                        <span>Section Headings</span>
+                      </h3>
+                      <p className="text-gray-300 mt-1">Customize section headings to match your profession</p>
+                    </div>
+                    <button
+                      onClick={() => setShowHeadingEditor(true)}
+                      className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                    >
+                      <Edit className="w-4 h-4" />
+                      <span>Edit Headings</span>
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                    {Object.entries(getAllSectionHeadings(editedPersonalization?.sectionHeadings)).map(([key, value]) => (
+                      <div key={key} className="bg-white/5 rounded-lg p-3">
+                        <div className="text-sm text-gray-400 capitalize">{key}</div>
+                        <div className="text-white font-medium">{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Template Text Customization */}
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-white flex items-center space-x-3">
+                        <Type className="w-5 h-5 text-purple-400" />
+                        <span>Template Text</span>
+                      </h3>
+                      <p className="text-gray-300 mt-1">Customize template-specific text content</p>
+                    </div>
+                    <button
+                      onClick={() => setShowTemplateTextEditor(true)}
+                      className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                    >
+                      <Type className="w-4 h-4" />
+                      <span>Edit Text</span>
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {Object.entries(getAllTemplateText(editedPersonalization?.templateText, editedPersonalization?.templateId || 'corporate-executive')).map(([key, value]) => (
+                      <div key={key} className="bg-white/5 rounded-lg p-3">
+                        <div className="text-sm text-gray-400 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                        <div className="text-white font-medium text-sm truncate">{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Section Manager */}
                 <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
                   <h3 className="text-lg font-semibold text-white mb-6">Section Manager</h3>
@@ -1397,13 +1480,15 @@ function DashboardContent() {
                   </div>
                   
                   <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden" style={{ height: '600px' }}>
-                    <iframe
-                      key={`custom-preview-${previewKey}`}
-                      src={`/${portfolio.slug}`}
-                      className="w-full h-full border-none"
-                      title="Portfolio Preview"
-                      style={{ colorScheme: 'normal' }}
-                    />
+                    <div className="w-full h-full overflow-auto">
+                      <PortfolioRenderer 
+                        portfolio={{
+                          ...portfolio,
+                          resumeData: editedResumeData || portfolio.resumeData,
+                          personalization: editedPersonalization || portfolio.personalization
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1484,12 +1569,15 @@ function DashboardContent() {
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
               <h3 className="text-lg font-bold text-white mb-4">Live Preview</h3>
               <div className="aspect-video bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-                <iframe
-                  key={previewKey}
-                  src={`/${portfolio.slug}`}
-                  className="w-full h-full"
-                  title="Portfolio Preview"
-                />
+                <div className="w-full h-full overflow-auto">
+                  <PortfolioRenderer 
+                    portfolio={{
+                      ...portfolio,
+                      resumeData: editedResumeData || portfolio.resumeData,
+                      personalization: editedPersonalization || portfolio.personalization
+                    }}
+                  />
+                </div>
               </div>
               <a
                 href={`/${portfolio.slug}`}
@@ -1527,6 +1615,25 @@ function DashboardContent() {
         </div>
       </div>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
+      
+      {/* Section Heading Editor Modal */}
+      {showHeadingEditor && editedPersonalization && (
+        <SectionHeadingEditor
+          sectionHeadings={editedPersonalization.sectionHeadings}
+          onUpdate={handleSectionHeadingsUpdate}
+          onClose={() => setShowHeadingEditor(false)}
+        />
+      )}
+
+      {/* Template Text Editor Modal */}
+      {showTemplateTextEditor && editedPersonalization && (
+        <TemplateTextEditor
+          templateId={editedPersonalization.templateId}
+          templateText={editedPersonalization.templateText}
+          onUpdate={handleTemplateTextUpdate}
+          onClose={() => setShowTemplateTextEditor(false)}
+        />
+      )}
     </div>
   );
 } 

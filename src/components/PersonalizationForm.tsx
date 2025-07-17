@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, Palette, Layout, Eye, Plus, Settings, Stethoscope } from 'lucide-react';
-import { ResumeData, PersonalizationData } from '@/types/resume';
+import { ArrowLeft, Palette, Layout, Eye, Plus, Settings, Stethoscope, Edit2 } from 'lucide-react';
+import { ResumeData, PersonalizationData, SectionHeadings } from '@/types/resume';
 import { TemplateSelector } from './TemplateSelector';
 import { SectionManager } from './SectionManager';
 import { HealthcareForm } from './HealthcareForm';
+import { SectionHeadingEditor } from './SectionHeadingEditor';
 import { TemplateId } from '@/types/templates';
+import { getAllSectionHeadings } from '@/lib/section-headings';
 
 interface PersonalizationFormProps {
   resumeData: ResumeData;
@@ -19,11 +21,16 @@ interface PersonalizationFormProps {
 export function PersonalizationForm({ resumeData, personalization, onPersonalizationChange, onResumeDataChange, onPreviewClick }: PersonalizationFormProps) {
   const [formData, setFormData] = useState<PersonalizationData>(personalization);
   const [activeTab, setActiveTab] = useState<'template' | 'sections' | 'healthcare' | 'styling'>('template');
+  const [showHeadingEditor, setShowHeadingEditor] = useState(false);
 
   const updateFormData = (updates: Partial<PersonalizationData>) => {
     const newData = { ...formData, ...updates };
     setFormData(newData);
     onPersonalizationChange(newData);
+  };
+
+  const handleSectionHeadingsUpdate = (headings: SectionHeadings) => {
+    updateFormData({ sectionHeadings: headings });
   };
 
   const isHealthcareProfessional = resumeData.profession === 'healthcare';
@@ -67,6 +74,7 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
   ];
 
   return (
+    <>
     <div className="max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -258,6 +266,25 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
           </div>
         </div>
 
+        {/* Section Headings */}
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+          <div className="flex items-center space-x-3 mb-6">
+            <Edit2 className="w-6 h-6 text-purple-400" />
+            <h2 className="text-xl font-semibold text-white">Section Headings</h2>
+          </div>
+          
+          <p className="text-gray-300 mb-4">
+            Customize section headings to match your profession (e.g., "Technical Skills" instead of "Skills").
+          </p>
+          
+          <button
+            onClick={() => setShowHeadingEditor(true)}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+          >
+            Customize Section Headings
+          </button>
+        </div>
+
         {/* Additional Sections */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
           <div className="flex items-center space-x-3 mb-6">
@@ -314,5 +341,15 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
         </button>
       </div>
     </div>
+    
+    {/* Section Heading Editor Modal */}
+    {showHeadingEditor && (
+      <SectionHeadingEditor
+        sectionHeadings={getAllSectionHeadings(formData.sectionHeadings)}
+        onUpdate={handleSectionHeadingsUpdate}
+        onClose={() => setShowHeadingEditor(false)}
+      />
+    )}
+    </>
   );
 } 

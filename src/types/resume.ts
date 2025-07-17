@@ -60,6 +60,40 @@ export interface CustomSection {
   visible: boolean;
 }
 
+// Custom section headings
+export interface SectionHeadings {
+  experience: string;
+  education: string;
+  skills: string;
+  projects: string;
+  certifications: string;
+  summary: string;
+  contact: string;
+  // Add more as needed
+  [key: string]: string;
+}
+
+// Template-specific customizable text
+export interface TemplateText {
+  // Corporate Executive template
+  corporateExecutive?: {
+    tagline?: string;
+    ctaTitle?: string;
+    ctaDescription?: string;
+    ctaButtonText?: string;
+  };
+  // Modern Glassmorphism template
+  modernGlassmorphism?: {
+    tagline?: string;
+    ctaTitle?: string;
+    ctaDescription?: string;
+  };
+  // Add more templates as needed
+  [templateId: string]: {
+    [key: string]: string;
+  } | undefined;
+}
+
 // Healthcare-specific data for medical professionals
 export interface HealthcareData {
   medicalLicenses?: MedicalLicense[];
@@ -161,6 +195,10 @@ export interface PersonalizationData {
   // Section management
   sectionOrder?: string[]; // Array of section IDs in display order
   hiddenSections?: string[]; // Array of section IDs that are hidden
+  // Custom section headings
+  sectionHeadings?: SectionHeadings;
+  // Template-specific text customization
+  templateText?: TemplateText;
 }
 
 export interface PortfolioData {

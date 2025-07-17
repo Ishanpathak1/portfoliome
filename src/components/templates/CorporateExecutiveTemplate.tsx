@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
+import { getSectionHeading } from '@/lib/section-headings';
+import { getTemplateText } from '@/lib/template-text';
 
 interface CorporateExecutiveTemplateProps {
   portfolio: DatabasePortfolio;
@@ -17,6 +19,7 @@ interface CorporateExecutiveTemplateProps {
 
 export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemplateProps) {
   const { resumeData, personalization } = portfolio;
+  const { sectionHeadings, templateText } = personalization;
   const [activeSection, setActiveSection] = useState('hero');
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -90,7 +93,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Leadership <span className={colors.text}>Journey</span>
+              {getSectionHeading(sectionHeadings, 'experience')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
@@ -168,7 +171,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Core <span className={colors.text}>Competencies</span>
+              {getSectionHeading(sectionHeadings, 'skills')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
@@ -216,7 +219,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Strategic <span className={colors.text}>Initiatives</span>
+              {getSectionHeading(sectionHeadings, 'projects')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
@@ -285,7 +288,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Educational <span className={colors.text}>Foundation</span>
+              {getSectionHeading(sectionHeadings, 'education')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
@@ -333,7 +336,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Professional <span className={colors.text}>Certifications</span>
+              {getSectionHeading(sectionHeadings, 'certifications')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
@@ -455,7 +458,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                   {resumeData.contact?.name || 'Executive Leader'}
                 </h1>
                 <p className="text-2xl lg:text-3xl text-white/80 font-light">
-                  Driving Strategic Excellence & Innovation
+                  {getTemplateText(templateText, 'corporate-executive', 'tagline')}
                 </p>
                 <p className="text-lg lg:text-xl text-white/70 leading-relaxed max-w-2xl">
                   {resumeData.summary || 'Seasoned executive with proven track record of transforming organizations and delivering exceptional results through strategic vision and operational excellence.'}
@@ -488,9 +491,11 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
             {/* Right Column - Executive CTA */}
             <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-white/20">
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-white">Ready to Drive Growth?</h2>
+                <h2 className="text-3xl font-bold text-white">
+                  {getTemplateText(templateText, 'corporate-executive', 'ctaTitle')}
+                </h2>
                 <p className="text-white/80 text-lg">
-                  Let's discuss how strategic leadership can transform your organization's trajectory.
+                  {getTemplateText(templateText, 'corporate-executive', 'ctaDescription')}
                 </p>
 
                 <div className="mt-8 pt-6 border-t border-white/20">
@@ -498,7 +503,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                     className="w-full bg-white text-gray-900 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
                     onClick={() => window.open(`mailto:${resumeData.contact?.email}?subject=Executive Opportunity Inquiry`, '_blank')}
                   >
-                    Schedule Executive Meeting
+                    {getTemplateText(templateText, 'corporate-executive', 'ctaButtonText')}
                   </button>
                 </div>
               </div>
