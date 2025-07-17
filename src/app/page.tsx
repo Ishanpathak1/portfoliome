@@ -7,7 +7,7 @@ import { PersonalizationForm } from '@/components/PersonalizationForm';
 import { PortfolioPreview } from '@/components/PortfolioPreview';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { ResumeData, PersonalizationData } from '@/types/resume';
-import { Upload, Palette, Eye, Sparkles, Settings, FileText } from 'lucide-react';
+import { Upload, Palette, Eye, Sparkles, Settings, FileText, Users, Star, ArrowRight } from 'lucide-react';
 import { HomepageStructuredData } from '@/components/StructuredData';
 import NavigationPadding from '@/components/NavigationPadding';
 
@@ -26,6 +26,78 @@ export default function HomePage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [checkingExistingPortfolio, setCheckingExistingPortfolio] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [activeTab, setActiveTab] = useState('resume');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [generatedSlug, setGeneratedSlug] = useState('');
+
+  const testimonials = [
+    {
+      name: "Avi Chauhan",
+      text: "Too fast, getting portfolio and able to change it in seconds, feels like magic."
+    },
+    {
+      name: "Dhyey Pariekh", 
+      text: "Can't believe something like this exist, it does it too quickly, and gives so much control."
+    },
+    {
+      name: "Badal Gupta",
+      text: "Such a cool collection of templates, and option to change it anytime is a great feature to have."
+    }
+  ];
+
+  const availableTemplates = [
+    { 
+      id: 'full-stack-developer', 
+      name: 'Full Stack Developer', 
+      preview: '/template-previews/fullstack.jpg',
+      color: 'from-cyan-400 to-purple-600',
+      description: 'Terminal-style developer portfolio'
+    },
+    { 
+      id: 'creative-portfolio', 
+      name: 'Creative Portfolio', 
+      preview: '/template-previews/creative.jpg',
+      color: 'from-pink-400 to-purple-600',
+      description: 'Artistic and colorful design'
+    },
+    { 
+      id: 'tech-innovator', 
+      name: 'Tech Innovator', 
+      preview: '/template-previews/tech.jpg',
+      color: 'from-blue-400 to-cyan-600',
+      description: 'Futuristic tech-focused layout'
+    },
+    { 
+      id: 'minimalist-clean', 
+      name: 'Minimalist Clean', 
+      preview: '/template-previews/minimal.jpg',
+      color: 'from-gray-400 to-gray-600',
+      description: 'Clean and simple design'
+    },
+    { 
+      id: 'dark-professional', 
+      name: 'Dark Professional', 
+      preview: '/template-previews/dark.jpg',
+      color: 'from-slate-400 to-blue-600',
+      description: 'Professional dark theme'
+    },
+    { 
+      id: 'modern-glassmorphism', 
+      name: 'Modern Glassmorphism', 
+      preview: '/template-previews/glass.jpg',
+      color: 'from-purple-400 to-pink-600',
+      description: 'Glass-like modern effects'
+    },
+  ];
+
+  // Rotate testimonials every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Check if user has existing portfolio and redirect to dashboard
   useEffect(() => {
@@ -72,11 +144,26 @@ export default function HomePage() {
     }
   };
 
-  // Debug logging
-  console.log('HomePage render - currentStep:', currentStep, 'resumeData:', !!resumeData, 'isLoading:', isLoading);
+  // Generate slug from name
+  const generateSlug = (name: string) => {
+    const cleanName = name.toLowerCase().replace(/[^a-z\s]/g, '');
+    const parts = cleanName.split(' ').filter(part => part.length > 0);
+    const firstName = parts[0] || 'user';
+    const lastName = parts[1] || 'portfolio';
+    const randomSuffix = Math.random().toString(36).substring(2, 6);
+    return `${firstName}-${lastName}-${randomSuffix}`;
+  };
 
   const handleResumeUpload = useCallback(async (file: File) => {
+    // If resumeData already exists, skip upload and go to step 2
+    if (resumeData) {
+      setCurrentStep(2);
+      return;
+    }
+
     setIsLoading(true);
+    setUploadedFile(file);
+    
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -88,12 +175,14 @@ export default function HomePage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('API Response:', data); // Debug log
         const resumeData = data.data;
-        console.log('Setting resume data:', resumeData); // Debug log
-        setResumeData(resumeData); // API returns { success: true, data: resumeData }
-        console.log('Setting current step to 2'); // Debug log
-        setCurrentStep(2);
+        setResumeData(resumeData);
+        
+        // Generate slug from parsed name
+        const name = resumeData.contact?.name || 'User Portfolio';
+        const slug = generateSlug(name);
+        setGeneratedSlug(slug);
+        
       } else {
         const errorData = await response.json();
         console.error('Upload failed:', errorData.error);
@@ -105,7 +194,25 @@ export default function HomePage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [resumeData]);
+
+  const handleContinue = useCallback(async () => {
+    if (!user) {
+      // Sign in first
+      await signInWithGoogle();
+      return;
+    }
+    
+    // Move to step 2 after sign in
+    setCurrentStep(2);
+  }, [user, signInWithGoogle]);
+
+  // Auto-continue to step 2 after sign-in if resume is already uploaded
+  useEffect(() => {
+    if (user && resumeData && currentStep === 1) {
+      setCurrentStep(2);
+    }
+  }, [user, resumeData, currentStep]);
 
   const handlePersonalizationChange = useCallback((newPersonalization: PersonalizationData) => {
     setPersonalization(newPersonalization);
@@ -117,384 +224,449 @@ export default function HomePage() {
     }
   }, [resumeData]);
 
-  const steps = [
-    { number: 1, title: 'Upload Resume', icon: Upload, active: currentStep >= 1 },
-    { number: 2, title: 'Personalize', icon: Palette, active: currentStep >= 2 },
-    { number: 3, title: 'Preview & Share', icon: Eye, active: currentStep >= 3 },
-  ];
-
-  // Show landing page for non-authenticated users
-  if (!user) {
-    return (
-      <NavigationPadding>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-          {/* Navigation */}
-          <nav className="relative z-50 px-6 py-4">
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-2xl font-bold text-white">PortfolioHub</span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={signInWithGoogle}
-                  className="bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
-                >
-                  Sign In
-                </button>
-              </div>
-            </div>
-          </nav>
-
-          {/* Hero Section */}
-          <section className="relative px-6 pt-16 pb-24">
-            <div className="max-w-7xl mx-auto text-center">
-              {/* Floating background elements */}
-              <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
-                <div className="absolute top-40 right-10 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl"></div>
-              </div>
-
-              <div className="relative z-10">
-                <h1 className="text-5xl lg:text-7xl font-black text-white mb-8 leading-tight">
-                  Create Your
-                  <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent">
-                    Dream Portfolio
-                  </span>
-                  <span className="block text-white">In Minutes</span>
-                </h1>
-                
-                <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-                  Transform your resume into a stunning, professional portfolio website. 
-                  Choose from beautiful templates, customize to your style, and share with the world.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-                  <button
-                    onClick={signInWithGoogle}
-                    className="group relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:scale-105 transition-all duration-300 shadow-2xl"
-                  >
-                    <span className="relative z-10 flex items-center space-x-3">
-                      
-                      <span>Get Started with Google</span>
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </button>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-                  <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <div className="text-3xl font-bold text-white mb-2">10+</div>
-                    <div className="text-gray-400">Beautiful Templates</div>
-                  </div>
-                  <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <div className="text-3xl font-bold text-white mb-2">5 Min</div>
-                    <div className="text-gray-400">Setup Time</div>
-                  </div>
-                  <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <div className="text-3xl font-bold text-white mb-2">100%</div>
-                    <div className="text-gray-400">Free to Use</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Features Section */}
-          <section className="relative px-6 py-24 bg-black/20">
-            <div className="max-w-7xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl lg:text-5xl font-black text-white mb-6">
-                  Everything You Need to
-                  <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Stand Out
-                  </span>
-                </h2>
-                <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                  Professional portfolio creation made simple with powerful features
-                </p>
-              </div>
-
-              <div className="grid lg:grid-cols-3 gap-8">
-                <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Upload className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Smart Resume Parsing</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Upload your resume in any format (PDF, DOCX, TXT) and our AI instantly extracts all your information with perfect formatting.
-                  </p>
-                </div>
-
-                <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Palette className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Beautiful Templates</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Choose from professionally designed templates. From minimalist to bold, find the perfect style that represents you.
-                  </p>
-                </div>
-
-                <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Eye className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Custom Domain</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Get your personalized URL like yourname.portfoliohub.com to share your professional presence with employers.
-                  </p>
-                </div>
-
-                <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Settings className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Real-time Editing</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Make changes and see them instantly. Edit your content, switch templates, and update your portfolio anytime.
-                  </p>
-                </div>
-
-                <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Sparkles className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Mobile Optimized</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Your portfolio looks perfect on all devices. Mobile-first design ensures great experience everywhere.
-                  </p>
-                </div>
-
-                <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <FileText className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">SEO Optimized</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Built-in SEO optimization helps recruiters and employers find you easily through search engines.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* How It Works */}
-          <section className="relative px-6 py-24">
-            <div className="max-w-7xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl lg:text-5xl font-black text-white mb-6">
-                  How It Works
-                </h2>
-                <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                  From resume to professional portfolio in just 3 simple steps
-                </p>
-              </div>
-
-              <div className="grid lg:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="relative mb-8">
-                    <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-3xl font-bold text-white">1</span>
-                    </div>
-                    <div className="absolute top-12 left-1/2 transform -translate-x-1/2 w-px h-16 bg-gradient-to-b from-purple-500 to-transparent lg:hidden"></div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Upload Resume</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Simply upload your existing resume. Our smart parser extracts all your information automatically.
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="relative mb-8">
-                    <div className="w-24 h-24 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-3xl font-bold text-white">2</span>
-                    </div>
-                    <div className="absolute top-12 left-1/2 transform -translate-x-1/2 w-px h-16 bg-gradient-to-b from-pink-500 to-transparent lg:hidden"></div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Customize Design</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Choose from beautiful templates and customize colors, themes, and layout to match your style.
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="relative mb-8">
-                    <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-3xl font-bold text-white">3</span>
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Share & Impress</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Get your custom URL and share your professional portfolio with employers and clients.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* CTA Section */}
-          <section className="relative px-6 py-24 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-4xl lg:text-5xl font-black text-white mb-6">
-                Ready to Build Your
-                <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Professional Portfolio?
-                </span>
-              </h2>
-              <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-                Join thousands of professionals who have transformed their careers with stunning portfolios
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <button
-                  onClick={signInWithGoogle}
-                  className="group relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:scale-105 transition-all duration-300 shadow-2xl"
-                >
-                  <span className="relative z-10 flex items-center space-x-3">
-                    <span>🚀</span>
-                    <span>Get Started Free</span>
-                  </span>
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* Footer */}
-          <footer className="bg-black/40 border-t border-white/10 px-6 py-12">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex flex-col lg:flex-row justify-between items-center">
-                <div className="flex items-center space-x-2 mb-6 lg:mb-0">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-2xl font-bold text-white">PortfolioHub</span>
-                </div>
-                
-                <div className="flex items-center space-x-8 text-gray-400">
-                  <span> 2025 PortfolioHub. All rights reserved.</span>
-                </div>
-              </div>
-            </div>
-          </footer>
-        </div>
-      </NavigationPadding>
-    );
-  }
+  const handleGetStarted = () => {
+    if (!user) {
+      signInWithGoogle();
+    } else {
+      // If user is logged in, show upload section
+      document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Show loading while checking for existing portfolio
   if (checkingExistingPortfolio) {
     return (
       <NavigationPadding>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-            <p className="text-white mt-4 text-center">Checking your portfolio...</p>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <p className="text-gray-600 mt-4 text-center">Checking your portfolio...</p>
           </div>
         </div>
       </NavigationPadding>
     );
   }
 
-  return (
-    <NavigationPadding>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="container mx-auto px-6 py-12">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <div className="flex justify-between items-center mb-8">
-              <div></div>
-              <div className="flex items-center space-x-4">
-                <a
-                  href="/dashboard"
-                  className="flex items-center space-x-2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span>Dashboard</span>
-                </a>
-                <button
-                  onClick={signOut}
-                  className="text-gray-300 hover:text-white transition-colors px-4 py-2"
-                >
-                  Sign Out
-                </button>
-              </div>
-            </div>
-            <h1 className="text-5xl font-black text-white mb-4">
-              Create Your
-              <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Professional Portfolio
-              </span>
-            </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Welcome, <strong className="text-white">{user.displayName || user.email}</strong>! 
-              Let's create your professional portfolio.
-            </p>
-          </div>
-
-          {/* Progress Steps */}
-          <div className="flex justify-center mb-16">
-            <div className="flex items-center space-x-8">
-              {steps.map((step, index) => (
-                <div key={step.number} className="flex items-center">
-                  <div className={`
-                    w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                    ${step.active 
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 border-purple-400 text-white' 
-                      : 'border-gray-600 text-gray-400'
-                    }
-                  `}>
-                    <step.icon className="w-6 h-6" />
-                  </div>
-                  <div className="ml-4">
-                    <div className={`font-bold ${step.active ? 'text-white' : 'text-gray-400'}`}>
-                      Step {step.number}
-                    </div>
-                    <div className={`text-sm ${step.active ? 'text-gray-300' : 'text-gray-500'}`}>
-                      {step.title}
-                    </div>
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={`w-16 h-0.5 ml-8 ${step.active ? 'bg-purple-400' : 'bg-gray-600'}`} />
-                  )}
+  // Show step-by-step flow for authenticated users who are creating portfolio
+  if (user && (currentStep > 1 || resumeData)) {
+    return (
+      <NavigationPadding>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+          <div className="container mx-auto px-6 py-12">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <div className="flex justify-between items-center mb-8">
+                <div></div>
+                <div className="flex items-center space-x-4">
+                  <a
+                    href="/dashboard"
+                    className="flex items-center space-x-2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </a>
+                  <button
+                    onClick={signOut}
+                    className="text-gray-300 hover:text-white transition-colors px-4 py-2"
+                  >
+                    Sign Out
+                  </button>
                 </div>
-              ))}
+              </div>
+              <h1 className="text-5xl font-black text-white mb-4">
+                Create Your
+                <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Professional Portfolio
+                </span>
+              </h1>
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                Welcome, <strong className="text-white">{user.displayName || user.email}</strong>! 
+                Let's create your professional portfolio.
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="max-w-4xl mx-auto">
+              {currentStep === 1 && (
+                <div id="upload-section">
+                  <FileUploadSection 
+                    onFileUpload={handleResumeUpload}
+                    isLoading={isLoading}
+                  />
+                </div>
+              )}
+
+              {currentStep === 2 && resumeData && (
+                <PersonalizationForm 
+                  resumeData={resumeData}
+                  personalization={personalization}
+                  onPersonalizationChange={handlePersonalizationChange}
+                  onResumeDataChange={setResumeData}
+                  onPreviewClick={handlePreviewClick}
+                />
+              )}
+
+              {currentStep === 3 && resumeData && (
+                <PortfolioPreview 
+                  resumeData={resumeData}
+                  personalization={personalization}
+                />
+              )}
             </div>
           </div>
+          <HomepageStructuredData />
+                </div>
+      </NavigationPadding>
+    );
+  }
 
-          {/* Content */}
-          <div className="max-w-4xl mx-auto">
-            {currentStep === 1 && (
-              <FileUploadSection 
-                onFileUpload={handleResumeUpload}
-                isLoading={isLoading}
-              />
-            )}
+  // Main landing page (matches tiiny.host design)
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">P</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">PortfolioHub</span>
+            </div>
 
-            {currentStep === 2 && resumeData && (
-              <PersonalizationForm 
-                resumeData={resumeData}
-                personalization={personalization}
-                onPersonalizationChange={handlePersonalizationChange}
-                onResumeDataChange={setResumeData}
-                onPreviewClick={handlePreviewClick}
-              />
-            )}
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="/blog" className="text-gray-600 hover:text-gray-900 font-medium">Blog</a>
+              <a href="/features" className="text-gray-600 hover:text-gray-900 font-medium">Features</a>
+              <a href="/templates" className="text-gray-600 hover:text-gray-900 font-medium">Templates</a>
+              <a href="/contact" className="text-gray-600 hover:text-gray-900 font-medium">Contact</a>
+            </nav>
 
-            {currentStep === 3 && resumeData && (
-              <PortfolioPreview 
-                resumeData={resumeData}
-                personalization={personalization}
-              />
-            )}
+            {/* Auth Buttons */}
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <a
+                    href="/dashboard"
+                    className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium"
+                  >
+                    Dashboard
+                  </a>
+                  <button
+                    onClick={signOut}
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={signInWithGoogle}
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 font-medium"
+                  >
+                    Log in
+                  </button>
+                  <button
+                    onClick={signInWithGoogle}
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center space-x-2"
+                  >
+                    <span>Sign up free</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
-        <HomepageStructuredData />
-      </div>
-    </NavigationPadding>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start min-h-[calc(100vh-200px)]">
+          
+          {/* LEFT Column - Testimonial */}
+          <div className="lg:col-span-3 space-y-6" style={{paddingTop: '400px'}}>
+            <div className="space-y-4">
+              <p className="text-gray-600 italic text-lg leading-relaxed">
+                "{testimonials[currentTestimonial].text}"
+              </p>
+              <p className="text-gray-500 text-sm">- {testimonials[currentTestimonial].name}</p>
+            </div>
+            <div className="flex items-center space-x-3 text-sm text-gray-500">
+              <div className="flex items-center space-x-2">
+                <div className="flex -space-x-2">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full border-2 border-white"></div>
+                  <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white"></div>
+                  <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
+                </div>
+                <span>more than 30 portfolios hosted already</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CENTER Column - Main Content */}
+          <div className="lg:col-span-6 space-y-8">
+            {/* Main Heading */}
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                Convert your resume in Portfolio in one click.
+              </h1>
+              <p className="text-xl text-gray-600">
+                Upload, Choose, Share
+              </p>
+            </div>
+
+            {/* URL Preview */}
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-600">https://take-my.info/</span>
+                <input 
+                  type="text" 
+                  value={generatedSlug || 'your-name'}
+                  placeholder="your-name"
+                  className="flex-1 bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  readOnly
+                />
+              </div>
+            </div>
+
+                           {/* Tab Navigation */}
+               <div className="border-b border-gray-200">
+                 <nav className="flex space-x-8">
+                   <button 
+                     onClick={() => setActiveTab('resume')}
+                     className={`border-b-2 pb-2 px-1 font-medium ${activeTab === 'resume' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                   >
+                     Resume
+                   </button>
+                   <button 
+                     onClick={() => setActiveTab('templates')}
+                     className={`border-b-2 pb-2 px-1 font-medium ${activeTab === 'templates' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                   >
+                     Templates
+                   </button>
+                 </nav>
+               </div>
+
+                           {/* Content based on active tab */}
+               {activeTab === 'resume' ? (
+                 /* Upload Section */
+                 <div 
+                   id="upload-section" 
+                   className="border-2 border-dashed border-purple-300 rounded-xl p-12 text-center bg-purple-50/50 transition-colors hover:border-purple-400 hover:bg-purple-100/50"
+                   onDragOver={(e) => {
+                     e.preventDefault();
+                     e.currentTarget.classList.add('border-purple-500', 'bg-purple-100');
+                   }}
+                   onDragLeave={(e) => {
+                     e.preventDefault();
+                     e.currentTarget.classList.remove('border-purple-500', 'bg-purple-100');
+                   }}
+                   onDrop={(e) => {
+                     e.preventDefault();
+                     e.currentTarget.classList.remove('border-purple-500', 'bg-purple-100');
+                     const file = e.dataTransfer.files[0];
+                     if (file && (file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.type === 'text/plain')) {
+                       handleResumeUpload(file);
+                     }
+                   }}
+                 >
+                   <div className="space-y-4">
+                     <div className="flex justify-center space-x-4">
+                       <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                         <Upload className="w-6 h-6 text-gray-500" />
+                       </div>
+                       <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                         <FileText className="w-6 h-6 text-gray-500" />
+                       </div>
+                     </div>
+                     <div className="space-y-2">
+                       <p className="text-gray-600">Drag & drop resume or</p>
+                       <p className="text-gray-500 text-sm">single file here</p>
+                     </div>
+                     
+                     <input
+                       type="file"
+                       id="file-upload"
+                       accept=".pdf,.docx,.txt"
+                       onChange={(e) => {
+                         const file = e.target.files?.[0];
+                         if (file) {
+                           handleResumeUpload(file);
+                         }
+                       }}
+                       className="hidden"
+                     />
+                     
+                     {!resumeData ? (
+                       <button
+                         onClick={() => document.getElementById('file-upload')?.click()}
+                         disabled={isLoading}
+                         className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50"
+                       >
+                         {isLoading ? 'Uploading...' : 'Upload file'}
+                       </button>
+                     ) : (
+                       <div className="space-y-4">
+                         <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                           <p className="text-green-700 text-sm">
+                             ✅ <span className="font-medium">{uploadedFile?.name}</span> uploaded successfully!
+                           </p>
+                         </div>
+                         <button
+                           onClick={handleContinue}
+                           disabled={isLoading}
+                           className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50"
+                         >
+                           {!user ? 'Continue (Sign in required)' : 'Continue'}
+                         </button>
+                       </div>
+                     )}
+                   </div>
+                 </div>
+               ) : (
+                 /* Templates Section */
+                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                   {availableTemplates.map((template) => (
+                     <div 
+                       key={template.id}
+                       className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors cursor-pointer"
+                       onClick={() => {
+                         setPersonalization(prev => ({ ...prev, templateId: template.id }));
+                         setActiveTab('resume');
+                       }}
+                     >
+                       <div className="w-full h-32 rounded-lg mb-3 relative overflow-hidden">
+                         {/* Template Preview */}
+                         {template.id === 'full-stack-developer' && (
+                           <div className="w-full h-full bg-black text-green-400 p-2 text-xs font-mono">
+                             <div className="text-cyan-400">dev@portfolio:~$</div>
+                             <div className="text-green-400">whoami</div>
+                             <div className="text-white">Full Stack Developer</div>
+                             <div className="text-cyan-400">ls skills/</div>
+                             <div className="text-green-400">React TypeScript Node.js</div>
+                           </div>
+                         )}
+                         
+                         {template.id === 'creative-portfolio' && (
+                           <div className="w-full h-full bg-gradient-to-br from-pink-100 to-purple-100 p-2 relative">
+                             <div className="absolute top-2 right-2 w-4 h-4 bg-red-400 rounded-full"></div>
+                             <div className="absolute bottom-2 left-2 w-3 h-3 bg-yellow-400 rounded-full"></div>
+                             <div className="text-center mt-4">
+                               <div className="w-8 h-8 bg-purple-400 rounded-full mx-auto mb-2"></div>
+                               <div className="text-xs font-bold text-purple-800">Creative</div>
+                               <div className="text-xs text-purple-600">Portfolio</div>
+                             </div>
+                           </div>
+                         )}
+                         
+                         {template.id === 'tech-innovator' && (
+                           <div className="w-full h-full bg-black text-blue-400 p-2 relative">
+                             <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-cyan-900/20"></div>
+                             <div className="relative z-10">
+                               <div className="text-xs text-cyan-400">◆ TECH INNOVATOR</div>
+                               <div className="text-xs text-blue-300 mt-1">▲ Neural Networks</div>
+                               <div className="text-xs text-cyan-300">● Machine Learning</div>
+                               <div className="text-xs text-blue-200">◇ AI Development</div>
+                             </div>
+                           </div>
+                         )}
+                         
+                         {template.id === 'minimalist-clean' && (
+                           <div className="w-full h-full bg-white p-3 border border-gray-200">
+                             <div className="text-center">
+                               <div className="w-6 h-6 bg-gray-400 rounded-full mx-auto mb-2"></div>
+                               <div className="text-xs font-semibold text-gray-800">John Doe</div>
+                               <div className="text-xs text-gray-600">Developer</div>
+                               <div className="mt-2 space-y-1">
+                                 <div className="w-full h-1 bg-gray-200 rounded"></div>
+                                 <div className="w-3/4 h-1 bg-gray-200 rounded"></div>
+                                 <div className="w-1/2 h-1 bg-gray-200 rounded"></div>
+                               </div>
+                             </div>
+                           </div>
+                         )}
+                         
+                         {template.id === 'dark-professional' && (
+                           <div className="w-full h-full bg-gray-900 text-white p-2">
+                             <div className="text-center">
+                               <div className="w-6 h-6 bg-blue-500 rounded-full mx-auto mb-2"></div>
+                               <div className="text-xs font-semibold">Professional</div>
+                               <div className="text-xs text-gray-400">Executive</div>
+                               <div className="mt-2 space-y-1">
+                                 <div className="w-full h-1 bg-gray-700 rounded"></div>
+                                 <div className="w-4/5 h-1 bg-gray-700 rounded"></div>
+                                 <div className="w-3/5 h-1 bg-blue-500 rounded"></div>
+                               </div>
+                             </div>
+                           </div>
+                         )}
+                         
+                         {template.id === 'modern-glassmorphism' && (
+                           <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900 p-2 relative">
+                             <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-lg"></div>
+                             <div className="relative z-10 text-center">
+                               <div className="w-6 h-6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto mb-2"></div>
+                               <div className="text-xs font-semibold text-white">Modern</div>
+                               <div className="text-xs text-purple-200">Glassmorphism</div>
+                               <div className="mt-2 space-y-1">
+                                 <div className="w-full h-1 bg-white/20 rounded"></div>
+                                 <div className="w-3/4 h-1 bg-white/20 rounded"></div>
+                               </div>
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                       <h3 className="font-medium text-gray-900 text-sm">{template.name}</h3>
+                       <p className="text-xs text-gray-500 mt-1">{template.description}</p>
+                     </div>
+                   ))}
+                 </div>
+               )}
+
+            {/* File Format Info */}
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                <div className="flex items-center space-x-2">
+                  <FileText className="w-4 h-4" />
+                  <span>PDF, DOCX, TXT</span>
+                </div>
+                <span>•</span>
+                <span>Max 10MB</span>
+              </div>
+              <div className="text-xs text-gray-400 max-w-md mx-auto">
+                <p>PDF files: For text selection (not scanned images)</p>
+                <p>DOCX files: Use standard formatting with clear section headers</p>
+                <p>All files: Include sections like "Experience", "Education", "Skills"</p>
+              </div>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="text-center space-y-4 pt-24 pb-12">
+              <p className="text-lg text-gray-500 tracking-wide font-medium">Used by students, job professionals & employees</p>
+            </div>
+          </div>
+
+          {/* RIGHT Column - Try for free with arrow */}
+          <div className="lg:col-span-3 flex justify-center lg:justify-end" style={{paddingTop: '330px', paddingRight: '0px'}}>
+            <div className="relative" style={{marginRight: '-190px'}}>
+              <button
+                onClick={handleGetStarted}
+                className="block"
+              >
+                <img 
+                  src="/tff1.png" 
+                  alt="Try for free" 
+                  className="max-w-none w-[600px] hover:opacity-90 transition-opacity"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+      <HomepageStructuredData />
+    </div>
   );
 } 
