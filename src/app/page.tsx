@@ -384,36 +384,15 @@ export default function HomePage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start min-h-[calc(100vh-200px)]">
-          
-          {/* LEFT Column - Testimonial */}
-          <div className="lg:col-span-3 space-y-6" style={{paddingTop: '400px'}}>
-            <div className="space-y-4">
-              <p className="text-gray-600 italic text-lg leading-relaxed">
-                "{testimonials[currentTestimonial].text}"
-              </p>
-              <p className="text-gray-500 text-sm">- {testimonials[currentTestimonial].name}</p>
-            </div>
-            <div className="flex items-center space-x-3 text-sm text-gray-500">
-              <div className="flex items-center space-x-2">
-                <div className="flex -space-x-2">
-                  <div className="w-6 h-6 bg-purple-500 rounded-full border-2 border-white"></div>
-                  <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white"></div>
-                  <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
-                </div>
-                <span>more than 30 portfolios hosted already</span>
-              </div>
-            </div>
-          </div>
-
-          {/* CENTER Column - Main Content */}
-          <div className="lg:col-span-6 space-y-8">
+        {/* Mobile Layout */}
+        <div className="lg:hidden">
+          <div className="space-y-6">
             {/* Main Heading */}
             <div className="text-center space-y-4">
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                 Convert your resume in Portfolio in one click.
               </h1>
-              <p className="text-xl text-gray-600">
+              <p className="text-lg text-gray-600">
                 Upload, Choose, Share
               </p>
             </div>
@@ -421,34 +400,178 @@ export default function HomePage() {
             {/* URL Preview */}
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <div className="flex items-center space-x-2">
-                <span className="text-gray-600">https://take-my.info/</span>
+                <span className="text-gray-600 text-sm">https://take-my.info/</span>
                 <input 
                   type="text" 
                   value={generatedSlug || 'your-name'}
                   placeholder="your-name"
-                  className="flex-1 bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="flex-1 bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
                   readOnly
                 />
               </div>
             </div>
 
-                           {/* Tab Navigation */}
-               <div className="border-b border-gray-200">
-                 <nav className="flex space-x-8">
-                   <button 
-                     onClick={() => setActiveTab('resume')}
-                     className={`border-b-2 pb-2 px-1 font-medium ${activeTab === 'resume' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                   >
-                     Resume
-                   </button>
-                   <button 
-                     onClick={() => setActiveTab('templates')}
-                     className={`border-b-2 pb-2 px-1 font-medium ${activeTab === 'templates' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                   >
-                     Templates
-                   </button>
-                 </nav>
-               </div>
+            {/* Upload Section Only */}
+            <div 
+              id="upload-section-mobile" 
+              className="border-2 border-dashed border-purple-300 rounded-xl p-8 text-center bg-purple-50/50 transition-colors hover:border-purple-400 hover:bg-purple-100/50"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add('border-purple-500', 'bg-purple-100');
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-purple-500', 'bg-purple-100');
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-purple-500', 'bg-purple-100');
+                const file = e.dataTransfer.files[0];
+                if (file && (file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.type === 'text/plain')) {
+                  handleResumeUpload(file);
+                }
+              }}
+            >
+              <div className="space-y-4">
+                <div className="flex justify-center space-x-4">
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <Upload className="w-5 h-5 text-gray-500" />
+                  </div>
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-gray-500" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-gray-600 text-sm">Drag & drop resume or</p>
+                  <p className="text-gray-500 text-xs">single file here</p>
+                </div>
+                
+                <input
+                  type="file"
+                  id="file-upload-mobile"
+                  accept=".pdf,.docx,.txt"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleResumeUpload(file);
+                    }
+                  }}
+                  className="hidden"
+                />
+                
+                {!resumeData ? (
+                  <button
+                    onClick={() => document.getElementById('file-upload-mobile')?.click()}
+                    disabled={isLoading}
+                    className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 text-sm"
+                  >
+                    {isLoading ? 'Uploading...' : 'Upload file'}
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-green-700 text-sm">
+                        ✅ <span className="font-medium">{uploadedFile?.name}</span> uploaded successfully!
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleContinue}
+                      disabled={isLoading}
+                      className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 text-sm"
+                    >
+                      {!user ? 'Continue (Sign in required)' : 'Continue'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* File Format Info */}
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
+                <div className="flex items-center space-x-2">
+                  <FileText className="w-3 h-3" />
+                  <span>PDF, DOCX, TXT</span>
+                </div>
+                <span>•</span>
+                <span>Max 10MB</span>
+              </div>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="text-center pt-8">
+              <p className="text-sm text-gray-500">Used by students, job professionals & employees</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:block">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start min-h-[calc(100vh-200px)]">
+            
+            {/* LEFT Column - Testimonial */}
+            <div className="lg:col-span-3 space-y-6" style={{paddingTop: '400px'}}>
+              <div className="space-y-4">
+                <p className="text-gray-600 italic text-lg leading-relaxed">
+                  "{testimonials[currentTestimonial].text}"
+                </p>
+                <p className="text-gray-500 text-sm">- {testimonials[currentTestimonial].name}</p>
+              </div>
+              <div className="flex items-center space-x-3 text-sm text-gray-500">
+                <div className="flex items-center space-x-2">
+                  <div className="flex -space-x-2">
+                    <div className="w-6 h-6 bg-purple-500 rounded-full border-2 border-white"></div>
+                    <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white"></div>
+                    <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <span>more than 30 portfolios hosted already</span>
+                </div>
+              </div>
+            </div>
+
+            {/* CENTER Column - Main Content */}
+            <div className="lg:col-span-6 space-y-8">
+              {/* Main Heading */}
+              <div className="text-center space-y-4">
+                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                  Convert your resume in Portfolio in one click.
+                </h1>
+                <p className="text-xl text-gray-600">
+                  Upload, Choose, Share
+                </p>
+              </div>
+
+              {/* URL Preview */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-600">https://take-my.info/</span>
+                  <input 
+                    type="text" 
+                    value={generatedSlug || 'your-name'}
+                    placeholder="your-name"
+                    className="flex-1 bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="border-b border-gray-200">
+                <nav className="flex space-x-8">
+                  <button 
+                    onClick={() => setActiveTab('resume')}
+                    className={`border-b-2 pb-2 px-1 font-medium ${activeTab === 'resume' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Resume
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('templates')}
+                    className={`border-b-2 pb-2 px-1 font-medium ${activeTab === 'templates' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Templates
+                  </button>
+                </nav>
+              </div>
 
                            {/* Content based on active tab */}
                {activeTab === 'resume' ? (
@@ -664,6 +787,7 @@ export default function HomePage() {
               </button>
             </div>
           </div>
+        </div>
         </div>
       </main>
       <HomepageStructuredData />
