@@ -47,8 +47,10 @@ import {
   Layers,
   QrCode,
   Smartphone,
-  Type
+  Type,
+  Menu
 } from 'lucide-react';
+import NavigationPadding from '@/components/NavigationPadding';
 
 export default function DashboardPage() {
   return (
@@ -81,6 +83,7 @@ function DashboardContent() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showHeadingEditor, setShowHeadingEditor] = useState(false);
   const [showTemplateTextEditor, setShowTemplateTextEditor] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Toast notifications
   const { toasts, removeToast, showSuccess, showError } = useToast();
@@ -117,6 +120,20 @@ function DashboardContent() {
       generateQRCode();
     }
   }, [portfolio?.slug]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMobileMenu && !(event.target as Element).closest('.mobile-menu-container')) {
+        setShowMobileMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMobileMenu]);
 
   const generateQRCode = async () => {
     try {
@@ -482,6 +499,149 @@ function DashboardContent() {
     { id: 'settings', title: 'Settings', icon: Settings },
   ];
 
+  // Template preview component
+  const renderTemplatePreview = (templateId: string) => {
+    switch (templateId) {
+      case 'full-stack-developer':
+        return (
+          <div className="w-full h-full bg-black text-green-400 p-2 text-xs font-mono">
+            <div className="text-cyan-400">dev@portfolio:~$</div>
+            <div className="text-green-400">whoami</div>
+            <div className="text-white">Full Stack Developer</div>
+            <div className="text-cyan-400">ls skills/</div>
+            <div className="text-green-400">React TypeScript Node.js</div>
+          </div>
+        );
+      case 'creative-portfolio':
+        return (
+          <div className="w-full h-full bg-gradient-to-br from-pink-100 to-purple-100 p-2 relative">
+            <div className="absolute top-2 right-2 w-4 h-4 bg-red-400 rounded-full"></div>
+            <div className="absolute bottom-2 left-2 w-3 h-3 bg-yellow-400 rounded-full"></div>
+            <div className="text-center mt-4">
+              <div className="w-8 h-8 bg-purple-400 rounded-full mx-auto mb-2"></div>
+              <div className="text-xs font-bold text-purple-800">Creative</div>
+              <div className="text-xs text-purple-600">Portfolio</div>
+            </div>
+          </div>
+        );
+      case 'tech-innovator':
+        return (
+          <div className="w-full h-full bg-black text-blue-400 p-2 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-cyan-900/20"></div>
+            <div className="relative z-10">
+              <div className="text-xs text-cyan-400">◆ TECH INNOVATOR</div>
+              <div className="text-xs text-blue-300 mt-1">▲ Neural Networks</div>
+              <div className="text-xs text-cyan-300">● Machine Learning</div>
+              <div className="text-xs text-blue-200">◇ AI Development</div>
+            </div>
+          </div>
+        );
+      case 'minimalist-clean':
+        return (
+          <div className="w-full h-full bg-white p-3 border border-gray-200">
+            <div className="text-center">
+              <div className="w-6 h-6 bg-gray-400 rounded-full mx-auto mb-2"></div>
+              <div className="text-xs font-semibold text-gray-800">John Doe</div>
+              <div className="text-xs text-gray-600">Developer</div>
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1 bg-gray-200 rounded"></div>
+                <div className="w-3/4 h-1 bg-gray-200 rounded"></div>
+                <div className="w-1/2 h-1 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'dark-professional':
+        return (
+          <div className="w-full h-full bg-gray-900 text-white p-2">
+            <div className="text-center">
+              <div className="w-6 h-6 bg-blue-500 rounded-full mx-auto mb-2"></div>
+              <div className="text-xs font-semibold">Professional</div>
+              <div className="text-xs text-gray-400">Executive</div>
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1 bg-gray-700 rounded"></div>
+                <div className="w-4/5 h-1 bg-gray-700 rounded"></div>
+                <div className="w-3/5 h-1 bg-blue-500 rounded"></div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'modern-glassmorphism':
+        return (
+          <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900 p-2 relative">
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-lg"></div>
+            <div className="relative z-10 text-center">
+              <div className="w-6 h-6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto mb-2"></div>
+              <div className="text-xs font-semibold text-white">Modern</div>
+              <div className="text-xs text-purple-200">Glassmorphism</div>
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1 bg-white/20 rounded"></div>
+                <div className="w-3/4 h-1 bg-white/20 rounded"></div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'creative-gradient':
+        return (
+          <div className="w-full h-full bg-gradient-to-br from-purple-400 to-pink-500 p-2 relative">
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-400/20 to-purple-400/20"></div>
+            <div className="relative z-10 text-center">
+              <div className="w-6 h-6 bg-white rounded-full mx-auto mb-2"></div>
+              <div className="text-xs font-semibold text-white">Creative</div>
+              <div className="text-xs text-purple-100">Gradient</div>
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1 bg-white/30 rounded"></div>
+                <div className="w-3/4 h-1 bg-white/30 rounded"></div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'developer-terminal':
+        return (
+          <div className="w-full h-full bg-black text-green-400 p-2 text-xs font-mono">
+            <div className="text-gray-400">$ whoami</div>
+            <div className="text-green-400">developer</div>
+            <div className="text-gray-400">$ ls -la</div>
+            <div className="text-green-400">skills projects experience</div>
+          </div>
+        );
+      case 'corporate-executive':
+        return (
+          <div className="w-full h-full bg-gradient-to-br from-gray-50 to-blue-50 p-2">
+            <div className="text-center">
+              <div className="w-6 h-6 bg-blue-600 rounded-full mx-auto mb-2"></div>
+              <div className="text-xs font-semibold text-gray-800">Executive</div>
+              <div className="text-xs text-gray-600">Corporate</div>
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1 bg-blue-200 rounded"></div>
+                <div className="w-3/4 h-1 bg-blue-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'open-source-contributor':
+        return (
+          <div className="w-full h-full bg-white p-2 border border-gray-200">
+            <div className="text-center">
+              <div className="w-6 h-6 bg-green-500 rounded-full mx-auto mb-2"></div>
+              <div className="text-xs font-semibold text-gray-800">Open Source</div>
+              <div className="text-xs text-gray-600">Contributor</div>
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1 bg-green-200 rounded"></div>
+                <div className="w-3/4 h-1 bg-green-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="w-full h-full bg-gray-100 p-2 flex items-center justify-center">
+            <div className="text-xs text-gray-500">Template Preview</div>
+          </div>
+        );
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
@@ -517,74 +677,102 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header */}
-      <header className="bg-white/10 backdrop-blur-xl border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
+    <NavigationPadding>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        {/* Tab Navigation */}
+        <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg mb-6 sm:mb-8 mobile-menu-container z-40">
+          {/* Mobile: Hamburger Menu */}
+          <div className="sm:hidden">
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center space-x-2">
+                {(() => {
+                  const activeTabData = tabs.find(tab => tab.id === activeTab);
+                  const Icon = activeTabData?.icon || BarChart3;
+                  return (
+                    <>
+                      <Icon className="w-5 h-5 text-white" />
+                      <span className="text-white font-medium">{activeTabData?.title}</span>
+                    </>
+                  );
+                })()}
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">Dashboard</h1>
-                <p className="text-gray-300 text-sm">Welcome back, {user?.displayName || user?.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <a
-                href={`/${portfolio.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
-              >
-                <Eye className="w-4 h-4" />
-                <span>View Live</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
               <button
-                onClick={signOut}
-                className="text-gray-300 hover:text-white transition-colors"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="p-2 text-gray-300 hover:text-white transition-colors"
               >
-                Sign Out
+                {showMobileMenu ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
               </button>
+            </div>
+            
+            {/* Mobile Menu Dropdown */}
+            {showMobileMenu && (
+              <div className="absolute top-full left-0 right-0 z-40 border-t border-white/20 bg-white/100 ">
+                <div className="px-4 py-3 space-y-1">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setShowMobileMenu(false);
+                      }}
+                      className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-white/20 text-black'
+                          : 'text-gray-900 hover:text-purple-500 hover:bg-grey/10'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="font-medium">{tab.title}</span>
+                    </button>
+                  );
+                })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop: Horizontal tabs */}
+          <div className="hidden sm:block p-1">
+            <div className="flex space-x-1">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-300 whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'bg-white text-gray-900 shadow-lg'
+                        : 'text-gray-300 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="font-medium">{tab.title}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg p-1 mb-8">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-300 ${
-                  activeTab === tab.id
-                    ? 'bg-white text-gray-900 shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span className="font-medium">{tab.title}</span>
-              </button>
-            );
-          })}
-        </div>
 
         {/* Tab Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             {activeTab === 'overview' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Portfolio Stats */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">Portfolio Overview</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Portfolio Overview</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                     <div className="bg-white/5 rounded-xl p-4 text-center">
                       <BarChart3 className="w-8 h-8 text-purple-400 mx-auto mb-2" />
                       <div className="text-2xl font-bold text-white">{portfolio.views}</div>
@@ -604,9 +792,9 @@ function DashboardContent() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
                   <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
                       onClick={() => setActiveTab('design')}
                       className="flex items-center space-x-3 bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-300"
@@ -686,13 +874,13 @@ function DashboardContent() {
             )}
 
             {activeTab === 'design' && editedPersonalization && (
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-6">Design & Theme</h2>
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Design & Theme</h2>
                 
                 {/* Template Selection */}
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                   <h3 className="text-lg font-medium text-white mb-4">Choose Template</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     {[
                       { id: 'modern-glassmorphism', name: 'Modern Glassmorphism', desc: 'Sleek with glass effects' },
                       { id: 'minimalist-clean', name: 'Minimalist Clean', desc: 'Clean sidebar navigation' },
@@ -749,12 +937,12 @@ function DashboardContent() {
             )}
 
             {activeTab === 'content' && editedResumeData && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Contact Information */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
-                      <User className="w-6 h-6" />
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center space-x-2">
+                      <User className="w-5 h-5 sm:w-6 sm:h-6" />
                       <span>Contact Information</span>
                     </h2>
                   </div>
@@ -1551,14 +1739,16 @@ function DashboardContent() {
                   </div>
                   
                   <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden" style={{ height: '600px' }}>
-                    <div className="w-full h-full overflow-auto">
-                      <PortfolioRenderer 
-                        portfolio={{
-                          ...portfolio,
-                          resumeData: editedResumeData || portfolio.resumeData,
-                          personalization: editedPersonalization || portfolio.personalization
-                        }}
-                      />
+                    <div className="w-full h-full overflow-auto relative">
+                      <div className="transform scale-75 origin-top-left w-[133.33%] h-[133.33%]">
+                        <PortfolioRenderer 
+                          portfolio={{
+                            ...portfolio,
+                            resumeData: editedResumeData || portfolio.resumeData,
+                            personalization: editedPersonalization || portfolio.personalization
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1635,33 +1825,37 @@ function DashboardContent() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Portfolio Preview */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Live Preview</h3>
+          <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
+            {/* Current Template Preview */}
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
+              <h3 className="text-lg font-bold text-white mb-4">Current Template</h3>
               <div className="aspect-video bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-                <div className="w-full h-full overflow-auto">
-                  <PortfolioRenderer 
-                    portfolio={{
-                      ...portfolio,
-                      resumeData: editedResumeData || portfolio.resumeData,
-                      personalization: editedPersonalization || portfolio.personalization
-                    }}
-                  />
-                </div>
+                {renderTemplatePreview(portfolio.templateId)}
               </div>
-              <a
-                href={`/${portfolio.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full mt-4 text-center bg-white/10 hover:bg-white/20 border border-white/20 text-white py-2 rounded-lg transition-colors"
-              >
-                Open in New Tab
-              </a>
+              <div className="mt-4 space-y-2">
+                <div className="text-center">
+                  <div className="text-sm font-medium text-white capitalize">
+                    {portfolio.templateId.replace('-', ' ')}
+                  </div>
+                  <div className="text-xs text-gray-300">
+                    {portfolio.personalization?.colorScheme && (
+                      <span className="capitalize">{portfolio.personalization.colorScheme} theme</span>
+                    )}
+                  </div>
+                </div>
+                <a
+                  href={`/${portfolio.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center bg-white/10 hover:bg-white/20 border border-white/20 text-white py-2 rounded-lg transition-colors text-sm sm:text-base"
+                >
+                  View Live Portfolio
+                </a>
+              </div>
             </div>
 
             {/* Portfolio Info */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
               <h3 className="text-lg font-bold text-white mb-4">Portfolio Info</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -1705,6 +1899,7 @@ function DashboardContent() {
           onClose={() => setShowTemplateTextEditor(false)}
         />
       )}
-    </div>
+      </div>
+    </NavigationPadding>
   );
 } 

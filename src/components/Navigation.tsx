@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from './FirebaseAuthWrapper';
+import { useState } from 'react';
 import { 
   Home,
   Layout,
@@ -13,10 +14,18 @@ import {
   User,
   LogOut,
   BookOpen,
+  Menu,
+  X,
+  ExternalLink,
 } from 'lucide-react';
 
-export function Navigation() {
+interface NavigationProps {
+  showDashboardMode?: boolean;
+}
+
+export function Navigation({ showDashboardMode = false }: NavigationProps) {
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Handle cases where auth context might not be available (during SSR)
   let user = null;
@@ -33,6 +42,9 @@ export function Navigation() {
     console.log('Auth context not available, using defaults');
   }
 
+  // Auto-detect dashboard mode if not explicitly set
+  const isDashboard = showDashboardMode || pathname === '/dashboard';
+
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Features', href: '/features', icon: Layout },
@@ -45,20 +57,41 @@ export function Navigation() {
 
   const isActive = (path: string) => pathname === path;
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">P</span>
+          {/* Logo / Dashboard Title */}
+          {isDashboard && user ? (
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-xl font-bold text-white">
+                  Welcome back, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0]}
+                </h1>
+                <p className="text-gray-300 text-sm">Dashboard</p>
+              </div>
+              <div className="sm:hidden">
+                <h1 className="text-lg font-bold text-white">Dashboard</h1>
+              </div>
             </div>
-            <span className="text-white font-bold text-xl">PortfolioHub</span>
-          </Link>
+          ) : (
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">P</span>
+              </div>
+              <span className="text-white font-bold text-xl">PortfolioHub</span>
+            </Link>
+          )}
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center space-x-1">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -77,23 +110,51 @@ export function Navigation() {
             ))}
           </div>
 
-          {/* Auth Buttons */}
-          <div className="flex items-center space-x-4">
+          {/* Auth Buttons & Mobile Menu */}
+          <div className="flex items-center space-x-3">
             {user ? (
               <div className="flex items-center space-x-3">
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="p-2 text-gray-300 hover:text-white transition-colors"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
+                {isDashboard ? (
+                  // Dashboard mode - show portfolio link
+                  <>
+                    <a
+                      href={`/${user.email?.split('@')[0]}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span className="hidden sm:inline">View Live</span>
+                    </a>
+                    <button
+                      onClick={() => signOut()}
+                      className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden sm:inline">Sign Out</span>
+                    </button>
+                  </>
+                ) : (
+                  // Regular mode - show dashboard link
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center space-x-2 px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="hidden sm:inline">Dashboard</span>
+                    </Link>
+                    <button
+                      onClick={() => signOut()}
+                      className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden sm:inline">Sign Out</span>
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               <button
@@ -104,29 +165,44 @@ export function Navigation() {
                 <span>Sign In</span>
               </button>
             )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="lg:hidden p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden border-t border-white/10">
-        <div className="grid grid-cols-4 gap-1 p-2">
-          {navigation.slice(0, 4).map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex flex-col items-center p-2 rounded-lg text-xs ${
-                isActive(item.href)
-                  ? 'bg-white/20 text-white'
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <item.icon className="w-5 h-5 mb-1" />
-              <span>{item.name}</span>
-            </Link>
-          ))}
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden border-t border-white/10 bg-white/5 backdrop-blur-xl">
+          <div className="px-4 py-3 space-y-1">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-white/20 text-white'
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.name}</span>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 } 

@@ -8,6 +8,7 @@ export default function ConditionalNavigation() {
   
   // Hide navigation for portfolio pages (URLs like /username)
   const isPortfolioPage = pathname?.split('/').length === 2 && pathname !== '/dashboard';
+  const isDashboardPage = pathname === '/dashboard';
   const marketingPages = ['/features', '/templates', '/how-it-works', '/faq', '/contact'];
   const shouldShowNav = !isPortfolioPage || marketingPages.includes(pathname || '');
 
@@ -15,5 +16,5 @@ export default function ConditionalNavigation() {
     return null;
   }
 
-  return <Navigation />;
+  return <Navigation showDashboardMode={isDashboardPage} />;
 } 
