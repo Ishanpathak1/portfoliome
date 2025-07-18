@@ -10,6 +10,7 @@ import { ResumeData, PersonalizationData } from '@/types/resume';
 import { Upload, Palette, Eye, Sparkles, Settings, FileText, Users, Star, ArrowRight } from 'lucide-react';
 import { HomepageStructuredData } from '@/components/StructuredData';
 import NavigationPadding from '@/components/NavigationPadding';
+import { MobilePortfolioFlow } from '@/components/MobilePortfolioFlow';
 
 export default function HomePage() {
   const { user, signInWithGoogle, signOut } = useAuth();
@@ -30,6 +31,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState('resume');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [generatedSlug, setGeneratedSlug] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
 
   const testimonials = [
     {
@@ -97,6 +99,16 @@ export default function HomePage() {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 4000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Check if user has existing portfolio and redirect to dashboard
@@ -249,31 +261,27 @@ export default function HomePage() {
 
   // Show step-by-step flow for authenticated users who are creating portfolio
   if (user && (currentStep > 1 || resumeData)) {
+    // Show mobile flow for mobile devices
+    if (isMobile && currentStep === 2) {
+      return (
+        <NavigationPadding>
+          <MobilePortfolioFlow 
+            onComplete={(newPersonalization) => {
+              setPersonalization(newPersonalization);
+            }}
+            onSignOut={signOut}
+          />
+        </NavigationPadding>
+      );
+    }
+
     return (
       <NavigationPadding>
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-          <div className="container mx-auto px-6 py-12">
+          <div className="container mx-auto px-6 py-4">
             {/* Header */}
-            <div className="text-center mb-16">
-              <div className="flex justify-between items-center mb-8">
-                <div></div>
-                <div className="flex items-center space-x-4">
-                  <a
-                    href="/dashboard"
-                    className="flex items-center space-x-2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
-                  >
-                    <Settings className="w-4 h-4" />
-                    <span>Dashboard</span>
-                  </a>
-                  <button
-                    onClick={signOut}
-                    className="text-gray-300 hover:text-white transition-colors px-4 py-2"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-              <h1 className="text-5xl font-black text-white mb-4">
+            <div className="text-center mb-4">
+              <h1 className="text-5xl font-black text-white mb-2">
                 Create Your
                 <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                   Professional Portfolio

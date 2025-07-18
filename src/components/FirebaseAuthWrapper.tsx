@@ -75,31 +75,6 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
 
   return (
     <AuthContext.Provider value={value}>
-      {user && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-full px-4 py-2 flex items-center space-x-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full" />
-                ) : (
-                  <UserIcon className="w-4 h-4 text-white" />
-                )}
-              </div>
-              <span className="text-white text-sm font-medium">
-                {user.displayName || user.email}
-              </span>
-            </div>
-            <button
-              onClick={signOut}
-              className="text-gray-300 hover:text-white transition-colors"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
       {children}
     </AuthContext.Provider>
   );

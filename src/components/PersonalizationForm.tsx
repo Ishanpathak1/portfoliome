@@ -117,28 +117,7 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
         })}
       </div>
 
-      {/* Preview Card */}
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6 mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Portfolio Preview</h2>
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg p-4">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-lg font-semibold text-white">
-                {resumeData.contact.name.charAt(0)}
-              </span>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">{resumeData.contact.name}</h3>
-              <p className="text-gray-300">{resumeData.contact.email}</p>
-            </div>
-          </div>
-          <div className="text-sm text-gray-400">
-            Template: {formData.templateId.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} • 
-            Color: {colorSchemes.find(c => c.id === formData.colorScheme)?.name} • 
-            Layout: {layouts.find(l => l.id === formData.layout)?.name}
-          </div>
-        </div>
-      </div>
+
 
       {/* Tab Content */}
       <div className="space-y-8">
