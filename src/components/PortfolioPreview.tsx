@@ -5,6 +5,7 @@ import { ArrowLeft, Edit, ExternalLink, Download, Share2, Copy, CheckCircle, Glo
 import { ResumeData, PersonalizationData } from '@/types/resume';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
+import confetti from 'canvas-confetti';
 
 // Import all template components
 import { ModernGlassmorphismTemplate } from '@/components/templates/ModernGlassmorphismTemplate';
@@ -57,6 +58,7 @@ export function PortfolioPreview({ resumeData, personalization }: PortfolioPrevi
         setPortfolioUrl(data.url);
         setPortfolioGenerated(true);
         console.log('Portfolio URL generated:', data.url);
+        triggerConfetti();
       } else {
         const errorData = await response.json();
         console.error('Failed to generate portfolio:', errorData.error);
@@ -78,6 +80,38 @@ export function PortfolioPreview({ resumeData, personalization }: PortfolioPrevi
     } catch (error) {
       console.error('Failed to copy URL:', error);
     }
+  };
+
+  const triggerConfetti = () => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(function () {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      // since particles fall down, start a bit higher than random
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+      });
+    }, 250);
   };
 
   // Convert ResumeData + PersonalizationData to DatabasePortfolio format
@@ -216,7 +250,7 @@ export function PortfolioPreview({ resumeData, personalization }: PortfolioPrevi
                         className="flex items-center justify-center space-x-2 btn-secondary"
                       >
                         <Settings className="w-4 h-4" />
-                        <span>Dashboard</span>
+                        <span>Manage Portfolio</span>
                       </a>
                       <button 
                         onClick={() => navigator.share && navigator.share({ 
@@ -243,7 +277,7 @@ export function PortfolioPreview({ resumeData, personalization }: PortfolioPrevi
                   className="btn-primary"
                   disabled={isGenerating}
                 >
-                  Generate Shareable Link
+                  {isGenerating ? 'Generating Portfolio...' : 'Generate Portfolio'}
                 </button>
               </div>
             )}

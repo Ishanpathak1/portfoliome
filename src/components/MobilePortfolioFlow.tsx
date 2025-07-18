@@ -3,17 +3,22 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, SkipForward, Check } from 'lucide-react';
-import { PersonalizationData } from '@/types/resume';
+import { PersonalizationData, ResumeData } from '@/types/resume';
 import { AVAILABLE_TEMPLATES } from '@/types/templates';
+import { useAuth } from '@/components/FirebaseAuthWrapper';
+import confetti from 'canvas-confetti';
 
 interface MobilePortfolioFlowProps {
+  resumeData: ResumeData;
   onComplete: (personalization: PersonalizationData) => void;
   onSignOut: () => void;
 }
 
-export function MobilePortfolioFlow({ onComplete, onSignOut }: MobilePortfolioFlowProps) {
+export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: MobilePortfolioFlowProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [mobileStep, setMobileStep] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [personalization, setPersonalization] = useState<PersonalizationData>({
     templateId: 'modern-glassmorphism',
     theme: 'modern',
@@ -74,9 +79,86 @@ export function MobilePortfolioFlow({ onComplete, onSignOut }: MobilePortfolioFl
     router.push('/dashboard');
   };
 
-  const handleFinish = () => {
-    onComplete(personalization);
-    router.push('/dashboard');
+  const handleFinish = async () => {
+    if (!user) {
+      alert('Please sign in to save your portfolio');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/save-portfolio', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          resumeData,
+          personalization,
+          userId: user.uid,
+          userEmail: user.email,
+          userName: user.displayName,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Portfolio generated:', data.url);
+        
+        // Trigger confetti celebration
+        const duration = 3000;
+        const animationEnd = Date.now() + duration;
+        
+        const randomInRange = (min: number, max: number) => {
+          return Math.random() * (max - min) + min;
+        };
+
+        const interval = setInterval(() => {
+          const timeLeft = animationEnd - Date.now();
+
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            return;
+          }
+
+          const particleCount = 50 * (timeLeft / duration);
+
+          // Fire confetti from the top left
+          confetti({
+            particleCount,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0 },
+            colors: ['#8B5CF6', '#EC4899', '#3B82F6', '#10B981']
+          });
+
+          // Fire confetti from the top right
+          confetti({
+            particleCount,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0 },
+            colors: ['#8B5CF6', '#EC4899', '#3B82F6', '#10B981']
+          });
+        }, 250);
+        
+        onComplete(personalization);
+        
+        // Delay navigation to show confetti
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1500);
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to generate portfolio:', errorData.error);
+        alert(`Failed to generate portfolio: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error generating portfolio:', error);
+      alert('Failed to generate portfolio. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -187,10 +269,20 @@ export function MobilePortfolioFlow({ onComplete, onSignOut }: MobilePortfolioFl
                 
                 <button
                   onClick={handleFinish}
-                  className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
+                  disabled={isGenerating}
+                  className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  <Check className="w-4 h-4" />
-                  <span>Continue to Dashboard</span>
+                  {isGenerating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Generating Portfolio...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Generate Portfolio</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

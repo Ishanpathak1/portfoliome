@@ -262,10 +262,11 @@ export default function HomePage() {
   // Show step-by-step flow for authenticated users who are creating portfolio
   if (user && (currentStep > 1 || resumeData)) {
     // Show mobile flow for mobile devices
-    if (isMobile && currentStep === 2) {
+    if (isMobile && currentStep === 2 && resumeData) {
       return (
         <NavigationPadding>
           <MobilePortfolioFlow 
+            resumeData={resumeData}
             onComplete={(newPersonalization) => {
               setPersonalization(newPersonalization);
             }}

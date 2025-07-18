@@ -27,6 +27,7 @@
     "autoprefixer": "^10.4.16",
     "aws-sdk": "^2.1692.0",
     "bcryptjs": "^3.0.2",
+    "canvas-confetti": "^1.9.3",
     "clsx": "^2.0.0",
     "firebase": "^11.10.0",
     "firebase-admin": "^13.4.0",
@@ -66,6 +67,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "eslint": "^8.51.0",
     "eslint-config-next": "14.0.0",
     "prisma": "^6.11.1"
