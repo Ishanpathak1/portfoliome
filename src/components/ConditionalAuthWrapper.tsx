@@ -11,7 +11,7 @@ export default function ConditionalAuthWrapper({ children }: ConditionalAuthWrap
   const pathname = usePathname();
   
   // Pages that need Firebase authentication
-  const authRequiredPaths = ['/dashboard'];
+  const authRequiredPaths = ['/dashboard', '/features', '/templates', '/faq', '/contact', '/how-it-works', '/blog'];
   
   // Check if current path needs authentication
   const needsAuth = authRequiredPaths.some(path => 
