@@ -87,6 +87,16 @@ const TEMPLATE_CONFIGS: Record<string, { name: string; fields: Array<{ key: stri
       { key: 'footerDescription', label: 'Footer Description', description: 'Description in the footer section', type: 'textarea' },
     ],
   },
+  'data-science-analyst': {
+    name: 'Data Science Analyst',
+    fields: [
+      { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
+      { key: 'tagline', label: 'Tagline', description: 'Main tagline under your name', type: 'text' },
+      { key: 'fallbackSummary', label: 'Fallback Summary', description: 'Displayed when no summary is available', type: 'textarea' },
+      { key: 'analyticsTitle', label: 'Analytics Title', description: 'Title for the analytics section', type: 'text' },
+      { key: 'analyticsDescription', label: 'Analytics Description', description: 'Description for the analytics section', type: 'textarea' },
+    ],
+  },
 };
 
 export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose }: TemplateTextEditorProps) {

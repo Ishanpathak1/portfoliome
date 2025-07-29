@@ -30,6 +30,7 @@ const CUSTOM_SECTION_TEMPLATES = [
   { type: 'text', title: 'Volunteer Work', placeholder: 'Describe your volunteer experience...' },
   { type: 'list', title: 'Languages', placeholder: 'List languages you speak' },
   { type: 'text', title: 'Hobbies & Interests', placeholder: 'Describe your interests...' },
+  { type: 'list', title: 'Analytics Metrics', placeholder: 'Projects Completed: 5\nAccuracy Rate: 95%\nData Processed: 10,000+\nModels Deployed: 3' },
 ];
 
 export function SectionManager({ 

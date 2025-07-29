@@ -51,6 +51,8 @@ export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: Mobil
         return 'bg-gradient-to-br from-green-900 to-emerald-900';
       case 'creative-portfolio':
         return 'bg-gradient-to-br from-pink-900 to-purple-900';
+      case 'data-science-analyst':
+        return 'bg-gradient-to-br from-blue-600 to-indigo-800';
       default:
         return 'bg-gray-500';
     }

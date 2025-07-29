@@ -11,6 +11,7 @@ import { CreativePortfolioTemplate } from './CreativePortfolioTemplate';
 import { TechInnovatorTemplate } from './TechInnovatorTemplate';
 import { FullStackDevTemplate } from './FullStackDevTemplate';
 import { OpenSourceContributorTemplate } from './OpenSourceContributorTemplate';
+import { DataScienceAnalystTemplate } from './DataScienceAnalystTemplate';
 import { useEffect } from 'react';
 import { trackPortfolioGeneration } from '@/lib/utils';
 
@@ -47,6 +48,8 @@ export function TemplateRenderer({ portfolio }: TemplateRendererProps) {
         return <FullStackDevTemplate portfolio={portfolio} />;
       case 'open-source-contributor':
         return <OpenSourceContributorTemplate portfolio={portfolio} />;
+      case 'data-science-analyst':
+        return <DataScienceAnalystTemplate portfolio={portfolio} />;
       default:
         // Fallback to modern glassmorphism template
         return <ModernGlassmorphismTemplate portfolio={portfolio} />;

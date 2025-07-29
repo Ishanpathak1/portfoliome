@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from './FirebaseAuthWrapper';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Home,
   Layout,
@@ -23,9 +23,14 @@ interface NavigationProps {
   showDashboardMode?: boolean;
 }
 
+interface UserPortfolio {
+  slug: string;
+}
+
 export function Navigation({ showDashboardMode = false }: NavigationProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userPortfolio, setUserPortfolio] = useState<UserPortfolio | null>(null);
   
   // Handle cases where auth context might not be available (during SSR)
   let user = null;
@@ -41,6 +46,32 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
     // Auth context not available (during SSR)
     console.log('Auth context not available, using defaults');
   }
+
+  // Fetch user's portfolio data when user is available
+  useEffect(() => {
+    const fetchUserPortfolio = async () => {
+      if (user) {
+        try {
+          const response = await fetch('/api/user-portfolio', {
+            headers: {
+              'Authorization': `Bearer ${await user.getIdToken()}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.portfolio) {
+              setUserPortfolio(data.portfolio);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user portfolio:', error);
+        }
+      }
+    };
+
+    fetchUserPortfolio();
+  }, [user]);
 
   // Auto-detect dashboard mode if not explicitly set
   const isDashboard = showDashboardMode || pathname === '/dashboard';
@@ -118,13 +149,22 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                   // Dashboard mode - show portfolio link
                   <>
                     <a
-                      href={`/${user.email?.split('@')[0]}`}
+                      href={userPortfolio ? `/${userPortfolio.slug}` : '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center space-x-2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
+                      className={`flex items-center space-x-2 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 ${
+                        userPortfolio ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-500/50 cursor-not-allowed'
+                      }`}
+                      onClick={(e) => {
+                        if (!userPortfolio) {
+                          e.preventDefault();
+                        }
+                      }}
                     >
                       <ExternalLink className="w-4 h-4" />
-                      <span className="hidden sm:inline">View Live</span>
+                      <span className="hidden sm:inline">
+                        {userPortfolio ? 'View Live' : 'Loading...'}
+                      </span>
                     </a>
                     <button
                       onClick={() => signOut()}

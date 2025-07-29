@@ -46,9 +46,16 @@ export const DEFAULT_TEMPLATE_TEXT: TemplateText = {
   },
   openSourceContributor: {
     fallbackName: 'Open Source Contributor',
-    tagline: 'Building the future, one commit at a time',
-    footerTitle: 'Open Source Enthusiast',
-    footerDescription: 'Passionate about building tools that make developers\' lives easier',
+    tagline: 'Building the Future, One Commit at a Time',
+    footerTitle: 'Let\'s Build Together',
+    footerDescription: 'Join me in creating open source solutions that make a difference in the developer community.',
+  },
+  dataScienceAnalyst: {
+    fallbackName: 'Data Science Professional',
+    tagline: 'Transforming Data into Actionable Insights',
+    fallbackSummary: 'Passionate data scientist with expertise in machine learning, statistical analysis, and data visualization. Dedicated to transforming complex data into actionable insights that drive business decisions.',
+    analyticsTitle: 'Analytics Dashboard',
+    analyticsDescription: 'Comprehensive overview of key performance metrics and data-driven achievements across all projects and initiatives.',
   },
 };
 

@@ -19,6 +19,11 @@ const DEFAULT_HEADINGS: SectionHeadings = {
   certifications: 'Certifications',
   summary: 'Summary',
   contact: 'Contact',
+  analytics: 'Analytics Metrics',
+  analyticsProjectsCompleted: '0',
+  analyticsAccuracyRate: 'N/A',
+  analyticsDataProcessed: 'N/A',
+  analyticsModelsDeployed: '0',
 };
 
 // Common alternative headings for different professions
@@ -113,6 +118,14 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
     'skills',
     'projects',
     'certifications',
+    'analytics',
+  ];
+
+  const analyticsSections: (keyof SectionHeadings)[] = [
+    'analyticsProjectsCompleted',
+    'analyticsAccuracyRate',
+    'analyticsDataProcessed',
+    'analyticsModelsDeployed',
   ];
 
   return (
@@ -167,6 +180,27 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
                 />
               </div>
             ))}
+          </div>
+
+          {/* Analytics Metrics */}
+          <div className="space-y-4 mt-6 pt-6 border-t border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700">Analytics Metrics Data</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {analyticsSections.map((section) => (
+                <div key={section} className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {String(section).replace('analytics', '').replace(/([A-Z])/g, ' $1').trim()}
+                  </label>
+                  <input
+                    type="text"
+                    value={editedHeadings[section] || ''}
+                    onChange={(e) => handleHeadingChange(section, e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder={DEFAULT_HEADINGS[section]}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Action Buttons */}

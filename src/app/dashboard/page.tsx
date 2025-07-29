@@ -633,6 +633,24 @@ function DashboardContent() {
             </div>
           </div>
         );
+      case 'data-science-analyst':
+        return (
+          <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-800 p-2 relative">
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-400/20 to-indigo-400/20"></div>
+            <div className="relative z-10 text-center">
+              <div className="w-6 h-6 bg-white rounded-full mx-auto mb-2 flex items-center justify-center">
+                <BarChart3 className="w-3 h-3 text-blue-600" />
+              </div>
+              <div className="text-xs font-semibold text-white">Data Science</div>
+              <div className="text-xs text-blue-200">Analyst</div>
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1 bg-white/30 rounded"></div>
+                <div className="w-3/4 h-1 bg-white/30 rounded"></div>
+                <div className="w-1/2 h-1 bg-blue-300 rounded"></div>
+              </div>
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="w-full h-full bg-gray-100 p-2 flex items-center justify-center">
@@ -892,6 +910,7 @@ function DashboardContent() {
                       { id: 'tech-innovator', name: 'Tech Innovator', desc: 'Futuristic developer showcase' },
                       { id: 'full-stack-developer', name: 'Full Stack Developer', desc: 'Modern web development focus' },
                                               { id: 'open-source-contributor', name: 'Open Source Contributor', desc: 'GitHub-focused community profile' },
+                      { id: 'data-science-analyst', name: 'Data Science Analyst', desc: 'Analytical data science portfolio' },
                     ].map((template) => (
                       <button
                         key={template.id}

@@ -87,6 +87,14 @@ export const AVAILABLE_TEMPLATES: TemplateConfig[] = [
     preview: '/templates/creative-portfolio.jpg',
     category: 'creative',
     features: ['Visual Storytelling', 'Gallery Layout', 'Custom Cursor', 'Parallax Effects', 'Artistic Design']
+  },
+  {
+    id: 'data-science-analyst',
+    name: 'Data Science Analyst',
+    description: 'Analytics-focused design with data visualization elements and statistical insights',
+    preview: '/templates/data-science-analyst.jpg',
+    category: 'professional',
+    features: ['Data Visualization', 'Analytics Focus', 'Statistical Charts', 'ML/AI Showcase', 'Research Metrics']
   }
 ];
 

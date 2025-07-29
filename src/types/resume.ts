@@ -69,6 +69,12 @@ export interface SectionHeadings {
   certifications: string;
   summary: string;
   contact: string;
+  analytics: string;
+  // Analytics metrics data
+  analyticsProjectsCompleted: string;
+  analyticsAccuracyRate: string;
+  analyticsDataProcessed: string;
+  analyticsModelsDeployed: string;
   // Add more as needed
   [key: string]: string;
 }
@@ -101,6 +107,44 @@ export interface TemplateText {
     tagline?: string;
     fallbackName?: string;
     fallbackSummary?: string;
+  };
+  // Developer Terminal template
+  developerTerminal?: {
+    // No customizable text for this template
+  };
+  // Full Stack Dev template
+  fullStackDev?: {
+    endMessage?: string;
+    footerMessage?: string;
+    techStack?: string;
+  };
+  // Minimalist Clean template
+  minimalistClean?: {
+    fallbackName?: string;
+    fallbackPosition?: string;
+    fallbackSummary?: string;
+  };
+  // Tech Innovator template
+  techInnovator?: {
+    fallbackName?: string;
+    tagline?: string;
+    ctaTitle?: string;
+    ctaDescription?: string;
+  };
+  // Open Source Contributor template
+  openSourceContributor?: {
+    fallbackName?: string;
+    tagline?: string;
+    footerTitle?: string;
+    footerDescription?: string;
+  };
+  // Data Science Analyst template
+  dataScienceAnalyst?: {
+    fallbackName?: string;
+    tagline?: string;
+    fallbackSummary?: string;
+    analyticsTitle?: string;
+    analyticsDescription?: string;
   };
   // Add more templates as needed
   [templateId: string]: {

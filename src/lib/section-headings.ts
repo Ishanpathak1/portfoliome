@@ -9,6 +9,11 @@ export const DEFAULT_SECTION_HEADINGS: SectionHeadings = {
   certifications: 'Certifications',
   summary: 'Summary',
   contact: 'Contact',
+  analytics: 'Analytics Metrics',
+  analyticsProjectsCompleted: '0',
+  analyticsAccuracyRate: 'N/A',
+  analyticsDataProcessed: 'N/A',
+  analyticsModelsDeployed: '0',
 };
 
 // Get section heading with fallback to default
