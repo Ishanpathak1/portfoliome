@@ -95,7 +95,7 @@ function getTemplateFileName(templateId: string): string {
     'creative-portfolio': 'CreativePortfolioTemplate',
     'tech-innovator': 'TechInnovatorTemplate',
     'open-source-contributor': 'OpenSourceContributorTemplate',
-    'full-stack-dev': 'FullStackDevTemplate',
+    'full-stack-developer': 'FullStackDevTemplate',
     'data-science-analyst': 'DataScienceAnalystTemplate',
   };
 
@@ -118,7 +118,7 @@ function getTemplateComponentName(templateId: string): string {
     'creative-portfolio': 'CreativePortfolioTemplate',
     'tech-innovator': 'TechInnovatorTemplate',
     'open-source-contributor': 'OpenSourceContributorTemplate',
-    'full-stack-dev': 'FullStackDevTemplate',
+    'full-stack-developer': 'FullStackDevTemplate',
     'data-science-analyst': 'DataScienceAnalystTemplate',
   };
 

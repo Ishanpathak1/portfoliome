@@ -89,65 +89,65 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
     if (!resumeData.experience?.length) return null;
     
     return (
-      <section id="experience" className="py-24 bg-white fade-in-section">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
+      <section id="experience" className="py-16 sm:py-20 lg:py-24 bg-white fade-in-section">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 sm:mb-6">
               {getSectionHeading(sectionHeadings, 'experience')}
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
+            <div className="w-16 sm:w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
           </div>
 
           <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b hidden lg:block" 
+            <div className="absolute left-4 sm:left-8 top-0 bottom-0 w-1 bg-gradient-to-b hidden lg:block" 
                  style={{ background: `linear-gradient(to bottom, ${colors.accent}, ${colors.accent}30)` }} />
 
-            <div className="space-y-12">
+            <div className="space-y-8 sm:space-y-12">
               {resumeData.experience.map((exp, index) => (
                 <div key={index} className="group relative">
-                  <div className="flex items-start space-x-8">
+                  <div className="flex items-start space-x-4 sm:space-x-8">
                     {/* Timeline Dot */}
-                    <div className="hidden lg:flex w-16 h-16 rounded-full items-center justify-center relative z-10 shadow-lg" 
+                    <div className="hidden lg:flex w-12 sm:w-16 h-12 sm:h-16 rounded-full items-center justify-center relative z-10 shadow-lg" 
                          style={{ backgroundColor: colors.accent }}>
-                      <Briefcase className="w-8 h-8 text-white" />
+                      <Briefcase className="w-6 sm:w-8 h-6 sm:h-8 text-white" />
                     </div>
 
                     {/* Content Card */}
-                    <div className="flex-1 bg-white rounded-3xl border border-gray-200 p-8 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 group">
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                    <div className="flex-1 bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-6 sm:p-8 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 group">
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-6">
                         <div>
-                          <h3 className="text-2xl font-bold text-gray-900 mb-2">{exp.position}</h3>
-                          <div className="flex items-center space-x-4 text-gray-600">
+                          <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-2">{exp.position}</h3>
+                          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-gray-600">
                             <div className="flex items-center">
-                              <Building2 className="w-5 h-5 mr-2" style={{ color: colors.accent }} />
-                              <span className="font-semibold">{exp.company}</span>
+                              <Building2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" style={{ color: colors.accent }} />
+                              <span className="font-semibold text-sm sm:text-base">{exp.company}</span>
                             </div>
                             {exp.location && (
                               <div className="flex items-center">
-                                <MapPin className="w-4 h-4 mr-1" />
-                                <span>{exp.location}</span>
+                                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                                <span className="text-sm sm:text-base">{exp.location}</span>
                               </div>
                             )}
                           </div>
                         </div>
                         
                         <div className="mt-4 lg:mt-0">
-                          <div className="inline-flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2">
-                            <Calendar className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm font-medium text-gray-700">
+                          <div className="inline-flex items-center space-x-2 bg-gray-100 rounded-full px-3 sm:px-4 py-2">
+                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+                            <span className="text-xs sm:text-sm font-medium text-gray-700">
                               {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         {(exp.responsibilities || []).map((desc: string, descIndex: number) => (
-                          <div key={descIndex} className="flex items-start space-x-3">
-                            <ChevronRight className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: colors.accent }} />
-                            <p className="text-gray-700 leading-relaxed">{desc}</p>
+                          <div key={descIndex} className="flex items-start space-x-2 sm:space-x-3">
+                            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0" style={{ color: colors.accent }} />
+                            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{desc}</p>
                           </div>
                         ))}
                       </div>
@@ -167,24 +167,24 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
     if (!resumeData.skills?.length) return null;
     
     return (
-      <section id="skills" className={`py-24 bg-gradient-to-b ${colors.gradient} fade-in-section`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
+      <section id="skills" className={`py-16 sm:py-20 lg:py-24 bg-gradient-to-b ${colors.gradient} fade-in-section`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 sm:mb-6">
               {getSectionHeading(sectionHeadings, 'skills')}
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
+            <div className="w-16 sm:w-24 h-1 bg-gradient-to-r mx-auto rounded-full" 
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {resumeData.skills.map((skillCategory, index) => (
-              <div key={index} className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.accent }}>
-                    <Code className="w-6 h-6 text-white" />
+              <div key={index} className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                <div className="flex items-center mb-4 sm:mb-6">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.accent }}>
+                    <Code className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 ml-4">{skillCategory.category}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 ml-3 sm:ml-4">{skillCategory.category}</h3>
                 </div>
                 
                 <div className="space-y-4">
@@ -449,39 +449,39 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
       <section ref={heroRef} className={`min-h-screen bg-gradient-to-r ${colors.primary} relative overflow-hidden`}>
         <div className="absolute inset-0 bg-black/20" />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 h-screen flex items-center">
-          <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-screen flex items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
             {/* Left Column - Executive Info */}
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <h1 className="text-5xl lg:text-7xl font-black text-white leading-tight">
+            <div className="space-y-6 lg:space-y-8">
+              <div className="space-y-4 lg:space-y-6">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-tight">
                   {resumeData.contact?.name || 'Executive Leader'}
                 </h1>
-                <p className="text-2xl lg:text-3xl text-white/80 font-light">
+                <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/80 font-light">
                   {getTemplateText(templateText, 'corporate-executive', 'tagline')}
                 </p>
-                <p className="text-lg lg:text-xl text-white/70 leading-relaxed max-w-2xl">
+                <p className="text-base sm:text-lg lg:text-xl text-white/70 leading-relaxed max-w-2xl">
                   {resumeData.summary || 'Seasoned executive with proven track record of transforming organizations and delivering exceptional results through strategic vision and operational excellence.'}
                 </p>
               </div>
               
               {/* Contact Info */}
-              <div className="flex flex-wrap gap-6">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6">
                 {resumeData.contact?.email && (
-                  <div className="flex items-center space-x-3 text-white/80">
-                    <Mail className="w-5 h-5" />
-                    <span>{resumeData.contact.email}</span>
+                  <div className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base">
+                    <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                    <span className="break-all">{resumeData.contact.email}</span>
                   </div>
                 )}
                 {resumeData.contact?.phone && (
-                  <div className="flex items-center space-x-3 text-white/80">
-                    <Phone className="w-5 h-5" />
+                  <div className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base">
+                    <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span>{resumeData.contact.phone}</span>
                   </div>
                 )}
                 {resumeData.contact?.location && (
-                  <div className="flex items-center space-x-3 text-white/80">
-                    <MapPin className="w-5 h-5" />
+                  <div className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base">
+                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span>{resumeData.contact.location}</span>
                   </div>
                 )}
@@ -489,18 +489,18 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
             </div>
 
             {/* Right Column - Executive CTA */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-white/20">
-              <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-white">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/20">
+              <div className="space-y-4 lg:space-y-6">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                   {getTemplateText(templateText, 'corporate-executive', 'ctaTitle')}
                 </h2>
-                <p className="text-white/80 text-lg">
+                <p className="text-white/80 text-sm sm:text-base lg:text-lg">
                   {getTemplateText(templateText, 'corporate-executive', 'ctaDescription')}
                 </p>
 
-                <div className="mt-8 pt-6 border-t border-white/20">
+                <div className="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-white/20">
                   <button 
-                    className="w-full bg-white text-gray-900 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                    className="w-full bg-white text-gray-900 py-3 px-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm sm:text-base"
                     onClick={() => window.open(`mailto:${resumeData.contact?.email}?subject=Executive Opportunity Inquiry`, '_blank')}
                   >
                     {getTemplateText(templateText, 'corporate-executive', 'ctaButtonText')}
@@ -520,24 +520,24 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
       ))}
 
       {/* Executive Contact CTA */}
-      <section className={`py-24 bg-gradient-to-r ${colors.primary} relative overflow-hidden`}>
+      <section className={`py-16 sm:py-20 lg:py-24 bg-gradient-to-r ${colors.primary} relative overflow-hidden`}>
         <div className="absolute inset-0 bg-black/20" />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <div className="space-y-8">
-            <h2 className="text-4xl lg:text-5xl font-black text-white">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="space-y-6 sm:space-y-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white">
               Ready to Lead the Future?
             </h2>
-            <p className="text-xl text-white/80 leading-relaxed max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-white/80 leading-relaxed max-w-3xl mx-auto">
               Transform your organization with proven leadership expertise and strategic vision.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
               <a
                 href={`mailto:${resumeData.contact?.email}?subject=Executive Opportunity Discussion`}
-                className="inline-flex items-center space-x-3 bg-white text-gray-900 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-2xl"
+                className="inline-flex items-center justify-center space-x-2 sm:space-x-3 bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-sm sm:text-base lg:text-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-2xl"
               >
-                <Mail className="w-5 h-5" />
+                <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span>Schedule Strategy Session</span>
               </a>
               
@@ -546,9 +546,9 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                   href={resumeData.contact.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-3 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300"
+                  className="inline-flex items-center justify-center space-x-2 sm:space-x-3 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-sm sm:text-base lg:text-lg hover:bg-white/20 transition-all duration-300"
                 >
-                  <Linkedin className="w-5 h-5" />
+                  <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                   <span>LinkedIn Profile</span>
                 </a>
               )}
