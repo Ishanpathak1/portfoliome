@@ -10,6 +10,9 @@ import { SectionManager } from '@/components/SectionManager';
 import { SectionHeadingEditor } from '@/components/SectionHeadingEditor';
 import { TemplateTextEditor } from '@/components/TemplateTextEditor';
 import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
+import { useNotifications } from '@/components/notifications/NotificationStore';
+import { AppNotification } from '@/components/notifications/NotificationTypes';
+import { useSearchParams } from 'next/navigation';
 import { getAllSectionHeadings } from '@/lib/section-headings';
 import { getAllTemplateText } from '@/lib/template-text';
 import { PortfolioRenderer } from '@/components/PortfolioRenderer';
@@ -62,6 +65,7 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const { user, signOut } = useAuth();
+  const searchParams = useSearchParams();
   const [portfolio, setPortfolio] = useState<DatabasePortfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -87,6 +91,8 @@ function DashboardContent() {
 
   // Toast notifications
   const { toasts, removeToast, showSuccess, showError } = useToast();
+  // Notification center
+  const { addNotifications, removeByDedupeKey } = useNotifications();
 
   // Helper function to ensure resume data has all required arrays
   const ensureResumeDataStructure = (resumeData: any): ResumeData => {
@@ -113,6 +119,16 @@ function DashboardContent() {
       loadUserPortfolio();
     }
   }, [user]);
+
+  // Handle deep links from notifications to open specific editor context
+  useEffect(() => {
+    const tab = searchParams?.get('tab');
+    const section = searchParams?.get('section');
+    const indexParam = searchParams?.get('index');
+    if (tab) setActiveTab(tab);
+    if (section) setEditingSection(section);
+    if (indexParam) setEditingIndex(Number(indexParam));
+  }, [searchParams]);
 
   // Generate QR code when portfolio changes
   useEffect(() => {
@@ -182,7 +198,11 @@ function DashboardContent() {
         setPortfolio(data.portfolio);
         setEditedSlug(data.portfolio?.slug || '');
         setEditedPersonalization(data.portfolio?.personalization || null);
-        setEditedResumeData(data.portfolio?.resumeData ? ensureResumeDataStructure(data.portfolio.resumeData) : null);
+        const normalized = data.portfolio?.resumeData ? ensureResumeDataStructure(data.portfolio.resumeData) : null;
+        setEditedResumeData(normalized);
+        if (normalized) {
+          generateIssueNotifications(normalized);
+        }
       } else if (response.status === 404) {
         // User doesn't have a portfolio yet
         setPortfolio(null);
@@ -191,6 +211,95 @@ function DashboardContent() {
       console.error('Error loading portfolio:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Create actionable issue notifications based on resumeData
+  const generateIssueNotifications = (resume: ResumeData) => {
+    const issues: AppNotification[] = [];
+
+    // Contact name missing
+    if (!resume.contact?.name) {
+      issues.push({
+        id: 'issue-contact-name-missing',
+        kind: 'issue',
+        title: 'Missing full name',
+        message: 'Add your full name in Contact Information.',
+        createdAt: Date.now(),
+        read: false,
+        dedupeKey: 'issue-contact-name-missing',
+        action: { targetTab: 'content', section: 'contact' },
+      });
+    }
+
+    // Invalid or missing experience dates
+    (resume.experience || []).forEach((exp, i) => {
+      const hasStart = !!exp.startDate && exp.startDate.trim().length > 0;
+      const hasEnd = exp.current || (!!exp.endDate && exp.endDate.trim().length > 0);
+      if (!hasStart || !hasEnd) {
+        const key = `issue-experience-${i}-date`;
+        issues.push({
+          id: key,
+          kind: 'issue',
+          title: 'Experience has invalid dates',
+          message: `Fix dates for experience #${i + 1}. Use formats like "Jan 2023".`,
+          createdAt: Date.now(),
+          read: false,
+          dedupeKey: key,
+          action: { targetTab: 'content', section: 'experience', index: i },
+        });
+      }
+      if (!exp.position || !exp.company) {
+        const key = `issue-experience-${i}-missing-fields`;
+        issues.push({
+          id: key,
+          kind: 'issue',
+          title: 'Experience is missing details',
+          message: `Add position and company for experience #${i + 1}.`,
+          createdAt: Date.now(),
+          read: false,
+          dedupeKey: key,
+          action: { targetTab: 'content', section: 'experience', index: i },
+        });
+      }
+    });
+
+    // Project name and description
+    (resume.projects || []).forEach((p, i) => {
+      if (!p.name || !p.description) {
+        const key = `issue-project-${i}-basics`;
+        issues.push({
+          id: key,
+          kind: 'issue',
+          title: 'Project missing basics',
+          message: `Add name and description for project #${i + 1}.`,
+          createdAt: Date.now(),
+          read: false,
+          dedupeKey: key,
+          action: { targetTab: 'content', section: 'projects', index: i },
+        });
+      }
+    });
+
+    // Education degree and institution
+    (resume.education || []).forEach((e, i) => {
+      if (!e.degree || !e.institution) {
+        const key = `issue-education-${i}-basics`;
+        issues.push({
+          id: key,
+          kind: 'issue',
+          title: 'Education missing basics',
+          message: `Add degree and institution for education #${i + 1}.`,
+          createdAt: Date.now(),
+          read: false,
+          dedupeKey: key,
+          action: { targetTab: 'content', section: 'education', index: i },
+        });
+      }
+    });
+
+    if (issues.length > 0) {
+      addNotifications(issues);
     }
   };
 
@@ -242,11 +351,14 @@ function DashboardContent() {
 
       const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
 
-      if (response.ok) {
+        if (response.ok) {
         const data = await response.json();
         setPortfolio(data.portfolio);
         setEditedSlug(data.portfolio.slug); // Update slug if changed
-        setEditedResumeData(ensureResumeDataStructure(data.portfolio.resumeData));
+          const normalized = ensureResumeDataStructure(data.portfolio.resumeData);
+          setEditedResumeData(normalized);
+          // Re-generate issues for updated content
+          generateIssueNotifications(normalized);
         setEditedPersonalization(data.portfolio.personalization); // Update personalization state
         setPreviewKey(prev => prev + 1); // Force iframe refresh
         showSuccess('Portfolio updated successfully!');

@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useNotifications } from '@/components/notifications/NotificationStore';
+import { AppNotification } from '@/components/notifications/NotificationTypes';
 import { FileUploadSection } from '@/components/FileUploadSection';
 import { PersonalizationForm } from '@/components/PersonalizationForm';
 import { PortfolioPreview } from '@/components/PortfolioPreview';
@@ -32,6 +34,7 @@ export default function HomePage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [generatedSlug, setGeneratedSlug] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const { addNotifications } = useNotifications();
 
   const testimonials = [
     {
@@ -194,6 +197,39 @@ export default function HomePage() {
         const name = resumeData.contact?.name || 'User Portfolio';
         const slug = generateSlug(name);
         setGeneratedSlug(slug);
+
+        // Issue notifications from initial parse to guide the user
+        const initialIssues: AppNotification[] = [];
+        if (!resumeData?.contact?.name) {
+          initialIssues.push({
+            id: 'parse-contact-name-missing',
+            kind: 'issue',
+            title: 'We could not detect your full name',
+            message: 'Add your full name in Contact Information inside the editor.',
+            createdAt: Date.now(),
+            read: false,
+            dedupeKey: 'issue-contact-name-missing',
+            action: { targetTab: 'content', section: 'contact' },
+          });
+        }
+        (resumeData?.experience || []).forEach((exp: any, i: number) => {
+          const hasStart = !!exp.startDate && exp.startDate.trim().length > 0;
+          const hasEnd = exp.current || (!!exp.endDate && exp.endDate.trim().length > 0);
+          if (!hasStart || !hasEnd) {
+            const key = `issue-experience-${i}-date`;
+            initialIssues.push({
+              id: `parse-${key}`,
+              kind: 'issue',
+              title: 'Experience has invalid dates',
+              message: `Fix dates for experience #${i + 1}. Use formats like "Jan 2023".`,
+              createdAt: Date.now(),
+              read: false,
+              dedupeKey: key,
+              action: { targetTab: 'content', section: 'experience', index: i },
+            });
+          }
+        });
+        if (initialIssues.length > 0) addNotifications(initialIssues);
         
       } else {
         const errorData = await response.json();
@@ -533,7 +569,7 @@ export default function HomePage() {
                     <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white"></div>
                     <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
-                  <span>more than 30 portfolios hosted already</span>
+                  <span>more than 60 portfolios hosted already</span>
                 </div>
               </div>
             </div>

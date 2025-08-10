@@ -39,6 +39,28 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
     return () => unsubscribe();
   }, []);
 
+  // Expose current ID token globally for API calls that need Authorization
+  useEffect(() => {
+    let cancelled = false;
+    const updateToken = async () => {
+      try {
+        const token = await auth.currentUser?.getIdToken();
+        if (!cancelled) (window as any).firebaseAuthToken = token;
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('firebase-token-changed', { detail: { hasToken: !!token } }));
+        }
+      } catch {
+        if (!cancelled) (window as any).firebaseAuthToken = undefined;
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('firebase-token-changed', { detail: { hasToken: false } }));
+        }
+      }
+    };
+    updateToken();
+    const unsub = auth.onIdTokenChanged(() => updateToken());
+    return () => { cancelled = true; unsub(); };
+  }, []);
+
   const signInWithGoogle = async () => {
     try {
       await signInWithPopup(auth, googleProvider);

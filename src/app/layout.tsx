@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import ConditionalAuthWrapper from '@/components/ConditionalAuthWrapper';
+import { NotificationProvider } from '@/components/notifications/NotificationStore';
 import { GoogleAnalyticsWrapper } from '@/components/GoogleAnalytics';
 import ConditionalNavigation from '@/components/ConditionalNavigation';
 
@@ -107,10 +108,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <GoogleAnalyticsWrapper />
         <ConditionalAuthWrapper>
-          <ConditionalNavigation />
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-            {children}
-          </div>
+          <NotificationProvider>
+            <ConditionalNavigation />
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+              {children}
+            </div>
+          </NotificationProvider>
         </ConditionalAuthWrapper>
       </body>
     </html>

@@ -108,3 +108,24 @@ model PortfolioView {
 
   @@map("portfolio_views")
 }
+
+// Broadcast announcements for notifications
+model Announcement {
+  id              String   @id @default(cuid())
+  title           String
+  message         String
+  kind            String   @default("announcement")
+  createdAt       DateTime @default(now())
+  createdByEmail  String
+  createdByName   String?
+}
+
+// Per-user read receipts for announcements
+model AnnouncementReceipt {
+  id             String   @id @default(cuid())
+  userId         String
+  announcementId String
+  readAt         DateTime @default(now())
+
+  @@unique([userId, announcementId])
+}

@@ -18,6 +18,7 @@ import {
   X,
   ExternalLink,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface NavigationProps {
   showDashboardMode?: boolean;
@@ -141,13 +142,14 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
             ))}
           </div>
 
-          {/* Auth Buttons & Mobile Menu */}
+          {/* Auth Buttons, Notification Bell & Mobile Menu */}
           <div className="flex items-center space-x-3">
             {user ? (
               <div className="flex items-center space-x-3">
                 {isDashboard ? (
                   // Dashboard mode - show portfolio link
                   <>
+                    <NotificationBell isDashboard />
                     <a
                       href={userPortfolio ? `/${userPortfolio.slug}` : '#'}
                       target="_blank"
@@ -178,6 +180,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                 ) : (
                   // Regular mode - show dashboard link
                   <>
+                    <NotificationBell />
                     <Link
                       href="/dashboard"
                       className="flex items-center space-x-2 px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
