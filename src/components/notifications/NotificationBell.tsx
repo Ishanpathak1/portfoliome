@@ -53,87 +53,171 @@ export function NotificationBell({ isDashboard = false }: NotificationBellProps)
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-[420px] max-w-[92vw] z-[100]">
-          {/* caret */}
-          <div className="absolute right-4 -top-2 w-4 h-4 bg-slate-900 border border-slate-700 rotate-45 rounded-sm" />
-          <div className="relative bg-slate-900 text-white border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/80 bg-slate-900">
-              <div className="text-sm font-semibold tracking-wide">Notifications</div>
-              {unreadNotifications.length > 0 && (
-                <button
-                  onClick={() => markAllAsRead()}
-                  className="text-xs text-gray-300 hover:text-white inline-flex items-center gap-1"
-                >
-                  <Check className="w-3.5 h-3.5" /> Mark all read
-                </button>
+        <>
+          {/* Desktop dropdown */}
+          <div className="hidden sm:block absolute right-0 mt-2 w-[420px] max-w-[92vw] z-[100]">
+            {/* caret */}
+            <div className="absolute right-4 -top-2 w-4 h-4 bg-slate-900 border border-slate-700 rotate-45 rounded-sm" />
+            <div className="relative bg-slate-900 text-white border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/80 bg-slate-900">
+                <div className="text-sm font-semibold tracking-wide">Notifications</div>
+                {unreadNotifications.length > 0 && (
+                  <button
+                    onClick={() => markAllAsRead()}
+                    className="text-xs text-gray-300 hover:text-white inline-flex items-center gap-1"
+                  >
+                    <Check className="w-3.5 h-3.5" /> Mark all read
+                  </button>
+                )}
+              </div>
+
+              {topNotifications.length === 0 ? (
+                <div className="px-5 py-8 text-gray-300 text-sm flex items-center gap-3">
+                  <Megaphone className="w-5 h-5 text-gray-400" /> No unread notifications
+                </div>
+              ) : (
+                <ul className="max-h-[440px] overflow-auto">
+                  {topNotifications.map(n => (
+                    <li key={n.id} className="px-4 py-3 hover:bg-slate-800/70 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5">
+                          {n.kind === 'issue' ? (
+                            <AlertTriangle className={`w-4 h-4 ${n.read ? 'text-amber-400/70' : 'text-amber-400'}`} />
+                          ) : (
+                            <Megaphone className={`w-4 h-4 ${n.read ? 'text-blue-400/70' : 'text-blue-400'}`} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-sm font-medium truncate">{n.title}</div>
+                            <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(n.createdAt)}</div>
+                          </div>
+                          {n.message && (
+                            <div className="text-xs text-gray-300 mt-1 line-clamp-3">{n.message}</div>
+                          )}
+                          <div className="mt-2 flex items-center gap-2">
+                            {n.action ? (
+                              <Link
+                                href={buildDashboardLink(n)}
+                                onClick={() => setOpen(false)}
+                                className="text-xs text-white bg-purple-600 hover:bg-purple-500 px-2.5 py-1 rounded-md inline-flex items-center gap-1"
+                              >
+                                Resolve <ChevronRight className="w-3.5 h-3.5" />
+                              </Link>
+                            ) : null}
+                            {!n.action ? (
+                              <Link
+                                href="/dashboard"
+                                onClick={() => setOpen(false)}
+                                className="text-xs text-white bg-purple-600 hover:bg-purple-500 px-2.5 py-1 rounded-md inline-flex items-center gap-1"
+                              >
+                                Open <ChevronRight className="w-3.5 h-3.5" />
+                              </Link>
+                            ) : null}
+                            <button
+                              onClick={() => markAsRead(n.id)}
+                              className="text-xs text-gray-300 hover:text-white px-2 py-1 rounded-md hover:bg-slate-800"
+                            >
+                              Mark read
+                            </button>
+                            <button
+                              onClick={() => removeNotification(n.id)}
+                              className="ml-auto text-xs text-gray-400 hover:text-white p-1 rounded-md hover:bg-slate-800"
+                              aria-label="Dismiss"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
-
-            {topNotifications.length === 0 ? (
-              <div className="px-5 py-8 text-gray-300 text-sm flex items-center gap-3">
-                <Megaphone className="w-5 h-5 text-gray-400" /> No unread notifications
-              </div>
-            ) : (
-              <ul className="max-h-[440px] overflow-auto">
-                {topNotifications.map(n => (
-                  <li key={n.id} className="px-4 py-3 hover:bg-slate-800/70 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        {n.kind === 'issue' ? (
-                          <AlertTriangle className={`w-4 h-4 ${n.read ? 'text-amber-400/70' : 'text-amber-400'}`} />
-                        ) : (
-                          <Megaphone className={`w-4 h-4 ${n.read ? 'text-blue-400/70' : 'text-blue-400'}`} />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="text-sm font-medium truncate">{n.title}</div>
-                          <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(n.createdAt)}</div>
-                        </div>
-                        {n.message && (
-                          <div className="text-xs text-gray-300 mt-1 line-clamp-3">{n.message}</div>
-                        )}
-                        <div className="mt-2 flex items-center gap-2">
-                          {n.action ? (
-                            <Link
-                              href={buildDashboardLink(n)}
-                              onClick={() => setOpen(false)}
-                              className="text-xs text-white bg-purple-600 hover:bg-purple-500 px-2.5 py-1 rounded-md inline-flex items-center gap-1"
-                            >
-                              Resolve <ChevronRight className="w-3.5 h-3.5" />
-                            </Link>
-                          ) : null}
-                          {!n.action ? (
-                            <Link
-                              href="/dashboard"
-                              onClick={() => setOpen(false)}
-                              className="text-xs text-white bg-purple-600 hover:bg-purple-500 px-2.5 py-1 rounded-md inline-flex items-center gap-1"
-                            >
-                              Open <ChevronRight className="w-3.5 h-3.5" />
-                            </Link>
-                          ) : null}
-                          <button
-                            onClick={() => markAsRead(n.id)}
-                            className="text-xs text-gray-300 hover:text-white px-2 py-1 rounded-md hover:bg-slate-800"
-                          >
-                            Mark read
-                          </button>
-                          <button
-                            onClick={() => removeNotification(n.id)}
-                            className="ml-auto text-xs text-gray-400 hover:text-white p-1 rounded-md hover:bg-slate-800"
-                            aria-label="Dismiss"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
-        </div>
+
+          {/* Mobile sheet */}
+          <>
+            {/* overlay */}
+            <div className="sm:hidden fixed inset-0 bg-black/40 z-[100]" onClick={() => setOpen(false)} />
+            <div className="sm:hidden fixed inset-x-0 top-16 z-[101] bg-slate-900 text-white border-t border-slate-700 rounded-b-xl shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/80">
+                <div className="text-base font-semibold">Notifications</div>
+                {unreadNotifications.length > 0 && (
+                  <button
+                    onClick={() => markAllAsRead()}
+                    className="text-sm text-gray-300 hover:text-white inline-flex items-center gap-1"
+                  >
+                    <Check className="w-4 h-4" /> Mark all read
+                  </button>
+                )}
+              </div>
+              {topNotifications.length === 0 ? (
+                <div className="px-5 py-8 text-gray-300 text-sm flex items-center gap-3">
+                  <Megaphone className="w-5 h-5 text-gray-400" /> No unread notifications
+                </div>
+              ) : (
+                <ul className="max-h-[65vh] overflow-auto">
+                  {topNotifications.map(n => (
+                    <li key={n.id} className="px-4 py-4 border-b border-slate-800">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5">
+                          {n.kind === 'issue' ? (
+                            <AlertTriangle className={`w-5 h-5 ${n.read ? 'text-amber-400/70' : 'text-amber-400'}`} />
+                          ) : (
+                            <Megaphone className={`w-5 h-5 ${n.read ? 'text-blue-400/70' : 'text-blue-400'}`} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-sm font-semibold break-words">{n.title}</div>
+                            <div className="text-[12px] text-gray-400 whitespace-nowrap">{formatWhen(n.createdAt)}</div>
+                          </div>
+                          {n.message && (
+                            <div className="text-sm text-gray-300 mt-1 break-words">{n.message}</div>
+                          )}
+                          <div className="mt-3 flex items-center gap-2">
+                            {n.action ? (
+                              <Link
+                                href={buildDashboardLink(n)}
+                                onClick={() => setOpen(false)}
+                                className="text-sm text-white bg-purple-600 hover:bg-purple-500 px-3 py-2 rounded-md inline-flex items-center gap-1"
+                              >
+                                Resolve <ChevronRight className="w-4 h-4" />
+                              </Link>
+                            ) : (
+                              <Link
+                                href="/dashboard"
+                                onClick={() => setOpen(false)}
+                                className="text-sm text-white bg-purple-600 hover:bg-purple-500 px-3 py-2 rounded-md inline-flex items-center gap-1"
+                              >
+                                Open <ChevronRight className="w-4 h-4" />
+                              </Link>
+                            )}
+                            <button
+                              onClick={() => markAsRead(n.id)}
+                              className="text-sm text-gray-300 hover:text-white px-3 py-2 rounded-md bg-slate-800/60"
+                            >
+                              Mark read
+                            </button>
+                            <button
+                              onClick={() => removeNotification(n.id)}
+                              className="ml-auto text-sm text-gray-400 hover:text-white p-2 rounded-md bg-slate-800/60"
+                              aria-label="Dismiss"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        </>
       )}
     </div>
   );
