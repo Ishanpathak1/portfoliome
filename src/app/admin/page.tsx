@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
-import { LogOut, Megaphone, Send } from 'lucide-react';
+import { LogOut, Megaphone, Send, Link as LinkIcon } from 'lucide-react';
+import Link from 'next/link';
 
 const ADMIN_EMAIL = 'ishan.pathak2711@gmail.com';
 
@@ -12,6 +13,10 @@ export default function AdminPage() {
   const [message, setMessage] = useState('');
   const [title, setTitle] = useState('Announcement');
   const [loading, setLoading] = useState(false);
+  // Optional deep-link action
+  const [actionTab, setActionTab] = useState('');
+  const [actionSection, setActionSection] = useState('');
+  const [actionIndex, setActionIndex] = useState<string>('');
 
   const isAdmin = useMemo(() => !!user && user.email === ADMIN_EMAIL, [user]);
 
@@ -29,16 +34,26 @@ export default function AdminPage() {
     if (!message.trim()) return;
     setLoading(true);
     try {
+      const action = (actionTab || actionSection || actionIndex)
+        ? {
+            ...(actionTab ? { targetTab: actionTab } : {}),
+            ...(actionSection ? { section: actionSection } : {}),
+            ...(actionIndex !== '' ? { index: Number(actionIndex) } : {}),
+          }
+        : undefined;
       const res = await fetch('/api/admin/announcements', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${await user?.getIdToken()}`,
         },
-        body: JSON.stringify({ title, message }),
+        body: JSON.stringify({ title, message, action }),
       });
       if (res.ok) {
         setMessage('');
+        setActionTab('');
+        setActionSection('');
+        setActionIndex('');
         await load();
       }
     } finally {
@@ -83,6 +98,20 @@ export default function AdminPage() {
           <div className="mt-6 grid gap-3">
             <input value={title} onChange={e => setTitle(e.target.value)} className="bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white" placeholder="Title" />
             <textarea value={message} onChange={e => setMessage(e.target.value)} rows={3} className="bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white" placeholder="Message..." />
+            <div className="grid gap-2 sm:grid-cols-3">
+              <div>
+                <label className="block text-xs text-gray-300 mb-1">Tab</label>
+                <input value={actionTab} onChange={e => setActionTab(e.target.value)} className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white" placeholder="e.g., content, design, settings" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-300 mb-1">Section</label>
+                <input value={actionSection} onChange={e => setActionSection(e.target.value)} className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white" placeholder="e.g., experience, projects" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-300 mb-1">Index</label>
+                <input value={actionIndex} onChange={e => setActionIndex(e.target.value)} className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white" placeholder="0" inputMode="numeric" />
+              </div>
+            </div>
             <button onClick={send} disabled={loading} className="self-start inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white px-4 py-2 rounded-md">
               <Send className="w-4 h-4" /> {loading ? 'Sending...' : 'Send'}
             </button>
@@ -99,6 +128,12 @@ export default function AdminPage() {
                   <div className="text-xs text-gray-300">{new Date(a.createdAt).toLocaleString()}</div>
                 </div>
                 <div className="text-sm text-gray-300 mt-1">{a.message}</div>
+                {a.action ? (
+                  <div className="mt-2 text-xs text-gray-300 flex items-center gap-2">
+                    <LinkIcon className="w-3.5 h-3.5" />
+                    <Link className="underline hover:text-white" href={`/dashboard${buildLinkFromAction(a.action)}`}>Open deep link</Link>
+                  </div>
+                ) : null}
               </div>
             ))}
             {announcements.length === 0 && <div className="text-sm text-gray-300">No announcements yet.</div>}
@@ -107,5 +142,18 @@ export default function AdminPage() {
       </div>
     </div>
   );
+}
+
+function buildLinkFromAction(action: any): string {
+  try {
+    const params = new URLSearchParams();
+    if (action?.targetTab) params.set('tab', String(action.targetTab));
+    if (action?.section) params.set('section', String(action.section));
+    if (typeof action?.index === 'number') params.set('index', String(action.index));
+    const query = params.toString();
+    return query ? `?${query}` : '';
+  } catch {
+    return '';
+  }
 }
 

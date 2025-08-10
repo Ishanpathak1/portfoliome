@@ -95,6 +95,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           kind: 'announcement',
           title: a.title,
           message: a.message,
+          action: a.action,
           createdAt: a.createdAt || Date.now(),
           read: readIds.has(a.id) ? true : !!a.read,
         }));

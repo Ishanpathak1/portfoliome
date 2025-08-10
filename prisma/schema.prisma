@@ -114,6 +114,8 @@ model Announcement {
   id              String   @id @default(cuid())
   title           String
   message         String
+  // Optional action payload for deep-linking (e.g., { targetTab, section, index })
+  action          Json?
   kind            String   @default("announcement")
   createdAt       DateTime @default(now())
   createdByEmail  String

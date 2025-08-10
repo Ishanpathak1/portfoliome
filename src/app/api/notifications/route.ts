@@ -4,6 +4,10 @@ import path from 'path';
 import { prisma } from '@/lib/prisma';
 import { NextRequest } from 'next/server';
 
+// Force dynamic execution so build doesn't try to prerender this route
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Read announcements from data/announcements.json
 function parseTokenUserId(authHeader: string | null): { userId: string | null } {
   if (!authHeader || !authHeader.startsWith('Bearer ')) return { userId: null };
@@ -36,6 +40,7 @@ export async function GET(req: NextRequest) {
         kind: (a.kind as any) || 'announcement',
         title: a.title,
         message: a.message,
+        action: a.action as any,
         createdAt: new Date(a.createdAt).getTime(),
         read: !!readMap[a.id],
       }));

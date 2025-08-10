@@ -103,6 +103,15 @@ export function NotificationBell({ isDashboard = false }: NotificationBellProps)
                               Resolve <ChevronRight className="w-3.5 h-3.5" />
                             </Link>
                           ) : null}
+                          {!n.action ? (
+                            <Link
+                              href="/dashboard"
+                              onClick={() => setOpen(false)}
+                              className="text-xs text-white bg-purple-600 hover:bg-purple-500 px-2.5 py-1 rounded-md inline-flex items-center gap-1"
+                            >
+                              Open <ChevronRight className="w-3.5 h-3.5" />
+                            </Link>
+                          ) : null}
                           <button
                             onClick={() => markAsRead(n.id)}
                             className="text-xs text-gray-300 hover:text-white px-2 py-1 rounded-md hover:bg-slate-800"

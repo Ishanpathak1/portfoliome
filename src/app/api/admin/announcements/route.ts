@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { title, message, kind } = await request.json();
+    const { title, message, kind, action } = await request.json();
     if (!message) return NextResponse.json({ error: 'Message is required' }, { status: 400 });
 
     const item = await prisma.announcement.create({
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
         title: title || 'Announcement',
         message,
         kind: kind || 'announcement',
+        action: action ? action : undefined,
         createdByEmail: email,
         createdByName: 'Admin',
       }

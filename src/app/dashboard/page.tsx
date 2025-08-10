@@ -126,6 +126,8 @@ function DashboardContent() {
     const section = searchParams?.get('section');
     const indexParam = searchParams?.get('index');
     if (tab) setActiveTab(tab);
+    // If a section is specified but no tab, ensure we land in content tab by default
+    if (section && !tab) setActiveTab('content');
     if (section) setEditingSection(section);
     if (indexParam) setEditingIndex(Number(indexParam));
   }, [searchParams]);
