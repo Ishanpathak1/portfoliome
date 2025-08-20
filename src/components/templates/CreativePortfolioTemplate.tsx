@@ -708,7 +708,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
                       <div className="flex items-center gap-2 text-sm" style={{ color: colors.sketch }}>
                         <Calendar className="w-4 h-4" />
                         <span className="font-bold">
-                          {project.startDate} {project.endDate && `- ${project.endDate}`}
+                          {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
                         </span>
                       </div>
                     )}

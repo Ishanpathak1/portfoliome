@@ -729,7 +729,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                       <div className="flex items-center gap-3 bg-gradient-to-r from-current to-transparent rounded-2xl p-3 md:p-4 border-2" style={{ color: colors.quantum + '20', borderColor: colors.quantum }}>
                         <Calendar className="w-4 h-4 md:w-5 md:h-5" style={{ color: colors.quantum }} />
                         <span className="text-white font-bold text-sm md:text-base">
-                          {project.startDate} {project.endDate && `- ${project.endDate}`}
+                          {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
                         </span>
                       </div>
                     )}

@@ -501,7 +501,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                     <div className={`flex items-center gap-3 ${themeColors.glassDark} px-6 py-3 rounded-2xl border`}>
                       <Calendar className="w-5 h-5 text-gray-400" />
                       <span className="text-gray-400 font-medium">
-                        {project.startDate} {project.endDate && `- ${project.endDate}`}
+                        {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
                       </span>
                     </div>
                   )}

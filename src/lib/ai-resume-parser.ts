@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { ResumeData } from '@/types/resume';
-import { validateAndFixUrl } from './utils';
+import { validateAndFixUrl, normalizeDateInput } from './utils';
 
 const openai = new OpenAI({
   apiKey: process.env.OPEN_KEY,
@@ -193,9 +193,9 @@ export class AIResumeParser {
           // New field names (semantically correct)
           position,
           company: exp.company || '',
-          startDate: exp.startDate || '',
-          endDate: exp.endDate || '',
-          current: exp.current || false,
+          startDate: normalizeDateInput(exp.startDate || ''),
+          endDate: normalizeDateInput(exp.endDate || ''),
+          current: (exp.current || false) || /present|current|now/i.test(String(exp.endDate || exp.startDate || '')),
           responsibilities,
           // Legacy field names for template compatibility
           title: position,
@@ -206,7 +206,7 @@ export class AIResumeParser {
         degree: edu.degree || '',
         institution: edu.institution || '',
         field: edu.field || '',
-        graduationDate: edu.graduationDate || '',
+        graduationDate: normalizeDateInput(edu.graduationDate || ''),
         gpa: edu.gpa || '',
         // Additional fields for template compatibility
         location: edu.location || '',
@@ -221,7 +221,9 @@ export class AIResumeParser {
         description: proj.description || '',
         technologies: Array.isArray(proj.technologies) ? proj.technologies : [],
         link: proj.link || '',
-        github: proj.github || ''
+        github: proj.github || '',
+        startDate: normalizeDateInput(proj.startDate || ''),
+        endDate: normalizeDateInput(proj.endDate || '')
       })) : [],
       certifications: Array.isArray(data.certifications) ? data.certifications : []
     };

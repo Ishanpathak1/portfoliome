@@ -1,4 +1,5 @@
 import { ResumeData, Experience, Education, Project, Skill } from '@/types/resume';
+import { normalizeDateInput } from '@/lib/utils';
 
 // Enhanced patterns for better detection
 const EMAIL_PATTERN = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
@@ -285,9 +286,9 @@ export class AIResumeParser {
             currentJob.company = line.trim();
           } else if (this.looksLikeDates(line)) {
             const dates = this.parseDates(line);
-            currentJob.startDate = dates.startDate;
-            currentJob.endDate = dates.endDate;
-            currentJob.current = dates.current;
+            currentJob.startDate = normalizeDateInput(dates.startDate);
+            currentJob.endDate = normalizeDateInput(dates.endDate);
+            currentJob.current = dates.current || /present|current|now/i.test(line);
           } else if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
             currentJob.responsibilities.push(line.replace(/^[•\-*]\s*/, '').trim());
           } else {
@@ -401,7 +402,7 @@ export class AIResumeParser {
             currentEdu.institution = line.trim();
           } else if (this.looksLikeDates(line)) {
             const yearMatch = line.match(/\d{4}/);
-            currentEdu.graduationDate = yearMatch ? yearMatch[0] : '';
+            currentEdu.graduationDate = normalizeDateInput(yearMatch ? yearMatch[0] : '');
           } else if (line.toLowerCase().includes('gpa')) {
             const gpaMatch = line.match(/\d\.\d+/);
             currentEdu.gpa = gpaMatch ? gpaMatch[0] : '';

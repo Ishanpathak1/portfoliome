@@ -469,7 +469,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                   </div>
                   {(project.startDate || project.endDate) && (
                     <div className="text-sm" style={{ color: colors.textSecondary }}>
-                      {project.startDate} {project.endDate && `- ${project.endDate}`}
+                      {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
                     </div>
                   )}
                 </div>

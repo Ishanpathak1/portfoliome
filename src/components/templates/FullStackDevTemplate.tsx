@@ -753,7 +753,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                   {(project.startDate || project.endDate) && (
                     <div className="border-t border-cyan-500/30 pt-4">
                       <div className="text-purple-400 font-mono text-xs md:text-sm">
-                        TIMELINE: {project.startDate} {project.endDate && `- ${project.endDate}`}
+                        TIMELINE: {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
                       </div>
                     </div>
                   )}
