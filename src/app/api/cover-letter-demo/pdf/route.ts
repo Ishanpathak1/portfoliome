@@ -15,6 +15,13 @@ export async function GET(request: NextRequest) {
 		// Ensure serverless-friendly modes
 		(chromium as any).setHeadlessMode = true;
 		(chromium as any).setGraphicsMode = false;
+		// Ensure dynamic loader can find packaged libs
+		try {
+			const libPath = (chromium as any).libPath as string | undefined;
+			if (libPath) {
+				process.env.LD_LIBRARY_PATH = `${libPath}:${process.env.LD_LIBRARY_PATH || ''}`;
+			}
+		} catch {}
 
 		const browserWSEndpoint = process.env.BROWSER_WS_ENDPOINT || process.env.BROWSERLESS_WS;
 		if (browserWSEndpoint) {
@@ -31,6 +38,7 @@ export async function GET(request: NextRequest) {
 					'--single-process',
 					'--font-render-hinting=none',
 					'--disable-gpu',
+					'--disable-software-rasterizer',
 				],
 				defaultViewport: chromium.defaultViewport,
 				executablePath,

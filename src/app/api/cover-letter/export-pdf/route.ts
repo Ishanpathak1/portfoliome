@@ -15,6 +15,12 @@ export async function POST(request: NextRequest) {
     const { default: chromium } = await import('@sparticuz/chromium');
     (chromium as any).setHeadlessMode = true;
     (chromium as any).setGraphicsMode = false;
+    try {
+      const libPath = (chromium as any).libPath as string | undefined;
+      if (libPath) {
+        process.env.LD_LIBRARY_PATH = `${libPath}:${process.env.LD_LIBRARY_PATH || ''}`;
+      }
+    } catch {}
 
     const browserWSEndpoint = process.env.BROWSER_WS_ENDPOINT || process.env.BROWSERLESS_WS;
     if (browserWSEndpoint) {
@@ -31,6 +37,7 @@ export async function POST(request: NextRequest) {
           '--single-process',
           '--font-render-hinting=none',
           '--disable-gpu',
+          '--disable-software-rasterizer',
         ],
         defaultViewport: chromium.defaultViewport,
         executablePath,
