@@ -9,15 +9,18 @@ export async function GET(request: NextRequest) {
 		const { searchParams } = new URL(request.url);
 		const targetUrl = searchParams.get('url');
 		const origin = new URL(request.url).origin;
-		const { default: puppeteer } = await import('puppeteer');
+		const { default: puppeteer } = await import('puppeteer-core');
+		const { default: chromium } = await import('@sparticuz/chromium');
+		const executablePath = await chromium.executablePath();
 		browser = await puppeteer.launch({
 			args: [
-				'--no-sandbox',
-				'--disable-setuid-sandbox',
+				...chromium.args,
 				'--font-render-hinting=none',
 				'--disable-gpu',
 			],
-			headless: true
+			defaultViewport: chromium.defaultViewport,
+			executablePath,
+			headless: chromium.headless ?? true
 		});
 		const page = await browser.newPage();
 		await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });

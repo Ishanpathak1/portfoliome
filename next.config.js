@@ -4,7 +4,7 @@ const nextConfig = {
     domains: ['localhost'],
   },
   experimental: {
-    serverComponentsExternalPackages: ['pdf-parse']
+    serverComponentsExternalPackages: ['pdf-parse', '@sparticuz/chromium', 'puppeteer-core']
   }
 }
 
