@@ -1,10 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 
-// Global variable to store the Prisma client instance
-let prisma: PrismaClient;
+// Allow disabling DB access in local development to avoid noisy Prisma errors
+const isDbDisabled = process.env.DISABLE_DB === 'true';
+export const isDbEnabled = !isDbDisabled;
 
-// Check if we're in development mode
-if (process.env.NODE_ENV === 'development') {
+// Global variable to store the Prisma client instance
+let prismaInstance: PrismaClient | undefined;
+
+if (isDbDisabled) {
+  // Do not initialize Prisma at all when DB is disabled
+  prismaInstance = undefined;
+} else if (process.env.NODE_ENV === 'development') {
   // In development, use a global variable to prevent multiple instances
   if (!(global as any).prisma) {
     (global as any).prisma = new PrismaClient({
@@ -16,10 +22,10 @@ if (process.env.NODE_ENV === 'development') {
       },
     });
   }
-  prisma = (global as any).prisma;
+  prismaInstance = (global as any).prisma;
 } else {
   // In production, create a new instance
-  prisma = new PrismaClient({
+  prismaInstance = new PrismaClient({
     datasources: {
       db: {
         url: process.env.DATABASE_URL,
@@ -28,4 +34,11 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-export { prisma }; 
+export const prisma = prismaInstance;
+
+export function requirePrisma(): PrismaClient {
+  if (!prismaInstance) {
+    throw new Error('Database is disabled (set DISABLE_DB=false) or Prisma not initialized.');
+  }
+  return prismaInstance;
+}

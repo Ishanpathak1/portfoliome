@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { requirePrisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
     const userId = await getUserIdFromToken(authHeader);
 
     // Check if slug exists in database
+    const prisma = requirePrisma();
     const existingPortfolio = await prisma.portfolio.findUnique({
       where: { slug },
       select: { id: true, userId: true }

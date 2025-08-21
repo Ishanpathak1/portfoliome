@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { requirePrisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -19,6 +19,7 @@ function parseTokenEmail(authHeader: string | null): string | null {
 
 export async function GET() {
   try {
+    const prisma = requirePrisma();
     const items = await prisma.announcement.findMany({
       orderBy: { createdAt: 'desc' },
       take: 50,
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
     const { title, message, kind, action } = await request.json();
     if (!message) return NextResponse.json({ error: 'Message is required' }, { status: 400 });
 
+    const prisma = requirePrisma();
     const item = await prisma.announcement.create({
       data: {
         title: title || 'Announcement',

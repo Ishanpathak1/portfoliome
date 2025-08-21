@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { requirePrisma } from '@/lib/prisma';
 
 function parseToken(request: NextRequest): { userId: string | null } {
   const auth = request.headers.get('Authorization');
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     if (idArray.length === 0) return NextResponse.json({ ok: true });
 
     console.log('[POST /api/notifications/read] userId=', userId, 'ids=', idArray);
+    const prisma = requirePrisma();
     await prisma.$transaction(
       idArray.map((announcementId) =>
         prisma.announcementReceipt.upsert({

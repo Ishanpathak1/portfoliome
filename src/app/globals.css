@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure consistent A4 single-page sizing for PDF export */
+@media print {
+	@page {
+		size: A4;
+		margin: 0;
+	}
+	html, body {
+		height: 100%;
+		background: white !important;
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+	/* Hide Next.js dev overlays/toasts in print/PDF */
+	[data-nextjs-toast],
+	#nextjs__container,
+	#nextjs-overlay,
+	.nextjs-toast-errors,
+	.nextjs-toast {
+		display: none !important;
+		visibility: hidden !important;
+		opacity: 0 !important;
+	}
+}
+
+.a4-page {
+	/* Exact A4 width at ~96dpi; keep height content within one page */
+	width: 794px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900;

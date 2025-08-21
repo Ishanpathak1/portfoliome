@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserPortfolio } from '@/lib/portfolio-db';
-import { prisma } from '@/lib/prisma';
+import { requirePrisma } from '@/lib/prisma';
 import { PersonalizationData, ResumeData } from '@/types/resume';
 
 export const dynamic = 'force-dynamic';
@@ -104,6 +104,7 @@ export async function PUT(request: NextRequest) {
 
       // Double-check if new slug is available (race condition protection)
       console.log('🔍 Checking slug availability...');
+      const prisma = requirePrisma();
       const existingPortfolio = await prisma.portfolio.findUnique({
         where: { slug },
         select: { id: true, userId: true }
@@ -134,6 +135,7 @@ export async function PUT(request: NextRequest) {
         console.log(`🔄 Database update attempt ${attempt}/${maxRetries}`);
         
         // Add a timeout to the database operation
+        const prisma = requirePrisma();
         const dbUpdatePromise = prisma.portfolio.update({
           where: { userId },
           data: updateData

@@ -71,6 +71,7 @@ function DashboardContent() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [showPreview, setShowPreview] = useState(false);
+  const [jobs, setJobs] = useState<Array<{ id: string; company: string; status: 'APPLIED'|'ACCEPTED'|'REJECTED'; updatedAt?: string }>>([]);
 
   // Form states
   const [editedSlug, setEditedSlug] = useState('');
@@ -81,6 +82,15 @@ function DashboardContent() {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  // Cover letter states
+  const [jdText, setJdText] = useState('');
+  const [extraPrompt, setExtraPrompt] = useState('');
+  const [clBlocks, setClBlocks] = useState<{ greeting: string; intro: string; bodyParas: string[]; closing: string; signoff: string } | null>(null);
+  const [clCompany, setClCompany] = useState('');
+  const [clStatus, setClStatus] = useState<'Applied' | 'Approved' | 'Rejected' | 'Waiting'>('Waiting');
+  const [clLoading, setClLoading] = useState(false);
+  const [clEditMode, setClEditMode] = useState(false);
+  const [clDownloading, setClDownloading] = useState(false);
 
   // Content editing states
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -119,6 +129,21 @@ function DashboardContent() {
       loadUserPortfolio();
     }
   }, [user]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const token = await user?.getIdToken();
+        if (!token) return;
+        const res = await fetch('/api/applications', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (res.ok) setJobs(data.items || []);
+      } catch (e) {
+        console.error('Failed to load jobs', e);
+      }
+    };
+    if (activeTab === 'jobs') fetchJobs();
+  }, [activeTab, user]);
 
   // Handle deep links from notifications to open specific editor context
   useEffect(() => {
@@ -609,7 +634,9 @@ function DashboardContent() {
     { id: 'overview', title: 'Overview', icon: BarChart3 },
     { id: 'design', title: 'Design & Theme', icon: Palette },
     { id: 'content', title: 'Content & Info', icon: User },
+    { id: 'cover-letter', title: 'Cover Letter', icon: FileText },
     { id: 'custom', title: 'Custom Sections', icon: Layers },
+    { id: 'jobs', title: 'My Jobs', icon: Briefcase },
     { id: 'settings', title: 'Settings', icon: Settings },
   ];
 
@@ -896,9 +923,200 @@ function DashboardContent() {
         </div>
 
         {/* Tab Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className={`grid ${activeTab === 'cover-letter' ? 'grid-cols-1 xl:grid-cols-12' : 'grid-cols-1 lg:grid-cols-3'} gap-4 sm:gap-6 lg:gap-8`}>
           {/* Main Content */}
-          <div className="lg:col-span-2 order-2 lg:order-1">
+          <div className={`${activeTab === 'cover-letter' ? 'xl:col-span-12' : 'lg:col-span-2'} order-2 lg:order-1`}>
+            {activeTab === 'cover-letter' && (
+              <div className="space-y-4 sm:space-y-6">
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
+                  <h2 className="text-xl font-bold text-white mb-4">Generate your cover letter</h2>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                    {/* Left: JD input and controls */}
+                    <div className="space-y-3 xl:col-span-4">
+                      <label className="block text-sm text-gray-200">Paste job description</label>
+                      <textarea className="w-full rounded-lg p-3 bg-white/5 border border-white/10 text-white min-h-[260px]" value={jdText} onChange={(e)=>setJdText(e.target.value)} />
+                      <label className="block text-sm text-gray-200">Optional prompt to guide tone/focus</label>
+                      <input className="w-full rounded-lg p-3 bg-white/5 border border-white/10 text-white" placeholder="Optional: emphasize leadership, keep to 350 words, etc." value={extraPrompt} onChange={(e)=>setExtraPrompt(e.target.value)} />
+                      <div className="grid grid-cols-2 gap-3">
+                        <input placeholder="Company name (required)" className="rounded-lg p-3 bg-white/5 border border-white/10 text-white" value={clCompany} onChange={(e)=>setClCompany(e.target.value)} />
+                        <select className="rounded-lg p-3 bg-white/5 border border-white/10 text-white" value={clStatus} onChange={(e)=>setClStatus(e.target.value as any)}>
+                          <option className="text-black" value="Waiting">Applied (waiting)</option>
+                          <option className="text-black" value="Approved">Approved</option>
+                          <option className="text-black" value="Rejected">Rejected</option>
+                        </select>
+                      </div>
+                      <button
+                        onClick={async ()=>{
+                          if (!clCompany.trim()) { alert('Please enter the company name.'); return; }
+                          setClLoading(true);
+                          try {
+                            const token = await user?.getIdToken();
+                            const toAppStatus = (s: 'Applied'|'Approved'|'Rejected'|'Waiting'): 'APPLIED'|'ACCEPTED'|'REJECTED' => {
+                              if (s === 'Approved') return 'ACCEPTED';
+                              if (s === 'Rejected') return 'REJECTED';
+                              return 'APPLIED';
+                            };
+                            const res = await fetch('/api/cover-letter/generate', { 
+                              method: 'POST', 
+                              headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, 
+                              body: JSON.stringify({ 
+                                jobDescription: jdText, 
+                                resumeData: editedResumeData, 
+                                prompt: `${extraPrompt}\nDo not use generic openers like \"I am excited to apply\".`,
+                                company: clCompany.trim(),
+                                status: toAppStatus(clStatus)
+                              }) 
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              setClBlocks(data.contentBlocks);
+                            }
+                          } finally {
+                            setClLoading(false);
+                          }
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+                        disabled={clLoading || jdText.trim().length < 30 || !clCompany.trim()}
+                      >{clLoading ? 'Generating…' : 'Generate'}</button>
+                    </div>
+                    {/* Right: Demo-style preview with quick edits */}
+                    <div className="bg-white rounded-xl p-0 border border-white/10 text-gray-900 overflow-hidden xl:col-span-8">
+                      <div className="h-1.5 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600" />
+                      <div className="p-6">
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <input className="text-2xl font-extrabold text-gray-900 w-full" value={editedResumeData?.contact?.name || ''} onChange={(e)=> setEditedResumeData(prev => prev ? ({ ...prev, contact: { ...prev.contact, name: e.target.value } }) : prev)} placeholder="Your Name" />
+                            <div className="text-gray-600">{editedResumeData?.summary ? 'Professional Summary' : 'Professional'}</div>
+                          </div>
+                          <div className="text-xs text-gray-500 text-right">
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 justify-end">
+                              {editedResumeData?.contact?.email && <span>{editedResumeData.contact.email}</span>}
+                              {editedResumeData?.contact?.phone && <><span>•</span><span>{editedResumeData.contact.phone}</span></>}
+                              {editedResumeData?.contact?.location && <><span>•</span><span>{editedResumeData.contact.location}</span></>}
+                            </div>
+                            {editedResumeData?.contact?.linkedin && <div className="mt-1">{editedResumeData.contact.linkedin}</div>}
+                          </div>
+                        </div>
+                        <hr className="my-5" />
+                        <div className="text-sm text-gray-600 space-y-1 mb-4">
+                          <div>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                          <div className="font-medium text-gray-900">Hiring Manager</div>
+                          <div>
+                            <input className="w-full text-sm text-gray-700" value={clCompany} onChange={(e)=>setClCompany(e.target.value)} placeholder="Company Name" />
+                          </div>
+                        </div>
+                        <div className="space-y-5 leading-relaxed text-gray-800">
+                          <input className="font-medium w-full" value={clBlocks?.greeting || ''} onChange={(e)=> setClBlocks(prev => prev ? ({ ...prev, greeting: e.target.value }) : prev)} placeholder="Dear Hiring Manager," />
+                          <textarea className="w-full" rows={3} value={clBlocks?.intro || ''} onChange={(e)=> setClBlocks(prev => prev ? ({ ...prev, intro: e.target.value }) : prev)} placeholder={`What I like about ${clCompany || 'your company'} is ... I believe I can add value by ...`} />
+                          {(clBlocks?.bodyParas || []).map((p, i)=> (
+                            <textarea key={i} className="w-full" rows={3} value={p} onChange={(e)=> setClBlocks(prev => prev ? ({ ...prev, bodyParas: prev.bodyParas.map((bp, idx)=> idx===i ? e.target.value : bp) }) : prev)} />
+                          ))}
+                          <textarea className="w-full" rows={2} value={clBlocks?.closing || ''} onChange={(e)=> setClBlocks(prev => prev ? ({ ...prev, closing: e.target.value }) : prev)} placeholder="Closing sentence" />
+                          <textarea className="w-full font-semibold" rows={2} value={clBlocks?.signoff || ''} onChange={(e)=> setClBlocks(prev => prev ? ({ ...prev, signoff: e.target.value }) : prev)} placeholder={`Sincerely,\n${editedResumeData?.contact?.name || 'Your Name'}`} />
+                        </div>
+                        <div className="mt-6 flex gap-3 justify-end">
+                          <button
+                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-2"
+                            disabled={clDownloading}
+                            onClick={async ()=>{
+                              if (clDownloading) return;
+                              setClDownloading(true);
+                              try {
+                                const params = new URLSearchParams();
+                                params.set('pdf', '1');
+                                params.set('name', editedResumeData?.contact?.name || '');
+                                if (editedResumeData?.contact?.email) params.set('email', editedResumeData.contact.email);
+                                if (editedResumeData?.contact?.phone) params.set('phone', editedResumeData.contact.phone);
+                                if (editedResumeData?.contact?.location) params.set('location', editedResumeData.contact.location);
+                                if (editedResumeData?.contact?.linkedin) params.set('linkedin', editedResumeData.contact.linkedin);
+                                params.set('company', clCompany || 'Company Name');
+                                params.set('greeting', clBlocks?.greeting || 'Dear Hiring Manager,');
+                                params.set('intro', clBlocks?.intro || 'I am excited to apply...');
+                                (clBlocks?.bodyParas || []).forEach(p => params.append('bp', p));
+                                if (clBlocks?.closing) params.set('closing', clBlocks.closing);
+                                if (clBlocks?.signoff) params.set('signoff', clBlocks.signoff);
+                                const origin = window.location.origin;
+                                const res = await fetch(`/api/cover-letter-demo/pdf?url=${encodeURIComponent(`${origin}/cover-letter-render?${params.toString()}`)}`);
+                                const blob = await res.blob();
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a'); a.href = url; a.download = `Cover_Letter_${clCompany||'Company'}.pdf`; a.click(); URL.revokeObjectURL(url);
+                              } finally {
+                                setClDownloading(false);
+                              }
+                            }}
+                          >
+                            {clDownloading && <RefreshCw className="w-4 h-4 animate-spin" />}
+                            <span>{clDownloading ? 'Downloading…' : 'Download PDF'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {activeTab === 'jobs' && (
+              <div className="space-y-6">
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-white flex items-center space-x-3">
+                        <Briefcase className="w-6 h-6 text-purple-400" />
+                        <span>My Jobs</span>
+                      </h2>
+                      <p className="text-gray-300 mt-1">Track your applications and update their status</p>
+                    </div>
+                  </div>
+
+                  <div className="overflow-hidden rounded-lg border border-white/10">
+                    <table className="min-w-full divide-y divide-white/10">
+                      <thead>
+                        <tr className="bg-white/5">
+                          <th className="px-4 py-2 text-left text-sm font-semibold text-white">Company</th>
+                          <th className="px-4 py-2 text-left text-sm font-semibold text-white">Status</th>
+                          <th className="px-4 py-2 text-right text-sm font-semibold text-white">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {jobs.length === 0 && (
+                          <tr>
+                            <td colSpan={3} className="px-4 py-6 text-center text-gray-300">No applications yet.</td>
+                          </tr>
+                        )}
+                        {jobs.map((j) => (
+                          <tr key={j.id}>
+                            <td className="px-4 py-3 text-white">{j.company}</td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${j.status === 'APPLIED' ? 'bg-blue-500/20 text-blue-300' : j.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>{j.status}</span>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <select
+                                className="rounded-lg p-2 bg-white/5 border border-white/10 text-white"
+                                defaultValue={j.status}
+                                onChange={async (e)=>{
+                                  const next = e.target.value as 'APPLIED'|'ACCEPTED'|'REJECTED';
+                                  try {
+                                    const token = await user?.getIdToken();
+                                    await fetch('/api/applications', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ company: j.company, status: next }) });
+                                    setJobs(prev => prev.map(p => p.id === j.id ? { ...p, status: next } : p));
+                                  } catch (err) {
+                                    console.error('Update status failed', err);
+                                  }
+                                }}
+                              >
+                                <option className="text-black" value="APPLIED">APPLIED</option>
+                                <option className="text-black" value="ACCEPTED">ACCEPTED</option>
+                                <option className="text-black" value="REJECTED">REJECTED</option>
+                              </select>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
             {activeTab === 'overview' && (
               <div className="space-y-4 sm:space-y-6">
                 {/* Portfolio Stats */}
@@ -1959,6 +2177,8 @@ function DashboardContent() {
 
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
+            {activeTab !== 'cover-letter' && (
+            <>
             {/* Current Template Preview */}
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
               <h3 className="text-lg font-bold text-white mb-4">Current Template</h3>
@@ -2009,6 +2229,8 @@ function DashboardContent() {
                 </div>
               </div>
             </div>
+            </>
+            )}
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import { requirePrisma } from './prisma';
 import { ResumeData, PersonalizationData } from '@/types/resume';
 
 export interface DatabasePortfolio {
@@ -19,6 +19,28 @@ export interface DatabasePortfolio {
   updatedAt: Date;
 }
 
+export type ApplicationStatus = 'APPLIED' | 'ACCEPTED' | 'REJECTED';
+
+export async function upsertApplicationStatus(
+  userId: string,
+  company: string,
+  status: ApplicationStatus
+) {
+  const prisma = requirePrisma();
+  if (!company || !userId) throw new Error('Missing userId or company');
+  const normalizedCompany = company.trim();
+  const appModel = (prisma as any).application;
+  if (!appModel || typeof appModel.upsert !== 'function') {
+    console.warn('Prisma Client missing Application model. Did you run `prisma generate` and restart the dev server?');
+    return null;
+  }
+  return appModel.upsert({
+    where: { userId_company: { userId, company: normalizedCompany } },
+    update: { status },
+    create: { userId, company: normalizedCompany, status },
+  });
+}
+
 export async function saveUserPortfolio(
   userId: string,
   resumeData: ResumeData,
@@ -35,6 +57,7 @@ export async function saveUserPortfolio(
   const slug = generateUniqueSlug(name);
   
   // Ensure user exists in database (upsert)
+  const prisma = requirePrisma();
   await prisma.user.upsert({
     where: { id: userId },
     update: {
@@ -91,11 +114,12 @@ export async function saveUserPortfolio(
 
 export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfolio | null> {
   try {
+    const prisma = requirePrisma();
     // ⚡ Optimized query - only select needed fields
-    const portfolio = await prisma.portfolio.findUnique({
-      where: { 
-        slug, 
-        isPublic: true 
+    const portfolio = await prisma.portfolio.findFirst({
+      where: {
+        slug,
+        isPublic: true,
       },
       select: {
         id: true,
@@ -127,6 +151,7 @@ export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfoli
 
     // ⚡ Simplified analytics - only increment view count, no background operations
     try {
+      const prisma = requirePrisma();
       await prisma.portfolio.update({
         where: { id: portfolio.id },
         data: { views: { increment: 1 } },
@@ -145,6 +170,7 @@ export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfoli
 
 export async function getUserPortfolio(userId: string, userEmail?: string, testNewUser?: boolean): Promise<DatabasePortfolio | null> {
   try {
+    const prisma = requirePrisma();
     // Developer bypass: If developer is in test mode, return null to enable new user flow
     const isDeveloper = userEmail === 'ishan.pathak2711@gmail.com';
     if (isDeveloper && testNewUser) {
@@ -181,6 +207,7 @@ export async function getUserPortfolio(userId: string, userEmail?: string, testN
 
 export async function deleteUserPortfolio(userId: string): Promise<boolean> {
   try {
+    const prisma = requirePrisma();
     await prisma.portfolio.delete({
       where: { userId },
     });
@@ -223,6 +250,7 @@ function generateUniqueSlug(name: string): string {
 }
 
 export async function getPopularPortfolios(limit: number = 10): Promise<DatabasePortfolio[]> {
+  const prisma = requirePrisma();
   const portfolios = await prisma.portfolio.findMany({
     where: { isPublic: true },
     orderBy: { views: 'desc' },
@@ -234,6 +262,7 @@ export async function getPopularPortfolios(limit: number = 10): Promise<Database
 }
 
 export async function getRecentPortfolios(limit: number = 10): Promise<DatabasePortfolio[]> {
+  const prisma = requirePrisma();
   const portfolios = await prisma.portfolio.findMany({
     where: { isPublic: true },
     orderBy: { createdAt: 'desc' },

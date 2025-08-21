@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { prisma } from '@/lib/prisma';
+import { requirePrisma } from '@/lib/prisma';
 import { NextRequest } from 'next/server';
 
 // Force dynamic execution so build doesn't try to prerender this route
@@ -23,6 +23,7 @@ function parseTokenUserId(authHeader: string | null): { userId: string | null } 
 export async function GET(req: NextRequest) {
   try {
     // Prefer DB announcements
+    const prisma = requirePrisma();
     const db = await prisma.announcement.findMany({ orderBy: { createdAt: 'desc' }, take: 50 });
     const auth = parseTokenUserId(req.headers.get('Authorization'));
     let readMap: Record<string, boolean> = {};
