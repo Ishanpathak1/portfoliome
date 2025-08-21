@@ -426,7 +426,9 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
           {/* About Section */}
           {summary && (
             <section className="mb-8 lg:mb-12">
-              <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 pb-2 lg:pb-3 border-b border-gray-700 text-center lg:text-left inline-block mx-auto lg:mx-0">About</h2>
+              <div className="flex justify-center lg:justify-start">
+                <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 pb-2 lg:pb-3 border-b border-gray-700">About</h2>
+              </div>
               <p className="text-gray-300 text-base lg:text-lg leading-relaxed">{summary}</p>
             </section>
           )}

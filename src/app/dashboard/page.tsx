@@ -87,6 +87,7 @@ function DashboardContent() {
   const [extraPrompt, setExtraPrompt] = useState('');
   const [clBlocks, setClBlocks] = useState<{ greeting: string; intro: string; bodyParas: string[]; closing: string; signoff: string } | null>(null);
   const [clCompany, setClCompany] = useState('');
+  const [clRole, setClRole] = useState('');
   const [clStatus, setClStatus] = useState<'Applied' | 'Approved' | 'Rejected' | 'Waiting'>('Waiting');
   const [clLoading, setClLoading] = useState(false);
   const [clEditMode, setClEditMode] = useState(false);
@@ -986,7 +987,7 @@ function DashboardContent() {
                         <div className="flex items-end justify-between">
                           <div>
                             <input className="text-2xl font-extrabold text-gray-900 w-full" value={editedResumeData?.contact?.name || ''} onChange={(e)=> setEditedResumeData(prev => prev ? ({ ...prev, contact: { ...prev.contact, name: e.target.value } }) : prev)} placeholder="Your Name" />
-                            <div className="text-gray-600">{editedResumeData?.summary ? 'Professional Summary' : 'Professional'}</div>
+                            <input className="text-gray-600 w-full" value={clRole} onChange={(e)=> setClRole(e.target.value)} placeholder="Role you’re applying for (e.g., Frontend Engineer)" />
                           </div>
                           <div className="text-xs text-gray-500 text-right">
                             <div className="flex flex-wrap gap-x-3 gap-y-1 justify-end">
@@ -1030,6 +1031,7 @@ function DashboardContent() {
                                 if (editedResumeData?.contact?.location) params.set('location', editedResumeData.contact.location);
                                 if (editedResumeData?.contact?.linkedin) params.set('linkedin', editedResumeData.contact.linkedin);
                                 params.set('company', clCompany || 'Company Name');
+                                if (clRole) params.set('role', clRole);
                                 params.set('greeting', clBlocks?.greeting || 'Dear Hiring Manager,');
                                 params.set('intro', clBlocks?.intro || 'I am excited to apply...');
                                 (clBlocks?.bodyParas || []).forEach(p => params.append('bp', p));

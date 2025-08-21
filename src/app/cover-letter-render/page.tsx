@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import EditableText from '@/components/EditableText';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,7 @@ export default function CoverLetterRenderPage({ searchParams }: Props) {
   const location = (searchParams.location as string) || '';
   const linkedin = (searchParams.linkedin as string) || '';
   const company = (searchParams.company as string) || 'Company Name';
+  const role = (searchParams.role as string) || (searchParams.position as string) || 'Professional';
   const greeting = (searchParams.greeting as string) || 'Dear Hiring Manager,';
   const intro = (searchParams.intro as string) || 'I am excited to apply...';
   const closing = (searchParams.closing as string) || '';
@@ -38,7 +40,7 @@ export default function CoverLetterRenderPage({ searchParams }: Props) {
             <div className="flex items-end justify-between">
               <div>
                 <div className="text-3xl font-extrabold text-gray-900">{name}</div>
-                <div className="text-gray-600">Professional</div>
+                <EditableText value={role} className="text-gray-600 outline-none" disabled={pdf} />
               </div>
               <div className="text-sm text-gray-500 text-right">
                 <div className="flex flex-wrap gap-x-4 gap-y-1 justify-end">
