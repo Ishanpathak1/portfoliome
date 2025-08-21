@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const maxDuration = 30;
 
 export async function GET(request: NextRequest) {
 	let browser: any = null;
@@ -11,17 +12,32 @@ export async function GET(request: NextRequest) {
 		const origin = new URL(request.url).origin;
 		const { default: puppeteer } = await import('puppeteer-core');
 		const { default: chromium } = await import('@sparticuz/chromium');
-		const executablePath = await chromium.executablePath();
-		browser = await puppeteer.launch({
-			args: [
-				...chromium.args,
-				'--font-render-hinting=none',
-				'--disable-gpu',
-			],
-			defaultViewport: chromium.defaultViewport,
-			executablePath,
-			headless: chromium.headless ?? true
-		});
+		// Ensure serverless-friendly modes
+		(chromium as any).setHeadlessMode = true;
+		(chromium as any).setGraphicsMode = false;
+
+		const browserWSEndpoint = process.env.BROWSER_WS_ENDPOINT || process.env.BROWSERLESS_WS;
+		if (browserWSEndpoint) {
+			browser = await puppeteer.connect({ browserWSEndpoint });
+		} else {
+			const executablePath = await chromium.executablePath();
+			browser = await puppeteer.launch({
+				args: [
+					...chromium.args,
+					'--no-sandbox',
+					'--disable-setuid-sandbox',
+					'--disable-dev-shm-usage',
+					'--no-zygote',
+					'--single-process',
+					'--font-render-hinting=none',
+					'--disable-gpu',
+				],
+				defaultViewport: chromium.defaultViewport,
+				executablePath,
+				headless: (chromium as any).headless ?? true,
+				ignoreHTTPSErrors: true,
+			});
+		}
 		const page = await browser.newPage();
 		await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
 		await page.emulateMediaType('print');
