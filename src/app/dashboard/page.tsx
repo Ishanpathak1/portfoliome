@@ -100,6 +100,12 @@ function DashboardContent() {
   const [showTemplateTextEditor, setShowTemplateTextEditor] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+  // Settings: Update from Resume
+  const [resumeUpdateMode, setResumeUpdateMode] = useState<'merge' | 'replace'>('merge');
+  const [resumeUpdateLoading, setResumeUpdateLoading] = useState(false);
+  const [resumeUpdateError, setResumeUpdateError] = useState<string | null>(null);
+  const [resumeUpdateSummary, setResumeUpdateSummary] = useState<{ experience: number; projects: number; education: number; skills: number } | null>(null);
+
   // Toast notifications
   const { toasts, removeToast, showSuccess, showError } = useToast();
   // Notification center
@@ -123,6 +129,60 @@ function DashboardContent() {
         website: resumeData?.contact?.website || ''
       }
     };
+  };
+
+  const mergeResumeData = (currentData: ResumeData, parsed: ResumeData): ResumeData => {
+    const merged: ResumeData = {
+      ...currentData,
+      contact: { ...currentData.contact, ...parsed.contact },
+      summary: parsed.summary || currentData.summary,
+      experience: parsed.experience && parsed.experience.length > 0 ? parsed.experience : currentData.experience,
+      education: parsed.education && parsed.education.length > 0 ? parsed.education : currentData.education,
+      projects: parsed.projects && parsed.projects.length > 0 ? parsed.projects : currentData.projects,
+      skills: parsed.skills && parsed.skills.length > 0 ? parsed.skills : currentData.skills,
+    };
+    return ensureResumeDataStructure(merged);
+  };
+
+  const handleResumeUpdateUpload = async (file: File) => {
+    setResumeUpdateError(null);
+    setResumeUpdateSummary(null);
+    setResumeUpdateLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/parse-resume', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to parse resume');
+      }
+
+      const data = await response.json();
+      const parsed: ResumeData = ensureResumeDataStructure(data.data);
+
+      const current = editedResumeData || portfolio?.resumeData || ({} as ResumeData);
+      const next = resumeUpdateMode === 'replace' ? parsed : mergeResumeData(current as ResumeData, parsed);
+      setEditedResumeData(next);
+
+      setResumeUpdateSummary({
+        experience: parsed.experience.length,
+        projects: parsed.projects.length,
+        education: parsed.education.length,
+        skills: parsed.skills.length,
+      });
+      showSuccess('Resume parsed. Review changes and Save Settings to apply.');
+    } catch (e: any) {
+      console.error('Resume update failed', e);
+      setResumeUpdateError(e.message || 'Failed to update from resume');
+      showError('Failed to update from resume');
+    } finally {
+      setResumeUpdateLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -2171,6 +2231,68 @@ function DashboardContent() {
                       </div>
                       <div className="text-green-400 font-medium">Public</div>
                     </div>
+                  </div>
+                </div>
+
+                {/* Update from Resume */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-medium text-white mb-4">Update from Resume</h3>
+                  <div className="bg-white/5 rounded-xl p-4 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="text-gray-300 text-sm">Upload a new resume to refresh your portfolio content.</div>
+                      <div className="flex items-center gap-3">
+                        <label className="inline-flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
+                          <input
+                            type="radio"
+                            name="resume-update-mode"
+                            checked={resumeUpdateMode === 'merge'}
+                            onChange={() => setResumeUpdateMode('merge')}
+                          />
+                          <span>Merge</span>
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
+                          <input
+                            type="radio"
+                            name="resume-update-mode"
+                            checked={resumeUpdateMode === 'replace'}
+                            onChange={() => setResumeUpdateMode('replace')}
+                          />
+                          <span>Replace</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        accept=".pdf,.docx,.txt"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleResumeUpdateUpload(file);
+                          }
+                          // Reset so same file can be reselected if needed
+                          e.currentTarget.value = '' as any;
+                        }}
+                        disabled={resumeUpdateLoading}
+                        className="hidden"
+                        id="settings-resume-upload"
+                      />
+                      <label
+                        htmlFor="settings-resume-upload"
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${resumeUpdateLoading ? 'bg-gray-600 text-gray-300' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+                      >
+                        <Upload className="w-4 h-4" />
+                        <span>{resumeUpdateLoading ? 'Processing…' : 'Upload Resume'}</span>
+                      </label>
+                      {resumeUpdateError && <span className="text-red-400 text-sm">{resumeUpdateError}</span>}
+                    </div>
+
+                    {resumeUpdateSummary && (
+                      <div className="text-gray-300 text-sm">
+                        Parsed: {resumeUpdateSummary.experience} experience, {resumeUpdateSummary.projects} projects, {resumeUpdateSummary.education} education, {resumeUpdateSummary.skills} skill groups.
+                      </div>
+                    )}
                   </div>
                 </div>
 
