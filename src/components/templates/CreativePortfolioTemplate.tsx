@@ -896,7 +896,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
 
             {section.type === 'list' && (
               <ul className="space-y-6">
-                {section.items?.map((item: string, index: number) => (
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                   <li key={index} className="flex items-start gap-4">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center mt-1">
                       <Star className="w-4 h-4 text-white" />
@@ -911,7 +911,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
 
             {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
               <div className="space-y-8">
-                {section.items?.map((item: any, index: number) => (
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                   <div key={index} className="border-l-8 pl-6 py-4" style={{ borderColor: colors.accent }}>
                     <h3 className="text-2xl font-black mb-2" style={{ color: colors.ink }}>
                       {item.title}

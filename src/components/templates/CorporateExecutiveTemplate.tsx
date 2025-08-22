@@ -381,7 +381,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
             
             {section.type === 'list' && (
               <div className="space-y-4">
-                {section.items?.map((item: string, index: number) => (
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                   <div key={index} className="flex items-start space-x-3">
                     <ChevronRight className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: colors.accent }} />
                     <span className="text-gray-700">{item}</span>
@@ -392,7 +392,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
             
             {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
               <div className="space-y-6">
-                {section.items?.map((item: any, index: number) => (
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                   <div key={index} className="border-l-4 pl-6" style={{ borderColor: colors.accent }}>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
                     {item.description && (

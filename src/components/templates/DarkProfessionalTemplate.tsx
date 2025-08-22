@@ -250,7 +250,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
           
           {section.type === 'list' && (
             <ul className="space-y-2">
-              {section.items?.map((item: string, index: number) => (
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                 <li key={index} className="text-gray-300 flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0" style={{ backgroundColor: currentColors.accent }}></span>
                   {item}
@@ -261,7 +261,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
           
           {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
             <div className="space-y-4">
-              {section.items?.map((item: any, index: number) => (
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                 <div key={index} className="border-l-4 pl-6" style={{ borderColor: currentColors.accent }}>
                   <h3 className="text-lg font-semibold text-white">{item.title}</h3>
                   {item.description && (

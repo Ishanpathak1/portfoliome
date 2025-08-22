@@ -675,7 +675,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
               
               {section.type === 'list' && (
                 <ul className="space-y-4">
-                  {section.items?.map((item: string, index: number) => (
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                     <li key={index} className="flex items-start gap-4">
                       <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${themeColors.primary} mt-2 flex-shrink-0`} />
                       <span className="text-gray-300 text-lg">{item}</span>
@@ -686,7 +686,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
               
               {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
                 <div className="space-y-6">
-                  {section.items?.map((item: any, index: number) => (
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                     <div key={index} className={`border-l-4 border-gradient-to-b ${themeColors.primary} pl-6 py-4`}>
                       <h3 className="text-2xl font-bold text-white mb-2">{item.title}</h3>
                       {item.description && (

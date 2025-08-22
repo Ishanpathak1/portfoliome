@@ -908,7 +908,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
 
               {section.type === 'list' && (
                 <ul className="space-y-4 md:space-y-6">
-                  {section.items?.map((item: string, index: number) => (
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                     <li key={index} className="flex items-start gap-4">
                       <div className="w-3 h-3 rounded-full mt-3 animate-pulse flex-shrink-0" style={{ backgroundColor: colors.neon }} />
                       <span className="text-gray-300 text-sm md:text-lg">{item}</span>
@@ -919,7 +919,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
 
               {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
                 <div className="space-y-6 md:space-y-8">
-                  {section.items?.map((item: any, index: number) => (
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                     <div key={index} className="border-l-4 pl-4 md:pl-6 py-4" style={{ borderLeftColor: colors.accent }}>
                       <h3 className="text-lg md:text-2xl font-black text-white mb-2">{item.title}</h3>
                       {item.description && (

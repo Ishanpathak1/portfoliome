@@ -85,6 +85,15 @@ export function SectionManager({
     };
 
     onUpdateResumeData(updatedResumeData);
+
+    // Ensure new custom section appears in templates that rely on sectionOrder
+    if (onSectionOrderChange) {
+      const currentOrder = sectionOrder.length > 0
+        ? sectionOrder
+        : allSections.map(s => s.id);
+      const newOrder = [...currentOrder, newSection.id];
+      onSectionOrderChange(newOrder);
+    }
     
     // Reset form
     setNewSectionTitle('');

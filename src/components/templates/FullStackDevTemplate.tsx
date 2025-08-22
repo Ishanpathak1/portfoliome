@@ -892,7 +892,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                     &gt; ls -la {section.title.toLowerCase()}/
                   </div>
                   <ul className="space-y-3">
-                    {section.items?.map((item: string, index: number) => (
+                    {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                       <li key={index} className="flex items-start space-x-3">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0" />
                         <span className="text-cyan-400 font-mono text-xs md:text-sm">{item}</span>
@@ -908,7 +908,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                     &gt; cat {section.title.toLowerCase()}.log
                   </div>
                   <div className="space-y-6">
-                    {section.items?.map((item: any, index: number) => (
+                    {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                       <div key={index} className="border-l-2 border-cyan-500 pl-4 md:pl-6">
                         <h3 className="text-sm md:text-lg font-mono font-bold text-purple-400 mb-2">
                           {item.title}

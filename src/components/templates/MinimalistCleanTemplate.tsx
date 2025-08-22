@@ -527,7 +527,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
           
           {section.type === 'list' && (
             <ul className="space-y-3">
-              {section.items?.map((item: string, index: number) => (
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                 <li key={index} className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'} flex items-start`}>
                   <span 
                     className="w-1.5 h-1.5 rounded-full mt-2 mr-3 flex-shrink-0"
@@ -541,7 +541,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
           
           {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
             <div className="space-y-6">
-              {section.items?.map((item: any, index: number) => (
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                 <div key={index} className={`border-l-4 pl-6`} style={{ borderLeftColor: colors.primary }}>
                   <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>
                     {item.title}

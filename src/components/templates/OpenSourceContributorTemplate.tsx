@@ -579,7 +579,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
 
             {section.type === 'list' && (
               <ul className="space-y-4">
-                {section.items?.map((item: string, index: number) => (
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                   <li key={index} className="flex items-start space-x-3">
                     <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: colors.primary }} />
                     <span className="text-lg" style={{ color: colors.textSecondary }}>{item}</span>
@@ -590,7 +590,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
 
             {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
               <div className="space-y-8">
-                {section.items?.map((item: any, index: number) => (
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                   <div key={index} className="border-l-4 pl-6" style={{ borderLeftColor: colors.primary }}>
                     <h3 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>{item.title}</h3>
                     {item.description && (
