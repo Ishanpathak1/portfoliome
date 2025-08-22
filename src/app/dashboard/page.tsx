@@ -364,6 +364,15 @@ function DashboardContent() {
         setTimeout(() => reject(new Error('Request timed out')), 12000); // 12 second timeout
       });
 
+      // Sanitize resume data before saving (e.g., remove empty technologies from projects)
+      const sanitizedResumeData = editedResumeData ? {
+        ...editedResumeData,
+        projects: (editedResumeData.projects || []).map((p) => ({
+          ...p,
+          technologies: (p.technologies || []).map(t => t.trim()).filter(t => t),
+        })),
+      } : editedResumeData;
+
       const fetchPromise = fetch('/api/update-portfolio', {
         method: 'PUT',
         headers: {
@@ -373,7 +382,7 @@ function DashboardContent() {
         body: JSON.stringify({
           slug: editedSlug !== portfolio.slug ? editedSlug : undefined,
           personalization: editedPersonalization,
-          resumeData: editedResumeData
+          resumeData: sanitizedResumeData
         })
       });
 
@@ -1579,7 +1588,7 @@ function DashboardContent() {
                                 <input
                                   type="text"
                                   value={(project.technologies || []).join(', ')}
-                                  onChange={(e) => updateProject(index, 'technologies', e.target.value.split(',').map(t => t.trim()).filter(t => t))}
+                                  onChange={(e) => updateProject(index, 'technologies', e.target.value.split(',').map(t => t.trim()))}
                                   className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                                   placeholder="React, Node.js, MongoDB"
                                 />
