@@ -708,16 +708,16 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
           <div className="p-6 border-t border-gray-200 dark:border-gray-700">
             <div className="space-y-3 text-sm">
               {resumeData.contact?.email && (
-                <div className={`flex items-center space-x-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                <a href={`mailto:${resumeData.contact.email}`} className={`flex items-center space-x-2 ${isDark ? 'text-gray-300' : 'text-gray-600'} hover:underline`}>
                   <Mail className="w-4 h-4" />
                   <span className="truncate">{resumeData.contact.email}</span>
-                </div>
+                </a>
               )}
               {resumeData.contact?.phone && (
-                <div className={`flex items-center space-x-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                <a href={`tel:${resumeData.contact.phone}`} className={`flex items-center space-x-2 ${isDark ? 'text-gray-300' : 'text-gray-600'} hover:underline`}>
                   <Phone className="w-4 h-4" />
                   <span>{resumeData.contact.phone}</span>
-                </div>
+                </a>
               )}
               {resumeData.contact?.location && (
                 <div className={`flex items-center space-x-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>

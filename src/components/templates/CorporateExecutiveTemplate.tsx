@@ -483,16 +483,16 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
               {/* Contact Info */}
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6">
                 {resumeData.contact?.email && (
-                  <div className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base">
+                  <a href={`mailto:${resumeData.contact.email}`} className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base hover:underline">
                     <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span className="break-all">{resumeData.contact.email}</span>
-                  </div>
+                  </a>
                 )}
                 {resumeData.contact?.phone && (
-                  <div className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base">
+                  <a href={`tel:${resumeData.contact.phone}`} className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base hover:underline">
                     <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span>{resumeData.contact.phone}</span>
-                  </div>
+                  </a>
                 )}
                 {resumeData.contact?.location && (
                   <div className="flex items-center space-x-2 sm:space-x-3 text-white/80 text-sm sm:text-base">

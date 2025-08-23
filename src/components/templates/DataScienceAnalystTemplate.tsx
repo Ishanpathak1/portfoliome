@@ -186,16 +186,16 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
               {/* Contact Info */}
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                 {contact?.email && (
-                  <div className="flex items-center space-x-2">
+                  <a href={`mailto:${contact.email}`} className="flex items-center space-x-2 hover:underline">
                     <Mail className="w-4 h-4" />
                     <span>{contact.email}</span>
-                  </div>
+                  </a>
                 )}
                 {contact?.phone && (
-                  <div className="flex items-center space-x-2">
+                  <a href={`tel:${contact.phone}`} className="flex items-center space-x-2 hover:underline">
                     <Phone className="w-4 h-4" />
                     <span>{contact.phone}</span>
-                  </div>
+                  </a>
                 )}
                 {contact?.location && (
                   <div className="flex items-center space-x-2">
@@ -204,16 +204,26 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
                   </div>
                 )}
                 {contact?.linkedin && (
-                  <div className="flex items-center space-x-2">
+                  <a
+                    href={contact.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 hover:underline"
+                  >
                     <Linkedin className="w-4 h-4" />
                     <span>LinkedIn</span>
-                  </div>
+                  </a>
                 )}
                 {contact?.github && (
-                  <div className="flex items-center space-x-2">
+                  <a
+                    href={contact.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 hover:underline"
+                  >
                     <Github className="w-4 h-4" />
                     <span>GitHub</span>
-                  </div>
+                  </a>
                 )}
               </div>
             </div>
