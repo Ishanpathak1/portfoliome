@@ -31,6 +31,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // Experience Section
   const renderExperienceSection = () => {
@@ -235,20 +236,21 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
 
   // Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section className="mb-12">
         <h2 className="text-3xl font-bold mb-6 pb-3 border-b border-gray-700 flex items-center">
           <Award className="w-8 h-8 mr-3" style={{ color: currentColors.accent }} />
           {section.title}
         </h2>
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className={style === 'cards' ? '' : 'bg-gray-800 rounded-lg p-6 border border-gray-700'}>
           {section.type === 'text' && (
             <p className="text-gray-300 leading-relaxed">
               {section.content}
             </p>
           )}
-          
-          {section.type === 'list' && (
+
+          {section.type === 'list' && style === 'grouped' && (
             <ul className="space-y-2">
               {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                 <li key={index} className="text-gray-300 flex items-start">
@@ -258,8 +260,21 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
               ))}
             </ul>
           )}
-          
-          {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
+
+          {section.type === 'list' && style === 'cards' && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                <div key={index} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: currentColors.accent }}></span>
+                    <span className="text-gray-300">{item}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'grouped' && (
             <div className="space-y-4">
               {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                 <div key={index} className="border-l-4 pl-6" style={{ borderColor: currentColors.accent }}>
@@ -269,6 +284,25 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                   )}
                   {item.date && (
                     <div className="flex items-center text-gray-400 text-sm mt-2">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>{formatDate(item.date)}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'cards' && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                <div key={index} className="bg-gray-900 rounded-lg p-5 border border-gray-700">
+                  <h3 className="text-lg font-semibold text-white mb-1">{item.title}</h3>
+                  {item.description && (
+                    <p className="text-gray-300 text-sm">{item.description}</p>
+                  )}
+                  {item.date && (
+                    <div className="flex items-center text-gray-400 text-xs mt-3">
                       <Calendar className="w-4 h-4 mr-1" />
                       <span>{formatDate(item.date)}</span>
                     </div>

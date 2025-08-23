@@ -59,6 +59,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // Terminal commands simulation
   const commands = [
@@ -863,6 +864,36 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
 
   // Enhanced Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
+    if (section.type === 'list' && style === 'cards') {
+      return (
+        <section className="py-12 md:py-20 bg-black relative overflow-hidden">
+          <div className="container mx-auto px-4 md:px-8 relative z-10">
+            <div className="text-center mb-12 md:mb-16">
+              <h2 className="text-2xl md:text-4xl font-mono font-bold text-cyan-400 mb-4">
+                &gt; cat /{section.title.toLowerCase()}.txt
+              </h2>
+              <div className="w-48 md:w-64 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto" />
+            </div>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                  <HolographicCard key={index} className="p-4 md:p-8">
+                    <div className="text-green-400 font-mono text-xs md:text-sm mb-2">
+                      &gt; item {index + 1}
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0" />
+                      <span className="text-cyan-400 font-mono text-xs md:text-sm">{item}</span>
+                    </div>
+                  </HolographicCard>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
     return (
       <section className="py-12 md:py-20 bg-black relative overflow-hidden">
         <div className="container mx-auto px-4 md:px-8 relative z-10">
@@ -886,7 +917,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                 </div>
               )}
 
-              {section.type === 'list' && (
+              {section.type === 'list' && style === 'grouped' && (
                 <div>
                   <div className="text-green-400 font-mono text-xs md:text-sm mb-4">
                     &gt; ls -la {section.title.toLowerCase()}/

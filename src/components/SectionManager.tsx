@@ -11,6 +11,8 @@ interface SectionManagerProps {
   hiddenSections?: string[];
   onSectionOrderChange?: (order: string[]) => void;
   onHiddenSectionsChange?: (hidden: string[]) => void;
+  sectionRenderStyle?: { [sectionId: string]: 'grouped' | 'cards' };
+  onSectionRenderStyleChange?: (styleMap: { [sectionId: string]: 'grouped' | 'cards' }) => void;
 }
 
 const DEFAULT_SECTIONS = [
@@ -39,13 +41,19 @@ export function SectionManager({
   sectionOrder = [], 
   hiddenSections = [],
   onSectionOrderChange,
-  onHiddenSectionsChange 
+  onHiddenSectionsChange,
+  sectionRenderStyle = {},
+  onSectionRenderStyleChange
 }: SectionManagerProps) {
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [newSectionType, setNewSectionType] = useState<'text' | 'list'>('text');
   const [newSectionTitle, setNewSectionTitle] = useState('');
   const [newSectionContent, setNewSectionContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editType, setEditType] = useState<'text' | 'list'>('text');
+  const [editTextContent, setEditTextContent] = useState('');
+  const [editListItems, setEditListItems] = useState<string[]>([]);
 
   const customSections = resumeData.customSections || [];
   
@@ -154,6 +162,38 @@ export function SectionManager({
       : [...hiddenSections, sectionId];
     
     onHiddenSectionsChange(newHidden);
+  };
+
+  const setRenderStyle = (sectionId: string, style: 'grouped' | 'cards') => {
+    if (!onSectionRenderStyleChange) return;
+    const updated = { ...sectionRenderStyle, [sectionId]: style };
+    onSectionRenderStyleChange(updated);
+  };
+
+  const beginEditSection = (sectionId: string) => {
+    const section = customSections.find(s => s.id === sectionId);
+    if (!section) return;
+    setEditingSection(sectionId);
+    setEditTitle(section.title || '');
+    const normalizedType: 'text' | 'list' = section.type === 'list' ? 'list' : 'text';
+    setEditType(normalizedType);
+    if (normalizedType === 'list') {
+      setEditListItems(Array.isArray(section.content) ? section.content as string[] : (section.content ? [String(section.content)] : []));
+      setEditTextContent('');
+    } else {
+      setEditTextContent(typeof section.content === 'string' ? section.content : (Array.isArray(section.content) ? (section.content as string[]).join('\n') : ''));
+      setEditListItems([]);
+    }
+  };
+
+  const saveEditSection = (sectionId: string) => {
+    const updates: Partial<CustomSection> = {
+      title: editTitle,
+      type: editType,
+      content: editType === 'list' ? editListItems.filter(item => item.trim()) : editTextContent
+    };
+    updateCustomSection(sectionId, updates);
+    setEditingSection(null);
   };
 
   return (
@@ -291,6 +331,31 @@ export function SectionManager({
                 </div>
 
                 <div className="flex items-center space-x-2">
+                  {/* Render Style (custom sections only) */}
+                  {isCustom && onSectionRenderStyleChange ? (
+                    <div className="flex items-center space-x-1 mr-2">
+                      <button
+                        onClick={() => setRenderStyle(section.id, 'grouped')}
+                        className={`px-2 py-1 text-xs rounded-md ${
+                          (sectionRenderStyle[section.id] || 'grouped') === 'grouped'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-white/10 text-white/70 hover:bg-white/15'
+                        }`}
+                      >
+                        Grouped
+                      </button>
+                      <button
+                        onClick={() => setRenderStyle(section.id, 'cards')}
+                        className={`px-2 py-1 text-xs rounded-md ${
+                          sectionRenderStyle[section.id] === 'cards'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-white/10 text-white/70 hover:bg-white/15'
+                        }`}
+                      >
+                        Cards
+                      </button>
+                    </div>
+                  ) : null}
                   {/* Move Up/Down */}
                   <button
                     onClick={() => moveSection(section.id, 'up')}
@@ -320,7 +385,7 @@ export function SectionManager({
                   {/* Edit Custom Section */}
                   {isCustom ? (
                     <button
-                      onClick={() => setEditingSection(section.id)}
+                      onClick={() => beginEditSection(section.id)}
                       className="p-1 text-white/70 hover:text-white"
                     >
                       <Edit3 className="w-4 h-4" />
@@ -342,12 +407,120 @@ export function SectionManager({
               {/* Custom Section Content Preview */}
               {isCustom && customSection ? (
                 <div className="mt-3 pt-3 border-t border-white/20">
-                  <div className="text-gray-300 text-sm">
-                    {Array.isArray(customSection.content) 
-                      ? customSection.content.slice(0, 3).join(', ') + (customSection.content.length > 3 ? '...' : '')
-                      : customSection.content.slice(0, 100) + (customSection.content.length > 100 ? '...' : '')
-                    }
-                  </div>
+                  {editingSection === section.id ? (
+                    <div className="space-y-3">
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-white mb-1 text-sm">Title</label>
+                          <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white mb-1 text-sm">Content Type</label>
+                          <select
+                            value={editType}
+                            onChange={(e) => {
+                              const next = e.target.value as 'text' | 'list';
+                              if (next === 'list' && editType === 'text') {
+                                const fromText = editTextContent
+                                  ? editTextContent.split('\n').map(s => s.trim()).filter(Boolean)
+                                  : [];
+                                setEditListItems(fromText);
+                                setEditTextContent('');
+                              }
+                              if (next === 'text' && editType === 'list') {
+                                setEditTextContent(editListItems.join('\n'));
+                                setEditListItems([]);
+                              }
+                              setEditType(next);
+                            }}
+                            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                          >
+                            <option value="text">Text</option>
+                            <option value="list">Cards / List</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {editType === 'text' && (
+                        <div>
+                          <label className="block text-white mb-1 text-sm">Text Content</label>
+                          <textarea
+                            rows={5}
+                            value={editTextContent}
+                            onChange={(e) => setEditTextContent(e.target.value)}
+                            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                          />
+                        </div>
+                      )}
+
+                      {editType === 'list' && (
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-white text-sm">Cards</label>
+                            <button
+                              onClick={() => setEditListItems([...editListItems, ''])}
+                              className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
+                            >
+                              Add Card
+                            </button>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {editListItems.map((item, i) => (
+                              <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
+                                <div className="text-white/70 text-xs">Card {i + 1}</div>
+                                <input
+                                  type="text"
+                                  value={item}
+                                  onChange={(e) => {
+                                    const next = [...editListItems];
+                                    next[i] = e.target.value;
+                                    setEditListItems(next);
+                                  }}
+                                  placeholder={`Enter content for card ${i + 1}`}
+                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                />
+                                <div className="flex justify-end">
+                                  <button
+                                    onClick={() => setEditListItems(editListItems.filter((_, idx) => idx !== i))}
+                                    className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => saveEditSection(section.id)}
+                          className="px-4 py-2 bg-green-600 text-white rounded-lg"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingSection(null)}
+                          className="px-4 py-2 bg-gray-600 text-white rounded-lg"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-gray-300 text-sm">
+                      {Array.isArray(customSection.content) 
+                        ? customSection.content.slice(0, 3).join(', ') + (customSection.content.length > 3 ? '...' : '')
+                        : customSection.content.slice(0, 100) + (customSection.content.length > 100 ? '...' : '')
+                      }
+                    </div>
+                  )}
                 </div>
               ) : null}
             </div>

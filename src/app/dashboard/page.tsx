@@ -2135,6 +2135,15 @@ function DashboardContent() {
                         });
                       }
                     }}
+                    sectionRenderStyle={editedPersonalization?.sectionRenderStyle || {}}
+                    onSectionRenderStyleChange={(styleMap) => {
+                      if (editedPersonalization) {
+                        setEditedPersonalization({
+                          ...editedPersonalization,
+                          sectionRenderStyle: styleMap
+                        });
+                      }
+                    }}
                   />
                 </div>
 

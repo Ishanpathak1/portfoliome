@@ -83,6 +83,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // Experience Section
   const renderExperienceSection = () => {
@@ -361,6 +362,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
 
   // Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section className={`py-24 bg-gradient-to-b ${colors.gradient} fade-in-section`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -372,19 +374,32 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                  style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.accent}60)` }} />
           </div>
           
-          <div className="bg-white rounded-3xl p-8 shadow-lg">
+          <div className={style === 'cards' ? '' : 'bg-white rounded-3xl p-8 shadow-lg'}>
             {section.type === 'text' && (
               <p className="text-lg text-gray-700 leading-relaxed">
                 {section.content}
               </p>
             )}
             
-            {section.type === 'list' && (
+            {section.type === 'list' && style === 'grouped' && (
               <div className="space-y-4">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                   <div key={index} className="flex items-start space-x-3">
                     <ChevronRight className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: colors.accent }} />
                     <span className="text-gray-700">{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {section.type === 'list' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                  <div key={index} className="bg-white rounded-2xl p-6 shadow border border-gray-200">
+                    <div className="flex items-start gap-3">
+                      <ChevronRight className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: colors.accent }} />
+                      <span className="text-gray-700">{item}</span>
+                    </div>
                   </div>
                 ))}
               </div>

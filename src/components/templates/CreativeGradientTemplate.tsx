@@ -51,6 +51,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // Experience Section
   const renderExperienceSection = () => {
@@ -382,6 +383,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
 
   // Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section className="py-12 md:py-16 lg:py-20 px-6">
         <div className="max-w-7xl mx-auto">
@@ -391,19 +393,32 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
             {section.title}
           </h2>
           
-          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-6 md:p-8 shadow-xl`}>
+          <div className={style === 'cards' ? '' : `${isDark ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-6 md:p-8 shadow-xl`}>
             {section.type === 'text' && (
               <p className={`text-base md:text-lg ${isDark ? 'text-gray-300' : 'text-gray-700'} leading-relaxed`}>
                 {section.content}
               </p>
             )}
             
-            {section.type === 'list' && (
+            {section.type === 'list' && style === 'grouped' && (
               <div className="space-y-4">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                   <div key={index} className="flex items-start space-x-3">
                     <div className={`w-2 h-2 bg-gradient-to-r ${colors.accent} rounded-full mt-2 flex-shrink-0`}></div>
                     <span className={`${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {section.type === 'list' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                  <div key={index} className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 shadow-xl`}>
+                    <div className="flex items-start space-x-3">
+                      <div className={`w-2 h-2 bg-gradient-to-r ${colors.accent} rounded-full mt-2 flex-shrink-0`}></div>
+                      <span className={`${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{item}</span>
+                    </div>
                   </div>
                 ))}
               </div>

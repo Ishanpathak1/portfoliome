@@ -140,6 +140,8 @@ export function PersonalizationForm({ resumeData, personalization, onPersonaliza
             hiddenSections={formData.hiddenSections}
             onSectionOrderChange={(order) => updateFormData({ sectionOrder: order })}
             onHiddenSectionsChange={(hidden) => updateFormData({ hiddenSections: hidden })}
+            sectionRenderStyle={formData.sectionRenderStyle}
+            onSectionRenderStyleChange={(styleMap) => updateFormData({ sectionRenderStyle: styleMap })}
           />
         )}
 

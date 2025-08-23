@@ -109,6 +109,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // Enhanced Header Section
   const renderHeader = () => (
@@ -642,6 +643,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
 
   // Enhanced Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section className="py-20 relative overflow-hidden">
         {/* Section Background */}
@@ -666,14 +668,14 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
           </div>
           
           <div className="max-w-4xl mx-auto">
-            <div className={`${themeColors.glass} rounded-3xl p-8 border backdrop-blur-2xl`}>
+            <div className={style === 'cards' ? '' : `${themeColors.glass} rounded-3xl p-8 border backdrop-blur-2xl`}>
               {section.type === 'text' && (
                 <p className="text-gray-300 leading-relaxed text-xl">
                   {section.content}
                 </p>
               )}
               
-              {section.type === 'list' && (
+              {section.type === 'list' && style === 'grouped' && (
                 <ul className="space-y-4">
                   {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                     <li key={index} className="flex items-start gap-4">
@@ -683,8 +685,21 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                   ))}
                 </ul>
               )}
+
+              {section.type === 'list' && style === 'cards' && (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                    <div key={index} className={`${themeColors.glassDark} rounded-2xl p-6 border`}>
+                      <div className="flex items-start gap-3">
+                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${themeColors.primary} mt-2 flex-shrink-0`} />
+                        <span className="text-gray-300">{item}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               
-              {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
+              {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'grouped' && (
                 <div className="space-y-6">
                   {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                     <div key={index} className={`border-l-4 border-gradient-to-b ${themeColors.primary} pl-6 py-4`}>
@@ -694,6 +709,25 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                       )}
                       {item.date && (
                         <div className="flex items-center gap-2 text-gray-400">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(item.date)}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'cards' && (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                    <div key={index} className={`${themeColors.glassDark} rounded-2xl p-6 border`}>
+                      <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                      {item.description && (
+                        <p className="text-gray-300 mb-2">{item.description}</p>
+                      )}
+                      {item.date && (
+                        <div className="flex items-center gap-2 text-gray-400 text-sm">
                           <Calendar className="w-4 h-4" />
                           <span>{formatDate(item.date)}</span>
                         </div>

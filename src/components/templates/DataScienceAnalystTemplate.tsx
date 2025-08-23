@@ -37,6 +37,7 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // Analytics color schemes
   const getAnalyticsColors = (scheme: string) => {
@@ -503,6 +504,7 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
 
   // Custom Section
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section key={section.id} className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
@@ -513,16 +515,29 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
             <h2 className="text-3xl font-bold text-gray-900">{section.title}</h2>
           </div>
 
-          <div className="bg-gray-50 rounded-xl p-6">
+          <div className={style === 'cards' ? '' : 'bg-gray-50 rounded-xl p-6'}>
             {Array.isArray(section.content) ? (
-              <ul className="space-y-3">
-                {section.content.map((item: string, index: number) => (
-                  <li key={index} className="flex items-start space-x-3">
-                    <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: colors.primary }}></div>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
+              style === 'cards' ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {section.content.map((item: string, index: number) => (
+                    <div key={index} className="bg-white rounded-xl p-6 shadow border border-gray-100">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: colors.primary }}></div>
+                        <span className="text-gray-700">{item}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {section.content.map((item: string, index: number) => (
+                    <li key={index} className="flex items-start space-x-3">
+                      <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: colors.primary }}></div>
+                      <span className="text-gray-700">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )
             ) : (
               <p className="text-gray-700 leading-relaxed">{section.content}</p>
             )}

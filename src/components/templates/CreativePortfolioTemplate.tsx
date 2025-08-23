@@ -46,6 +46,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
   
   // Artistic color palettes
   const getArtisticColors = (scheme: string): ArtisticColors => {
@@ -870,6 +871,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
 
   // Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section className="py-20 px-8 relative bg-gradient-to-br from-purple-50 to-pink-50">
         <TornEdge top />
@@ -884,7 +886,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-8 shadow-2xl border-8 relative" style={{ borderColor: colors.accent }}>
+          <div className={style === 'cards' ? '' : 'bg-white rounded-3xl p-8 shadow-2xl border-8 relative'} style={style === 'cards' ? undefined : { borderColor: colors.accent }}>
             <div className="absolute -top-4 -right-4 w-8 h-8 bg-purple-400 rounded-full shadow-lg" />
             <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-pink-400 rounded-full shadow-lg" />
             
@@ -894,7 +896,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
               </p>
             )}
 
-            {section.type === 'list' && (
+            {section.type === 'list' && style === 'grouped' && (
               <ul className="space-y-6">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                   <li key={index} className="flex items-start gap-4">
@@ -909,7 +911,24 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
               </ul>
             )}
 
-            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
+            {section.type === 'list' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                  <div key={index} className="bg-white rounded-2xl p-6 shadow-xl border-2" style={{ borderColor: colors.accent }}>
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center mt-1">
+                        <Star className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-lg font-medium" style={{ color: colors.ink }}>
+                        {item}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'grouped' && (
               <div className="space-y-8">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                   <div key={index} className="border-l-8 pl-6 py-4" style={{ borderColor: colors.accent }}>
@@ -923,6 +942,29 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
                     )}
                     {item.date && (
                       <div className="flex items-center gap-2" style={{ color: colors.sketch }}>
+                        <Calendar className="w-4 h-4" />
+                        <span className="font-bold">{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className="bg-white rounded-2xl p-6 shadow-xl border-2" style={{ borderColor: colors.accent }}>
+                    <h3 className="text-xl font-black mb-1" style={{ color: colors.ink }}>
+                      {item.title}
+                    </h3>
+                    {item.description && (
+                      <p className="text-base mb-2" style={{ color: colors.sketch }}>
+                        {item.description}
+                      </p>
+                    )}
+                    {item.date && (
+                      <div className="flex items-center gap-2 text-sm" style={{ color: colors.sketch }}>
                         <Calendar className="w-4 h-4" />
                         <span className="font-bold">{formatDate(item.date)}</span>
                       </div>

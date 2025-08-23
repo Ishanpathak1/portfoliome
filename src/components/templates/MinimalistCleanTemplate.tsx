@@ -27,6 +27,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   const getThemeColors = (scheme: string) => {
     const colorMap = {
@@ -505,6 +506,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
   };
 
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section 
         id={section.id} 
@@ -518,14 +520,14 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
           {section.title}
         </h2>
         
-        <div className={`rounded-2xl p-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+        <div className={style === 'cards' ? '' : `rounded-2xl p-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
           {section.type === 'text' && (
             <p className={`text-lg leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               {section.content}
             </p>
           )}
           
-          {section.type === 'list' && (
+          {section.type === 'list' && style === 'grouped' && (
             <ul className="space-y-3">
               {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                 <li key={index} className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'} flex items-start`}>
@@ -537,6 +539,24 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                 </li>
               ))}
             </ul>
+          )}
+
+          {section.type === 'list' && style === 'cards' && (
+            <div className="grid md:grid-cols-2 gap-4">
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                <div key={index} className={`rounded-2xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm border`}
+                  style={{ borderColor: colors.primary }}
+                >
+                  <div className="flex items-start">
+                    <span 
+                      className="w-1.5 h-1.5 rounded-full mt-2 mr-3 flex-shrink-0"
+                      style={{ backgroundColor: colors.primary }}
+                    ></span>
+                    <span className={`${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{item}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
           
           {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (

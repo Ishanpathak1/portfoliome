@@ -44,6 +44,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // GitHub color schemes
   const getGitHubColors = (scheme: string): GitHubColors => {
@@ -563,6 +564,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
 
   // Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section className="py-20 px-8" style={{ backgroundColor: colors.background }}>
         <div className="max-w-4xl mx-auto">
@@ -570,14 +572,14 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
             {section.title}
           </h2>
 
-          <div className="border rounded-lg p-8" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+          <div className={style === 'cards' ? '' : 'border rounded-lg p-8'} style={style === 'cards' ? undefined : { backgroundColor: colors.surface, borderColor: colors.border }}>
             {section.type === 'text' && (
               <p className="text-lg leading-relaxed" style={{ color: colors.textSecondary }}>
                 {section.content}
               </p>
             )}
 
-            {section.type === 'list' && (
+            {section.type === 'list' && style === 'grouped' && (
               <ul className="space-y-4">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                   <li key={index} className="flex items-start space-x-3">
@@ -588,7 +590,20 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
               </ul>
             )}
 
-            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
+            {section.type === 'list' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                  <div key={index} className="rounded-lg p-4 border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: colors.primary }} />
+                      <span style={{ color: colors.textSecondary }}>{item}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'grouped' && (
               <div className="space-y-8">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                   <div key={index} className="border-l-4 pl-6" style={{ borderLeftColor: colors.primary }}>
@@ -598,6 +613,25 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                     )}
                     {item.date && (
                       <div className="flex items-center space-x-2" style={{ color: colors.textSecondary }}>
+                        <Calendar className="w-4 h-4" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className="rounded-lg p-6 border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                    <h3 className="text-xl font-bold mb-2" style={{ color: colors.text }}>{item.title}</h3>
+                    {item.description && (
+                      <p className="text-sm mb-2" style={{ color: colors.textSecondary }}>{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className="flex items-center space-x-2 text-sm" style={{ color: colors.textSecondary }}>
                         <Calendar className="w-4 h-4" />
                         <span>{formatDate(item.date)}</span>
                       </div>

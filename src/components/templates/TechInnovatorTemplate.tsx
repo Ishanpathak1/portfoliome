@@ -48,6 +48,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
   ];
   const hiddenSections = personalization?.hiddenSections || [];
   const customSections = resumeData?.customSections || [];
+  const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
   // Holographic color schemes
   const getHolographicColors = (scheme: string): HolographicColors => {
@@ -881,6 +882,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
 
   // Custom Section Renderer
   const renderCustomSection = (section: any) => {
+    const style = sectionRenderStyle[section.id] || 'grouped';
     return (
       <section className="py-12 md:py-20 px-4 md:px-8 relative bg-black overflow-hidden">
         <QuantumGrid />
@@ -896,7 +898,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
             <div className="w-48 md:w-64 h-2 bg-gradient-to-r from-transparent via-current to-transparent mx-auto rounded-full" style={{ color: colors.accent }} />
           </div>
 
-          <div className="bg-black/90 backdrop-blur-xl border-2 rounded-3xl p-4 md:p-8 relative overflow-hidden" style={{ borderColor: colors.accent }}>
+          <div className={style === 'cards' ? '' : 'bg-black/90 backdrop-blur-xl border-2 rounded-3xl p-4 md:p-8 relative overflow-hidden'} style={style === 'cards' ? undefined : { borderColor: colors.accent }}>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-current to-transparent opacity-10" style={{ color: colors.accent }} />
             
             <div className="relative z-10">
@@ -906,7 +908,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                 </p>
               )}
 
-              {section.type === 'list' && (
+              {section.type === 'list' && style === 'grouped' && (
                 <ul className="space-y-4 md:space-y-6">
                   {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
                     <li key={index} className="flex items-start gap-4">
@@ -915,6 +917,19 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {section.type === 'list' && style === 'cards' && (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                    <div key={index} className="bg-black/90 backdrop-blur-xl border-2 rounded-2xl p-6" style={{ borderColor: colors.accent }}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-3 h-3 rounded-full mt-3 animate-pulse flex-shrink-0" style={{ backgroundColor: colors.neon }} />
+                        <span className="text-gray-300 text-sm md:text-lg">{item}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
 
               {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (

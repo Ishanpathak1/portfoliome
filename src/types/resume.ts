@@ -253,6 +253,8 @@ export interface PersonalizationData {
   // Section management
   sectionOrder?: string[]; // Array of section IDs in display order
   hiddenSections?: string[]; // Array of section IDs that are hidden
+  // Per-section render style (grouped vs cards)
+  sectionRenderStyle?: { [sectionId: string]: 'grouped' | 'cards' };
   // Custom section headings
   sectionHeadings?: SectionHeadings;
   // Template-specific text customization
