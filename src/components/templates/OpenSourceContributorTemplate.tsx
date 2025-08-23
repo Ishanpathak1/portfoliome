@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  Github, GitBranch, GitCommit, Star, Users, Award, 
+  Github, Star, Users, Award, 
   ExternalLink, MessageSquare, Heart, Zap, Folder,
   Code2, Calendar, MapPin, Mail, Phone, Linkedin,
   Briefcase, GraduationCap, Activity, TrendingUp,
@@ -33,10 +33,7 @@ interface GitHubColors {
 
 export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContributorTemplateProps) {
   const { resumeData, personalization } = portfolio;
-  const [contributionHeatmap, setContributionHeatmap] = useState<number[][]>([]);
-  const [totalContributions, setTotalContributions] = useState(0);
-  const [commitActivity, setCommitActivity] = useState<number[]>([]);
-  const [activeRepos, setActiveRepos] = useState<string[]>([]);
+  
 
   // Get dynamic section order and hidden sections
   const sectionOrder = personalization?.sectionOrder || [
@@ -107,33 +104,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
 
   const colors = getGitHubColors(personalization?.colorScheme || 'blue');
 
-  // Generate contribution heatmap
-  useEffect(() => {
-    const generateHeatmap = () => {
-      const weeks = 52;
-      const days = 7;
-      const heatmap = [];
-      
-      for (let week = 0; week < weeks; week++) {
-        const weekData = [];
-        for (let day = 0; day < days; day++) {
-          weekData.push(Math.floor(Math.random() * 5));
-        }
-        heatmap.push(weekData);
-      }
-      
-      setContributionHeatmap(heatmap);
-      setTotalContributions(heatmap.flat().reduce((a, b) => a + b, 0) * 10);
-    };
-    
-    generateHeatmap();
-  }, []);
-
-  // Generate commit activity
-  useEffect(() => {
-    const activity = Array.from({ length: 24 }, () => Math.floor(Math.random() * 50));
-    setCommitActivity(activity);
-  }, []);
+  // Remove fake/random GitHub stats generation
 
   // Header Section
   const renderHeader = () => (
@@ -170,56 +141,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
           )}
         </div>
 
-        {/* GitHub Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-            <div className="flex items-center justify-center mb-4">
-              <GitCommit className="w-8 h-8" style={{ color: colors.primary }} />
-            </div>
-            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
-              {totalContributions}
-            </div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>
-              Contributions
-            </div>
-          </div>
-
-          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-            <div className="flex items-center justify-center mb-4">
-              <Star className="w-8 h-8" style={{ color: colors.warning }} />
-            </div>
-            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
-              {resumeData.projects?.length || 0}
-            </div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>
-              Repositories
-            </div>
-          </div>
-
-          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-            <div className="flex items-center justify-center mb-4">
-              <Users className="w-8 h-8" style={{ color: colors.success }} />
-            </div>
-            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
-              {Math.floor(totalContributions / 10)}
-            </div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>
-              Followers
-            </div>
-          </div>
-
-          <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-            <div className="flex items-center justify-center mb-4">
-              <Heart className="w-8 h-8" style={{ color: colors.error }} />
-            </div>
-            <div className="text-3xl font-bold mb-2" style={{ color: colors.text }}>
-              {resumeData.skills?.length || 0}
-            </div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>
-              Languages
-            </div>
-          </div>
-        </div>
+        {/* GitHub Stats removed to avoid fake numbers. Show nothing unless real data is provided. */}
 
         {/* Contact Info */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -454,20 +376,6 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                 </div>
 
                 <div className="p-4 flex items-center justify-between" style={{ backgroundColor: colors.background }}>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4" style={{ color: colors.warning }} />
-                      <span className="text-sm" style={{ color: colors.textSecondary }}>
-                        {Math.floor(Math.random() * 100)}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <GitBranch className="w-4 h-4" style={{ color: colors.primary }} />
-                      <span className="text-sm" style={{ color: colors.textSecondary }}>
-                        {Math.floor(Math.random() * 20)}
-                      </span>
-                    </div>
-                  </div>
                   {(project.startDate || project.endDate) && (
                     <div className="text-sm" style={{ color: colors.textSecondary }}>
                       {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}

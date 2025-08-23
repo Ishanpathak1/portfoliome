@@ -569,7 +569,7 @@ export default function HomePage() {
                     <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white"></div>
                     <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
-                  <span>more than 60 portfolios hosted already</span>
+                  <span>more than 100 portfolios hosted already</span>
                 </div>
               </div>
             </div>
