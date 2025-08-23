@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Edit, ExternalLink, Download, Share2, Copy, CheckCircle, Globe, Star, Zap, Trophy, Sparkles, Settings } from 'lucide-react';
 import { ResumeData, PersonalizationData } from '@/types/resume';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
@@ -21,6 +22,7 @@ interface PortfolioPreviewProps {
 
 export function PortfolioPreview({ resumeData, personalization }: PortfolioPreviewProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const [portfolioUrl, setPortfolioUrl] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -59,6 +61,9 @@ export function PortfolioPreview({ resumeData, personalization }: PortfolioPrevi
         setPortfolioGenerated(true);
         console.log('Portfolio URL generated:', data.url);
         triggerConfetti();
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1500);
       } else {
         const errorData = await response.json();
         console.error('Failed to generate portfolio:', errorData.error);
