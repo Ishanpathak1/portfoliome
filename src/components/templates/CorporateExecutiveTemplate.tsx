@@ -423,6 +423,48 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                 ))}
               </div>
             )}
+
+            {section.type === 'cards' && style === 'grouped' && (
+              <div className="space-y-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className="border-l-4 pl-6" style={{ borderColor: colors.accent }}>
+                    {item.title && (
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                    )}
+                    {item.description && (
+                      <p className="text-gray-700 mb-2">{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {section.type === 'cards' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className="bg-white rounded-2xl p-6 shadow border border-gray-200">
+                    {item.title && (
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{item.title}</h3>
+                    )}
+                    {item.description && (
+                      <p className="text-gray-700 text-sm">{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className="flex items-center text-gray-500 text-xs mt-3">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Trash2, ChevronUp, ChevronDown, Eye, EyeOff, Edit3, Save, X } from 'lucide-react';
-import { CustomSection, ResumeData } from '@/types/resume';
+import { CustomCard, CustomSection, ResumeData } from '@/types/resume';
 
 interface SectionManagerProps {
   resumeData: ResumeData;
@@ -47,13 +47,15 @@ export function SectionManager({
 }: SectionManagerProps) {
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [newSectionType, setNewSectionType] = useState<'text' | 'list'>('text');
+  const [newSectionType, setNewSectionType] = useState<'text' | 'list' | 'cards'>('text');
   const [newSectionTitle, setNewSectionTitle] = useState('');
   const [newSectionContent, setNewSectionContent] = useState('');
+  const [newSectionCards, setNewSectionCards] = useState<CustomCard[]>([]);
   const [editTitle, setEditTitle] = useState('');
-  const [editType, setEditType] = useState<'text' | 'list'>('text');
+  const [editType, setEditType] = useState<'text' | 'list' | 'cards'>('text');
   const [editTextContent, setEditTextContent] = useState('');
   const [editListItems, setEditListItems] = useState<string[]>([]);
+  const [editCards, setEditCards] = useState<CustomCard[]>([]);
 
   const customSections = resumeData.customSections || [];
   
@@ -79,10 +81,13 @@ export function SectionManager({
     const newSection: CustomSection = {
       id: `custom-${Date.now()}`,
       title: newSectionTitle,
-      content: newSectionType === 'list' 
-        ? newSectionContent.split('\n').filter(line => line.trim())
-        : newSectionContent,
-      type: newSectionType === 'list' ? 'list' : 'text',
+      content:
+        newSectionType === 'list'
+          ? newSectionContent.split('\n').filter(line => line.trim())
+          : newSectionType === 'cards'
+          ? newSectionCards.filter(c => c && (c.title?.trim() || c.description?.trim() || c.date?.trim()))
+          : newSectionContent,
+      type: newSectionType,
       order: customSections.length,
       visible: true
     };
@@ -106,6 +111,7 @@ export function SectionManager({
     // Reset form
     setNewSectionTitle('');
     setNewSectionContent('');
+    setNewSectionCards([]);
     setIsAddingSection(false);
   };
 
@@ -175,14 +181,33 @@ export function SectionManager({
     if (!section) return;
     setEditingSection(sectionId);
     setEditTitle(section.title || '');
-    const normalizedType: 'text' | 'list' = section.type === 'list' ? 'list' : 'text';
+    const normalizedType: 'text' | 'list' | 'cards' =
+      section.type === 'list' ? 'list' : section.type === 'cards' ? 'cards' : 'text';
     setEditType(normalizedType);
     if (normalizedType === 'list') {
-      setEditListItems(Array.isArray(section.content) ? section.content as string[] : (section.content ? [String(section.content)] : []));
+      setEditListItems(Array.isArray(section.content) ? (section.content as string[]) : section.content ? [String(section.content)] : []);
       setEditTextContent('');
-    } else {
-      setEditTextContent(typeof section.content === 'string' ? section.content : (Array.isArray(section.content) ? (section.content as string[]).join('\n') : ''));
+      setEditCards([]);
+    } else if (normalizedType === 'cards') {
+      const asArray = Array.isArray(section.content) ? (section.content as any[]) : [];
+      const cards: CustomCard[] = asArray.map((it: any) => ({
+        title: String(it?.title || ''),
+        description: it?.description ? String(it.description) : undefined,
+        date: it?.date ? String(it.date) : undefined,
+      }));
+      setEditCards(cards);
+      setEditTextContent('');
       setEditListItems([]);
+    } else {
+      setEditTextContent(
+        typeof section.content === 'string'
+          ? section.content
+          : Array.isArray(section.content)
+          ? (section.content as string[]).join('\n')
+          : ''
+      );
+      setEditListItems([]);
+      setEditCards([]);
     }
   };
 
@@ -190,7 +215,12 @@ export function SectionManager({
     const updates: Partial<CustomSection> = {
       title: editTitle,
       type: editType,
-      content: editType === 'list' ? editListItems.filter(item => item.trim()) : editTextContent
+      content:
+        editType === 'list'
+          ? editListItems.filter(item => item.trim())
+          : editType === 'cards'
+          ? editCards.filter(c => c && (c.title?.trim() || c.description?.trim() || c.date?.trim()))
+          : editTextContent
     };
     updateCustomSection(sectionId, updates);
     setEditingSection(null);
@@ -219,11 +249,12 @@ export function SectionManager({
               <label className="block text-white mb-2">Section Type</label>
               <select
                 value={newSectionType}
-                onChange={(e) => setNewSectionType(e.target.value as 'text' | 'list')}
+                onChange={(e) => setNewSectionType(e.target.value as 'text' | 'list' | 'cards')}
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
               >
                 <option value="text">Text Content</option>
                 <option value="list">List Items</option>
+                <option value="cards">Cards (Title + Text + Date)</option>
               </select>
             </div>
 
@@ -238,18 +269,82 @@ export function SectionManager({
               />
             </div>
 
-            <div>
-              <label className="block text-white mb-2">Content</label>
-              <textarea
-                value={newSectionContent}
-                onChange={(e) => setNewSectionContent(e.target.value)}
-                placeholder={newSectionType === 'list' 
-                  ? "Enter each item on a new line\nItem 1\nItem 2\nItem 3"
-                  : "Write your content here..."}
-                rows={4}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50"
-              />
-            </div>
+            {newSectionType !== 'cards' ? (
+              <div>
+                <label className="block text-white mb-2">Content</label>
+                <textarea
+                  value={newSectionContent}
+                  onChange={(e) => setNewSectionContent(e.target.value)}
+                  placeholder={newSectionType === 'list' 
+                    ? "Enter each item on a new line\nItem 1\nItem 2\nItem 3"
+                    : "Write your content here..."}
+                  rows={4}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50"
+                />
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-white">Cards</label>
+                  <button
+                    onClick={() => setNewSectionCards([...
+                      newSectionCards,
+                      { title: '', description: '', date: '' }
+                    ])}
+                    className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
+                  >
+                    Add Card
+                  </button>
+                </div>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {newSectionCards.map((card, i) => (
+                    <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
+                      <div className="text-white/70 text-xs">Card {i + 1}</div>
+                      <input
+                        type="text"
+                        value={card.title}
+                        onChange={(e) => {
+                          const next = [...newSectionCards];
+                          next[i] = { ...next[i], title: e.target.value };
+                          setNewSectionCards(next);
+                        }}
+                        placeholder="Heading / Title"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                      />
+                      <textarea
+                        rows={3}
+                        value={card.description || ''}
+                        onChange={(e) => {
+                          const next = [...newSectionCards];
+                          next[i] = { ...next[i], description: e.target.value };
+                          setNewSectionCards(next);
+                        }}
+                        placeholder="Text / Description"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                      />
+                      <input
+                        type="date"
+                        value={card.date || ''}
+                        onChange={(e) => {
+                          const next = [...newSectionCards];
+                          next[i] = { ...next[i], date: e.target.value };
+                          setNewSectionCards(next);
+                        }}
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                      />
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => setNewSectionCards(newSectionCards.filter((_, idx) => idx !== i))}
+                          className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex space-x-3">
               <button
@@ -424,24 +519,55 @@ export function SectionManager({
                           <select
                             value={editType}
                             onChange={(e) => {
-                              const next = e.target.value as 'text' | 'list';
-                              if (next === 'list' && editType === 'text') {
-                                const fromText = editTextContent
-                                  ? editTextContent.split('\n').map(s => s.trim()).filter(Boolean)
-                                  : [];
-                                setEditListItems(fromText);
-                                setEditTextContent('');
+                              const next = e.target.value as 'text' | 'list' | 'cards';
+                              if (next === 'list') {
+                                if (editType === 'text') {
+                                  const fromText = editTextContent
+                                    ? editTextContent.split('\n').map(s => s.trim()).filter(Boolean)
+                                    : [];
+                                  setEditListItems(fromText);
+                                  setEditTextContent('');
+                                  setEditCards([]);
+                                }
+                                if (editType === 'cards') {
+                                  const fromCards = editCards.map(c => (c.title?.trim() || c.description?.trim() || '')).filter(Boolean);
+                                  setEditListItems(fromCards);
+                                  setEditCards([]);
+                                }
                               }
-                              if (next === 'text' && editType === 'list') {
-                                setEditTextContent(editListItems.join('\n'));
-                                setEditListItems([]);
+                              if (next === 'cards') {
+                                if (editType === 'text') {
+                                  const initial: CustomCard = { title: '', description: editTextContent || '', date: '' };
+                                  setEditCards(editTextContent ? [initial] : []);
+                                  setEditTextContent('');
+                                  setEditListItems([]);
+                                }
+                                if (editType === 'list') {
+                                  const initialCards: CustomCard[] = editListItems.map(t => ({ title: t, description: '', date: '' }));
+                                  setEditCards(initialCards);
+                                  setEditListItems([]);
+                                }
+                              }
+                              if (next === 'text') {
+                                if (editType === 'list') {
+                                  setEditTextContent(editListItems.join('\n'));
+                                  setEditListItems([]);
+                                  setEditCards([]);
+                                }
+                                if (editType === 'cards') {
+                                  const joined = editCards.map(c => c.title || c.description || '').filter(Boolean).join('\n');
+                                  setEditTextContent(joined);
+                                  setEditCards([]);
+                                  setEditListItems([]);
+                                }
                               }
                               setEditType(next);
                             }}
                             className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
                           >
                             <option value="text">Text</option>
-                            <option value="list">Cards / List</option>
+                            <option value="list">List</option>
+                            <option value="cards">Cards</option>
                           </select>
                         </div>
                       </div>
@@ -498,6 +624,67 @@ export function SectionManager({
                         </div>
                       )}
 
+                      {editType === 'cards' && (
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-white text-sm">Cards</label>
+                            <button
+                              onClick={() => setEditCards([...editCards, { title: '', description: '', date: '' }])}
+                              className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
+                            >
+                              Add Card
+                            </button>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {editCards.map((card, i) => (
+                              <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
+                                <div className="text-white/70 text-xs">Card {i + 1}</div>
+                                <input
+                                  type="text"
+                                  value={card.title}
+                                  onChange={(e) => {
+                                    const next = [...editCards];
+                                    next[i] = { ...next[i], title: e.target.value };
+                                    setEditCards(next);
+                                  }}
+                                  placeholder="Heading / Title"
+                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                />
+                                <textarea
+                                  rows={3}
+                                  value={card.description || ''}
+                                  onChange={(e) => {
+                                    const next = [...editCards];
+                                    next[i] = { ...next[i], description: e.target.value };
+                                    setEditCards(next);
+                                  }}
+                                  placeholder="Text / Description"
+                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                />
+                                <input
+                                  type="date"
+                                  value={card.date || ''}
+                                  onChange={(e) => {
+                                    const next = [...editCards];
+                                    next[i] = { ...next[i], date: e.target.value };
+                                    setEditCards(next);
+                                  }}
+                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                />
+                                <div className="flex justify-end">
+                                  <button
+                                    onClick={() => setEditCards(editCards.filter((_, idx) => idx !== i))}
+                                    className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => saveEditSection(section.id)}
@@ -515,9 +702,12 @@ export function SectionManager({
                     </div>
                   ) : (
                     <div className="text-gray-300 text-sm">
-                      {Array.isArray(customSection.content) 
-                        ? customSection.content.slice(0, 3).join(', ') + (customSection.content.length > 3 ? '...' : '')
-                        : customSection.content.slice(0, 100) + (customSection.content.length > 100 ? '...' : '')
+                      {Array.isArray(customSection.content)
+                        ? (typeof customSection.content[0] === 'string'
+                            ? (customSection.content as string[]).slice(0, 3).join(', ') + ((customSection.content as any[]).length > 3 ? '...' : '')
+                            : (customSection.content as CustomCard[]).slice(0, 3).map(c => c.title || c.description || '').filter(Boolean).join(', ') + ((customSection.content as any[]).length > 3 ? '...' : '')
+                          )
+                        : (customSection.content as string).slice(0, 100) + ((customSection.content as string).length > 100 ? '...' : '')
                       }
                     </div>
                   )}

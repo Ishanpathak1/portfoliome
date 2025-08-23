@@ -51,11 +51,17 @@ export interface SkillCategory {
 export interface Skill extends SkillCategory {}
 
 // Dynamic custom sections
+export interface CustomCard {
+  title: string;
+  description?: string;
+  date?: string; // ISO date string
+}
+
 export interface CustomSection {
   id: string;
   title: string;
-  content: string | string[]; // Can be text or list
-  type: 'text' | 'list' | 'achievements' | 'certifications' | 'publications';
+  content: string | string[] | CustomCard[]; // text, list, or cards
+  type: 'text' | 'list' | 'cards' | 'achievements' | 'certifications' | 'publications';
   order: number;
   visible: boolean;
 }

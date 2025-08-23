@@ -558,6 +558,48 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
               ))}
             </div>
           )}
+
+          {section.type === 'cards' && style === 'grouped' && (
+            <div className="space-y-6">
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                <div key={index} className={`border-l-4 pl-6 ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ borderLeftColor: colors.primary }}>
+                  {item.title && (
+                    <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{item.title}</h3>
+                  )}
+                  {item.description && (
+                    <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} mt-1`}>{item.description}</p>
+                  )}
+                  {item.date && (
+                    <div className={`flex items-center text-sm mt-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>{formatDate(item.date)}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {section.type === 'cards' && style === 'cards' && (
+            <div className="grid md:grid-cols-2 gap-4">
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                <div key={index} className={`rounded-2xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm border`} style={{ borderColor: colors.primary }}>
+                  {item.title && (
+                    <h3 className={`text-lg font-semibold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{item.title}</h3>
+                  )}
+                  {item.description && (
+                    <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} text-sm`}>{item.description}</p>
+                  )}
+                  {item.date && (
+                    <div className={`flex items-center text-xs mt-3 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>{formatDate(item.date)}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
           
           {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
             <div className="space-y-6">

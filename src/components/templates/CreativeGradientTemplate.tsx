@@ -423,6 +423,48 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                 ))}
               </div>
             )}
+
+            {section.type === 'cards' && style === 'grouped' && (
+              <div className="space-y-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className={`border-l-4 pl-6`} style={{ borderLeftColor: isDark ? '#fff' : '#000' }}>
+                    {item.title && (
+                      <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>{item.title}</h3>
+                    )}
+                    {item.description && (
+                      <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className={`flex items-center text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {section.type === 'cards' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className={`group relative ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-6 md:p-8 shadow-xl hover:shadow-2xl`}>
+                    {item.title && (
+                      <h3 className={`text-lg md:text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-1`}>{item.title}</h3>
+                    )}
+                    {item.description && (
+                      <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} text-sm`}>{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className={`flex items-center text-xs mt-3 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
             
             {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
               <div className="space-y-6">

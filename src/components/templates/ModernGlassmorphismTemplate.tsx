@@ -699,6 +699,48 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                 </div>
               )}
               
+              {section.type === 'cards' && style === 'grouped' && (
+                <div className="space-y-6">
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                    <div key={index} className={`border-l-4 pl-6 py-4`} style={{ borderLeftColor: '#fff' }}>
+                      {item.title && (
+                        <h3 className="text-2xl font-bold text-white mb-2">{item.title}</h3>
+                      )}
+                      {item.description && (
+                        <p className="text-gray-300 mb-3 text-lg">{item.description}</p>
+                      )}
+                      {item.date && (
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(item.date)}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {section.type === 'cards' && style === 'cards' && (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                    <div key={index} className={`${themeColors.glassDark} rounded-2xl p-6 border`}>
+                      {item.title && (
+                        <h3 className="text-xl font-bold text-white mb-1">{item.title}</h3>
+                      )}
+                      {item.description && (
+                        <p className="text-gray-300 text-sm">{item.description}</p>
+                      )}
+                      {item.date && (
+                        <div className="flex items-center gap-2 text-gray-400 text-sm mt-3">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(item.date)}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'grouped' && (
                 <div className="space-y-6">
                   {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (

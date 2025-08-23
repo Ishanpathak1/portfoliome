@@ -1,7 +1,13 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { FirebaseAuthWrapper } from './FirebaseAuthWrapper';
+import dynamic from 'next/dynamic';
+
+// Load Firebase wrapper only on the client and only when rendered
+const FirebaseAuthWrapper = dynamic(
+  () => import('./FirebaseAuthWrapper').then(m => m.FirebaseAuthWrapper),
+  { ssr: false }
+);
 
 interface ConditionalAuthWrapperProps {
   children: React.ReactNode;

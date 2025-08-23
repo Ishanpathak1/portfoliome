@@ -933,6 +933,64 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                 </div>
               )}
 
+              {section.type === 'cards' && style === 'grouped' && (
+                <div>
+                  <div className="text-green-400 font-mono text-xs md:text-sm mb-4">
+                    &gt; cat {section.title.toLowerCase()}.log
+                  </div>
+                  <div className="space-y-6">
+                    {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                      <div key={index} className="border-l-2 border-cyan-500 pl-4 md:pl-6">
+                        {item.title && (
+                          <h3 className="text-sm md:text-lg font-mono font-bold text-purple-400 mb-2">
+                            {item.title}
+                          </h3>
+                        )}
+                        {item.description && (
+                          <p className="text-cyan-400 font-mono text-xs md:text-sm mb-3">
+                            {item.description}
+                          </p>
+                        )}
+                        {item.date && (
+                          <div className="text-green-400 font-mono text-xs">
+                            {formatDate(item.date)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {section.type === 'cards' && style === 'cards' && (
+                <div>
+                  <div className="text-green-400 font-mono text-xs md:text-sm mb-4">
+                    &gt; cat {section.title.toLowerCase()}.json | jq
+                  </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                      <HolographicCard key={index} className="p-4 md:p-8">
+                        {item.title && (
+                          <div className="text-sm md:text-lg font-mono font-bold text-purple-400 mb-2">
+                            {item.title}
+                          </div>
+                        )}
+                        {item.description && (
+                          <div className="text-cyan-400 font-mono text-xs md:text-sm">
+                            {item.description}
+                          </div>
+                        )}
+                        {item.date && (
+                          <div className="text-green-400 font-mono text-xs mt-3">
+                            {formatDate(item.date)}
+                          </div>
+                        )}
+                      </HolographicCard>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
                 <div>
                   <div className="text-green-400 font-mono text-xs md:text-sm mb-4">

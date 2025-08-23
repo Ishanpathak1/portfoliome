@@ -526,30 +526,74 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
           </div>
 
           <div className={style === 'cards' ? '' : 'bg-gray-50 rounded-xl p-6'}>
-            {Array.isArray(section.content) ? (
-              style === 'cards' ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {section.content.map((item: string, index: number) => (
-                    <div key={index} className="bg-white rounded-xl p-6 shadow border border-gray-100">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: colors.primary }}></div>
-                        <span className="text-gray-700">{item}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <ul className="space-y-3">
-                  {section.content.map((item: string, index: number) => (
-                    <li key={index} className="flex items-start space-x-3">
+            {section.type === 'text' && (
+              <p className="text-gray-700 leading-relaxed">{section.content}</p>
+            )}
+
+            {section.type === 'list' && style === 'grouped' && (
+              <ul className="space-y-3">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                  <li key={index} className="flex items-start space-x-3">
+                    <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: colors.primary }}></div>
+                    <span className="text-gray-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {section.type === 'list' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: string, index: number) => (
+                  <div key={index} className="bg-white rounded-xl p-6 shadow border border-gray-100">
+                    <div className="flex items-start space-x-3">
                       <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: colors.primary }}></div>
                       <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              )
-            ) : (
-              <p className="text-gray-700 leading-relaxed">{section.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {section.type === 'cards' && style === 'grouped' && (
+              <div className="space-y-4">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className="border-l-4 pl-6" style={{ borderColor: colors.primary }}>
+                    {item.title && (
+                      <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
+                    )}
+                    {item.description && (
+                      <p className="text-gray-700 mt-1">{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className="flex items-center text-gray-600 text-sm mt-2">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {section.type === 'cards' && style === 'cards' && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                  <div key={index} className="bg-white rounded-xl p-6 shadow border border-gray-100">
+                    {item.title && (
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.title}</h3>
+                    )}
+                    {item.description && (
+                      <p className="text-gray-700 text-sm">{item.description}</p>
+                    )}
+                    {item.date && (
+                      <div className="flex items-center text-gray-600 text-xs mt-3">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span>{formatDate(item.date)}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>

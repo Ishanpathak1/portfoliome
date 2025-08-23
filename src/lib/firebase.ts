@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
@@ -14,20 +14,19 @@ const firebaseConfig = {
   measurementId: "G-2YWWZ2SNDK"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication and get a reference to the service
-export const auth = getAuth(app);
-
-// Initialize Firebase Analytics (only in browser)
-let analytics;
-if (typeof window !== 'undefined') {
-  analytics = getAnalytics(app);
-}
-
-// Initialize providers
+// Initialize Firebase safely on client only
+const appInstance = getApps().length ? getApp() : initializeApp(firebaseConfig);
+export const auth = getAuth(appInstance);
 export const googleProvider = new GoogleAuthProvider();
 
+let analytics: ReturnType<typeof getAnalytics> | undefined;
+if (typeof window !== 'undefined') {
+  try {
+    analytics = getAnalytics(appInstance);
+  } catch {
+    analytics = undefined;
+  }
+}
+
 export { analytics };
-export default app; 
+export default appInstance;

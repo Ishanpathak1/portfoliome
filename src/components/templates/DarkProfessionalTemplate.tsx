@@ -274,6 +274,48 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
             </div>
           )}
 
+          {section.type === 'cards' && style === 'grouped' && (
+            <div className="space-y-4">
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                <div key={index} className="border-l-4 pl-6" style={{ borderColor: currentColors.accent }}>
+                  {item.title && (
+                    <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                  )}
+                  {item.description && (
+                    <p className="text-gray-300 mt-1">{item.description}</p>
+                  )}
+                  {item.date && (
+                    <div className="flex items-center text-gray-400 text-sm mt-2">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>{formatDate(item.date)}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {section.type === 'cards' && style === 'cards' && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                <div key={index} className="bg-gray-900 rounded-lg p-5 border border-gray-700">
+                  {item.title && (
+                    <h3 className="text-lg font-semibold text-white mb-1">{item.title}</h3>
+                  )}
+                  {item.description && (
+                    <p className="text-gray-300 text-sm">{item.description}</p>
+                  )}
+                  {item.date && (
+                    <div className="flex items-center text-gray-400 text-xs mt-3">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>{formatDate(item.date)}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
           {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'grouped' && (
             <div className="space-y-4">
               {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (

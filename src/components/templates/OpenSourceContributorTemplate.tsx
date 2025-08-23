@@ -603,11 +603,13 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
               </div>
             )}
 
-            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'grouped' && (
+            {section.type === 'cards' && style === 'grouped' && (
               <div className="space-y-8">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                   <div key={index} className="border-l-4 pl-6" style={{ borderLeftColor: colors.primary }}>
-                    <h3 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>{item.title}</h3>
+                    {item.title && (
+                      <h3 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>{item.title}</h3>
+                    )}
                     {item.description && (
                       <p className="mb-4 text-lg" style={{ color: colors.textSecondary }}>{item.description}</p>
                     )}
@@ -622,11 +624,13 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
               </div>
             )}
 
-            {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && style === 'cards' && (
+            {section.type === 'cards' && style === 'cards' && (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
                   <div key={index} className="rounded-lg p-6 border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
-                    <h3 className="text-xl font-bold mb-2" style={{ color: colors.text }}>{item.title}</h3>
+                    {item.title && (
+                      <h3 className="text-xl font-bold mb-2" style={{ color: colors.text }}>{item.title}</h3>
+                    )}
                     {item.description && (
                       <p className="text-sm mb-2" style={{ color: colors.textSecondary }}>{item.description}</p>
                     )}

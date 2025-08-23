@@ -932,6 +932,48 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                 </div>
               )}
 
+              {section.type === 'cards' && style === 'grouped' && (
+                <div className="space-y-6 md:space-y-8">
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                    <div key={index} className="border-l-4 pl-4 md:pl-6 py-4" style={{ borderLeftColor: colors.accent }}>
+                      {item.title && (
+                        <h3 className="text-lg md:text-2xl font-black text-white mb-2">{item.title}</h3>
+                      )}
+                      {item.description && (
+                        <p className="text-gray-300 mb-4 text-sm md:text-lg">{item.description}</p>
+                      )}
+                      {item.date && (
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-bold text-sm md:text-base">{formatDate(item.date)}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {section.type === 'cards' && style === 'cards' && (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
+                    <div key={index} className="bg-black/90 backdrop-blur-xl border-2 rounded-2xl p-6" style={{ borderColor: colors.accent }}>
+                      {item.title && (
+                        <h3 className="text-xl font-black text-white mb-1">{item.title}</h3>
+                      )}
+                      {item.description && (
+                        <p className="text-gray-300 text-sm">{item.description}</p>
+                      )}
+                      {item.date && (
+                        <div className="flex items-center gap-2 text-gray-400 text-sm mt-3">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(item.date)}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {(section.type === 'achievements' || section.type === 'certifications' || section.type === 'publications') && (
                 <div className="space-y-6 md:space-y-8">
                   {(Array.isArray(section.content) ? section.content : [])?.map((item: any, index: number) => (
