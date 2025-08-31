@@ -81,9 +81,8 @@ export async function generateMetadata({ params, searchParams }: PortfolioPagePr
     const canonicalUrl = `${baseUrl}/${slug}`;
     const previewMode = searchParams?.preview === 'true';
 
-    // Generate a unique OG image URL per portfolio (slug-based)
-    // Version image with updatedAt for cache-busting when portfolio/theme changes
-    const ogImageUrl = `${baseUrl}/api/og?slug=${encodeURIComponent(slug)}&v=${encodeURIComponent(portfolio.updatedAt as any)}`;
+    // Use a clean, path-based OG image URL (Twitter/X prefers no query params)
+    const ogImageUrl = `${baseUrl}/og/${encodeURIComponent(slug)}`;
     
     return {
       title: portfolio.metaTitle || `${name} - Portfolio`,
