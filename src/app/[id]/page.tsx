@@ -2,6 +2,14 @@ import { getPortfolioBySlug } from '@/lib/portfolio-db';
 import { PortfolioRenderer } from '@/components/PortfolioRenderer';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { buildPortfolioJsonLd } from '@/lib/portfolio-structured-data';
+import React from 'react';
+
+function getBaseUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL?.replace('NEXT_PUBLIC_APP_URL=', '').trim();
+  if (envUrl && envUrl.startsWith('http')) return envUrl;
+  return process.env.NODE_ENV === 'production' ? 'https://take-my.info' : 'http://localhost:3000';
+}
 
 interface PortfolioPageProps {
   params: {
@@ -40,11 +48,21 @@ export default async function PortfolioPage({ params, searchParams }: PortfolioP
     };
   }
 
-  return <PortfolioRenderer portfolio={renderPortfolio} />;
+  const jsonLd = buildPortfolioJsonLd(portfolio);
+
+  return (
+    <>
+      <PortfolioRenderer portfolio={renderPortfolio} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+    </>
+  );
 }
 
 // ⚡ Generate metadata with error handling and caching
-export async function generateMetadata({ params }: PortfolioPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PortfolioPageProps): Promise<Metadata> {
   const { id: slug } = params;
   
   try {
@@ -59,20 +77,43 @@ export async function generateMetadata({ params }: PortfolioPageProps): Promise<
 
     const name = portfolio.resumeData.contact.name || 'Professional';
     const summary = portfolio.resumeData.summary || 'Professional portfolio';
+    const baseUrl = getBaseUrl();
+    const canonicalUrl = `${baseUrl}/${slug}`;
+    const previewMode = searchParams?.preview === 'true';
+
+    // Generate a unique OG image URL per portfolio (slug-based)
+    // Version image with updatedAt for cache-busting when portfolio/theme changes
+    const ogImageUrl = `${baseUrl}/api/og?slug=${encodeURIComponent(slug)}&v=${encodeURIComponent(portfolio.updatedAt as any)}`;
     
     return {
       title: portfolio.metaTitle || `${name} - Portfolio`,
       description: portfolio.metaDescription || summary.substring(0, 160),
+      alternates: {
+        canonical: canonicalUrl,
+      },
       openGraph: {
         title: portfolio.metaTitle || `${name} - Portfolio`,
         description: portfolio.metaDescription || summary.substring(0, 160),
         type: 'website',
+        url: canonicalUrl,
+        images: [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: `${name} - Portfolio`,
+          },
+        ],
       },
       twitter: {
         card: 'summary_large_image',
         title: portfolio.metaTitle || `${name} - Portfolio`,
         description: portfolio.metaDescription || summary.substring(0, 160),
+        images: [ogImageUrl],
       },
+      robots: previewMode
+        ? { index: false, follow: true }
+        : { index: true, follow: true },
     };
   } catch (error) {
     console.error('Error generating metadata:', error);

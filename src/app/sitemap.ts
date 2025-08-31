@@ -1,4 +1,6 @@
 import { MetadataRoute } from 'next'
+import { prisma } from '@/lib/prisma'
+import { getBlogPosts } from '@/lib/blog'
 
 type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
 
@@ -20,7 +22,7 @@ function getBaseUrl(): string {
   return process.env.NODE_ENV === 'production' ? 'https://take-my.info' : 'http://localhost:3000';
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
   
   // Main pages
@@ -30,12 +32,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/dashboard`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
     },
   ];
 
@@ -95,7 +91,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Blog pages (if you have a blog)
+  // Blog pages (dynamic)
+  const blogPosts = getBlogPosts();
   const blogPages: SitemapEntry[] = [
     {
       url: `${baseUrl}/blog`,
@@ -103,18 +100,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 0.8,
     },
-    {
-      url: `${baseUrl}/blog/portfolio-tips`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+    ...blogPosts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.date || Date.now()),
+      changeFrequency: 'weekly' as ChangeFrequency,
       priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/resume-writing`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
+    })),
   ];
 
   // Template showcase pages
@@ -139,6 +130,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  // Public portfolio pages (dynamic)
+  const portfolioPages: SitemapEntry[] = [];
+  try {
+    if (prisma) {
+      const portfolios = await prisma.portfolio.findMany({
+        where: { isPublic: true },
+        select: { slug: true, updatedAt: true },
+      });
+      for (const p of portfolios) {
+        portfolioPages.push({
+          url: `${baseUrl}/${p.slug}`,
+          lastModified: p.updatedAt,
+          changeFrequency: 'weekly',
+          priority: 0.6,
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch public portfolios for sitemap:', error);
+  }
+
   // Combine all pages
   return [
     ...mainPages,
@@ -146,5 +158,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...supportPages,
     ...blogPages,
     ...templatePages,
+    ...portfolioPages,
   ];
 } 

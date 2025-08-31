@@ -62,16 +62,36 @@ export async function POST(req: NextRequest) {
     const contactName = resumeData?.contact?.name || 'Candidate';
     const tone = 'warm professional, concise, numbers-first';
 
-    const sys = `You write concise, outcome-driven cover letters. Keep it to 350-450 words. Prefer concrete metrics and avoid fluff. Avoid generic openers like "I am excited to apply" or "I am writing to express my interest". Start with one sentence showing genuine appreciation for the company's product/mission (e.g., "What I like about <Company> is ..."), then transition into value you bring.`;
+    const sys = `You are a world-class cover-letter writer. Write in first person, confident but grounded.
+Keep it to 300-400 words. Prioritize specificity over adjectives. Use numbers and tangible outcomes.
+Absolutely avoid generic openers like "I am excited to apply" or "I am writing to express my interest".
+
+STYLE & TONE
+- Warm-professional, concise, "you"-focused. Limit the word "I" to at most twice per paragraph.
+- Mirror 2–4 distinctive phrases from the JOB DESCRIPTION to signal fit without overdoing it.
+- Vary sentence lengths. No cliches, no buzzwords, no filler.
+
+STRUCTURE
+1) Opening: a single sentence that shows a sharp, specific appreciation of the COMPANY's product/mission or problems, using details from JOB DESCRIPTION.
+2) Core: 2 short paragraphs that map the candidate's most relevant achievements to the role's top requirements. For each paragraph, explicitly connect an achievement to a requirement and include concrete metrics.
+3) Close: one sentence on why-now/impact-at-90-days, and a clear, polite CTA to talk.
+
+CUSTOMIZATION RULES
+- If COMPANY is provided, set greeting to "Dear ${company} Hiring Team," otherwise "Dear Hiring Manager,".
+- Address the company as "you"; frame benefits in terms of outcomes they will see (e.g., conversion lift, latency reduction, revenue impact).
+- Do not invent facts. Use only provided PROFILE SUMMARY, TOP ACHIEVEMENTS, SKILLS, and JOB DESCRIPTION.
+
+Return only JSON.`;
     const userPrompt = [
       `CANDIDATE: ${contactName}`,
+      company ? `COMPANY: ${company}` : '',
       profileSummary ? `PROFILE SUMMARY: ${profileSummary}` : '',
       topAchievements ? `TOP ACHIEVEMENTS: ${topAchievements}` : '',
       skills ? `SKILLS: ${skills}` : '',
       `TONE: ${tone}`,
       `JOB DESCRIPTION: ${jobDescription}`,
       prompt ? `ADDITIONAL INSTRUCTIONS: ${prompt}` : '',
-      `Return JSON with keys: greeting, intro, bodyParas (array of 2-3), closing, signoff. No extra text.`
+      `OUTPUT FORMAT: Return JSON with keys -> greeting (string), intro (string), bodyParas (array of exactly 2 or 3 short paragraphs), closing (string), signoff (string; use "${contactName}" as the name). No extra text.`
     ].filter(Boolean).join('\n');
 
     // Prefer Responses API when available; fallback to chat.completions
@@ -98,8 +118,8 @@ export async function POST(req: NextRequest) {
           { role: 'system', content: sys },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.3,
-        max_tokens: 700,
+        temperature: 0.5,
+        max_tokens: 900,
         response_format: { type: 'json_object' }
       });
       jsonText = resp?.choices?.[0]?.message?.content || '';

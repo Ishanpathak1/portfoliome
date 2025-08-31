@@ -18,44 +18,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: [
-          '/',
-          '/features',
-          '/templates',
-          '/how-it-works',
-          '/about',
-          '/contact',
-          '/faq',
-          '/blog',
-          '/privacy-policy',
-          '/terms-of-service'
-        ],
-        disallow: [
-          '/api/',
-          '/dashboard/',
-          '/*?*', // Prevent crawling of URLs with query parameters
-          '/*.json$', // Prevent crawling of JSON files
-          '/private/',
-          '/admin/',
-          '/auth/',
-          '/user/',
-          '/*.php$', // Block PHP files (common attack vector)
-          '/*.sql$', // Block SQL files
-          '/*.xml$', // Block XML files except sitemap
-          '/wp-*', // Block WordPress-style URLs
-        ],
-      },
-      {
-        userAgent: 'GPTBot',
-        disallow: ['/'], // Prevent GPT from crawling the site
-      },
-      {
-        userAgent: 'ChatGPT-User',
-        disallow: ['/'], // Prevent ChatGPT from crawling the site
-      },
-      {
-        userAgent: 'CCBot',
-        disallow: ['/'], // Prevent Common Crawl from crawling the site
+        allow: ['/', '/sitemap.xml'],
+        disallow: ['/api/'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

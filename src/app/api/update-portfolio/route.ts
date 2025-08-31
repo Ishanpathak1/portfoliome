@@ -222,6 +222,17 @@ export async function PUT(request: NextRequest) {
       updatedAt: updatedPortfolio.updatedAt,
     };
 
+    // 🔥 Warm OG image cache asynchronously (best-effort, non-blocking)
+    try {
+      const envUrl = process.env.NEXT_PUBLIC_APP_URL?.replace('NEXT_PUBLIC_APP_URL=', '').trim();
+      const baseUrl = envUrl && envUrl.startsWith('http')
+        ? envUrl
+        : (process.env.NODE_ENV === 'production' ? 'https://take-my.info' : 'http://localhost:3000');
+      const ogUrl = `${baseUrl}/api/og?slug=${encodeURIComponent(transformedPortfolio.slug)}&v=${encodeURIComponent(new Date(transformedPortfolio.updatedAt).toISOString())}`;
+      // Fire-and-forget to prime CDN cache
+      fetch(ogUrl, { method: 'GET', headers: { 'User-Agent': 'CacheWarm' } }).catch(() => {});
+    } catch {}
+
     const totalTime = Date.now() - startTime;
     console.log(`✅ Portfolio update completed in ${totalTime}ms`);
 

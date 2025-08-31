@@ -48,24 +48,47 @@ export async function GET(request: NextRequest) {
 				}
 			}
 		} else {
-			const executablePath = await chromium.executablePath();
-			browser = await puppeteer.launch({
-				args: [
-					...chromium.args,
-					'--no-sandbox',
-					'--disable-setuid-sandbox',
-					'--disable-dev-shm-usage',
-					'--no-zygote',
-					'--single-process',
-					'--font-render-hinting=none',
-					'--disable-gpu',
-					'--disable-software-rasterizer',
-				],
-				defaultViewport: chromium.defaultViewport,
-				executablePath,
-				headless: (chromium as any).headless ?? true,
-				ignoreHTTPSErrors: true,
-			});
+			// Try serverless Chromium first; if it fails on local macOS, fall back to system Chrome
+			try {
+				const executablePath = await chromium.executablePath();
+				browser = await puppeteer.launch({
+					args: [
+						...chromium.args,
+						'--no-sandbox',
+						'--disable-setuid-sandbox',
+						'--disable-dev-shm-usage',
+						'--no-zygote',
+						'--single-process',
+						'--font-render-hinting=none',
+						'--disable-gpu',
+						'--disable-software-rasterizer',
+					],
+					defaultViewport: chromium.defaultViewport,
+					executablePath,
+					headless: (chromium as any).headless ?? true,
+					ignoreHTTPSErrors: true,
+				});
+			} catch (e) {
+				// macOS local dev fallback to system Chrome
+				const guessPaths = [
+					'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+					'/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
+					process.env.CHROME_PATH || '',
+				].filter(Boolean);
+				let launched = false;
+				for (const p of guessPaths) {
+					try {
+						browser = await puppeteer.launch({
+							headless: 'new' as any,
+							executablePath: p,
+							args: ['--disable-gpu', '--no-sandbox', '--font-render-hinting=none'],
+						} as any);
+						launched = true;
+						break;
+					} catch {}
+				}
+				if (!launched) throw e;
+			}
 		}
 		const page = await browser.newPage();
 		await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
