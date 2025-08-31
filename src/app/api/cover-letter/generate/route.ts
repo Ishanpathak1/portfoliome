@@ -131,6 +131,16 @@ Return only JSON.`;
       parsed = fallbackCompose();
     }
 
+    // Normalize signoff to always include "Sincerely," followed by the candidate's name
+    try {
+      const ensureSincerelySignoff = (signoff: string | undefined, name: string): string => {
+        const candidateName = (name || 'Candidate').trim();
+        // Standardize to exactly two lines: "Sincerely," and the name
+        return `Sincerely,\n${candidateName}`;
+      };
+      parsed.signoff = ensureSincerelySignoff(parsed?.signoff, contactName);
+    } catch {}
+
     // Best-effort save of application status if provided
     const userId = parseUserId(authHeader);
     const allowed: ApplicationStatus[] = ['APPLIED', 'ACCEPTED', 'REJECTED'];

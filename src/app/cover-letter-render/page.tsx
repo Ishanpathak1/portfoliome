@@ -23,7 +23,7 @@ export default function CoverLetterRenderPage({ searchParams }: Props) {
   const greeting = (searchParams.greeting as string) || 'Dear Hiring Manager,';
   const intro = (searchParams.intro as string) || 'I am excited to apply...';
   const closing = (searchParams.closing as string) || '';
-  const signoff = (searchParams.signoff as string) || '';
+  const signoff = (searchParams.signoff as string) || `Sincerely,\n${name}`;
   const bp = searchParams.bp;
   const bodyParas: string[] = Array.isArray(bp)
     ? (bp as string[])
