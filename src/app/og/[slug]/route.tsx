@@ -25,21 +25,22 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
+          alignItems: 'center',
+          justifyContent: 'center',
           background: 'linear-gradient(135deg, #0f172a 0%, #111827 60%, #4c1d95 100%)',
           padding: 80,
           color: '#fff',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28, alignItems: 'center', textAlign: 'center', maxWidth: 1080 }}>
           <div
             style={{
-              fontSize: 96,
-              fontWeight: 800,
-              lineHeight: 1.05,
-              letterSpacing: '-0.025em',
-              textShadow: '0 6px 30px rgba(0,0,0,0.35)'
+              fontSize: 160,
+              fontWeight: 900,
+              lineHeight: 1.0,
+              letterSpacing: '-0.04em',
+              textShadow: '0 10px 40px rgba(0,0,0,0.45)',
+              wordBreak: 'break-word'
             }}
           >
             {displayTitle}
@@ -47,28 +48,14 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
           {slug && (
             <div
               style={{
-                fontSize: 34,
-                opacity: 0.9,
+                fontSize: 42,
+                opacity: 0.95,
+                fontWeight: 600,
               }}
             >
               {`take-my.info/${slug}`}
             </div>
           )}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div
-            style={{
-              fontSize: 28,
-              fontWeight: 700,
-              padding: '12px 18px',
-              borderRadius: 9999,
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.18)'
-            }}
-          >
-            PortfolioHub
-          </div>
         </div>
       </div>
     ),
