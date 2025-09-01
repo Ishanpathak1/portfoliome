@@ -10,12 +10,24 @@ interface NfcTapGuardProps {
   portfolio: DatabasePortfolio;
 }
 
-const STORAGE_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
-
 export function NfcTapGuard({ portfolio }: NfcTapGuardProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+
+  function isIosDevice(): boolean {
+    const ua = navigator.userAgent || (navigator as any).vendor || (window as any).opera;
+    const iPadOS13 = navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1;
+    return /iPad|iPhone|iPod/.test(ua) || iPadOS13;
+  }
+
+  function vibrateShort() {
+    try {
+      if ('vibrate' in navigator && !isIosDevice()) {
+        (navigator as any).vibrate?.(40);
+      }
+    } catch {}
+  }
 
   React.useEffect(() => {
     try {
@@ -23,24 +35,10 @@ export function NfcTapGuard({ portfolio }: NfcTapGuardProps) {
       const tapVal = searchParams?.get('tap');
       const nfcVal = searchParams?.get('nfc');
       const hasTap = tapVal !== null || nfcVal !== null;
-      const isForce = tapVal === 'force' || nfcVal === 'force';
       if (!hasTap) return;
-
-      const key = `nfcPrompt:${portfolio.id}`;
-      const raw = window.localStorage.getItem(key);
-      const now = Date.now();
-      if (!isForce && raw) {
-        const { ts } = JSON.parse(raw);
-        if (now - ts < STORAGE_TTL_MS) {
-          // Respect cooldown; still clean URL
-          cleanUrl(pathname);
-          return;
-        }
-      }
 
       // Show modal and set cooldown
       setOpen(true);
-      window.localStorage.setItem(key, JSON.stringify({ ts: now }));
       // Clean up the query param for SEO/share cleanliness
       cleanUrl(pathname);
     } catch {}
@@ -55,11 +53,13 @@ export function NfcTapGuard({ portfolio }: NfcTapGuardProps) {
   }
 
   function handleSaveContact() {
+    vibrateShort();
     const c = portfolio.resumeData.contact;
     downloadVCard(c, c.name || portfolio.slug);
   }
 
   function handleSendEmail() {
+    vibrateShort();
     const c = portfolio.resumeData.contact;
     const email = c.email || portfolio.userId;
     if (!email) return;
@@ -79,12 +79,7 @@ export function NfcTapGuard({ portfolio }: NfcTapGuardProps) {
   React.useEffect(() => {
     if (!open) return;
     try {
-      const isIos = () => {
-        const ua = navigator.userAgent || (navigator as any).vendor || (window as any).opera;
-        const iPadOS13 = navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1;
-        return /iPad|iPhone|iPod/.test(ua) || iPadOS13;
-      };
-      if ('vibrate' in navigator && !isIos()) {
+      if ('vibrate' in navigator && !isIosDevice()) {
         // Short pulse; safe on Android Chrome
         (navigator as any).vibrate?.(40);
       }
