@@ -75,6 +75,22 @@ export function NfcTapGuard({ portfolio }: NfcTapGuardProps) {
     return () => window.clearTimeout(timer);
   }, [open]);
 
+  // Android-only haptic (vibration) when modal opens
+  React.useEffect(() => {
+    if (!open) return;
+    try {
+      const isIos = () => {
+        const ua = navigator.userAgent || (navigator as any).vendor || (window as any).opera;
+        const iPadOS13 = navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1;
+        return /iPad|iPhone|iPod/.test(ua) || iPadOS13;
+      };
+      if ('vibrate' in navigator && !isIos()) {
+        // Short pulse; safe on Android Chrome
+        (navigator as any).vibrate?.(40);
+      }
+    } catch {}
+  }, [open]);
+
   return (
     <NfcContactModal
       open={open}

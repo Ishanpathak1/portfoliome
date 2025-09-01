@@ -18,6 +18,9 @@ export function NfcContactModal({ open, onClose, onSaveContact, onSendEmail, nam
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="relative z-10 w-[90%] max-w-md rounded-xl border border-white/10 bg-gray-900 p-6 text-white shadow-2xl">
+        <div className="mb-3 rounded-md bg-white/10 px-3 py-2 text-sm text-gray-100">
+          You just tapped {name ? `${name}'s` : 'this'} portfolio.
+        </div>
         <div className="mb-4">
           <h2 className="text-xl font-semibold">Quick actions</h2>
           <p className="mt-1 text-sm text-gray-300">
