@@ -1,5 +1,6 @@
 import { getPortfolioBySlug } from '@/lib/portfolio-db';
 import { PortfolioRenderer } from '@/components/PortfolioRenderer';
+import { NfcTapGuard } from '@/components/NfcTapGuard';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { buildPortfolioJsonLd } from '@/lib/portfolio-structured-data';
@@ -53,6 +54,7 @@ export default async function PortfolioPage({ params, searchParams }: PortfolioP
   return (
     <>
       <PortfolioRenderer portfolio={renderPortfolio} />
+      <NfcTapGuard portfolio={renderPortfolio} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
