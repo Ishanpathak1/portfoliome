@@ -188,7 +188,7 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
                 {contact?.email && (
                   <a href={`mailto:${contact.email}`} className="flex items-center space-x-2 hover:underline">
                     <Mail className="w-4 h-4" />
-                    <span>{contact.email}</span>
+                    <span>Email</span>
                   </a>
                 )}
                 {contact?.phone && (

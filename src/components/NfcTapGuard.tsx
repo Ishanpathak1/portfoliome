@@ -63,8 +63,11 @@ export function NfcTapGuard({ portfolio }: NfcTapGuardProps) {
     const c = portfolio.resumeData.contact;
     const email = c.email || portfolio.userId;
     if (!email) return;
-    const subject = encodeURIComponent('Hello from your NFC card');
-    const body = encodeURIComponent(`Hi ${c.name || ''},\n\n`);
+    const name = (c.name || portfolio.slug || '').trim();
+    const subjectText = name ? `Hello ${name}, I just tapped Your portfolio` : `Hello, I just tapped Your portfolio`;
+    const bodyText = name ? `Hello ${name},\nWe met today at........` : `Hello,\nWe met today at........`;
+    const subject = encodeURIComponent(subjectText);
+    const body = encodeURIComponent(bodyText);
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
   }
 

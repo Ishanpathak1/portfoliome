@@ -138,6 +138,7 @@ function DashboardContent() {
         email: resumeData?.contact?.email || '',
         phone: resumeData?.contact?.phone || '',
         location: resumeData?.contact?.location || '',
+        github: resumeData?.contact?.github || '',
         linkedin: resumeData?.contact?.linkedin || '',
         website: resumeData?.contact?.website || ''
       }
@@ -847,8 +848,8 @@ function DashboardContent() {
   const updateContact = (field: keyof Contact, value: string) => {
     if (!editedResumeData) return;
     
-    // Validate and fix URLs for website and linkedin fields
-    if (field === 'website' || field === 'linkedin') {
+    // Validate and fix URLs for website, linkedin, and github fields
+    if (field === 'website' || field === 'linkedin' || field === 'github') {
       value = validateAndFixUrl(value);
     }
     
@@ -1576,6 +1577,16 @@ function DashboardContent() {
                         onChange={(e) => updateContact('linkedin', e.target.value)}
                         className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         placeholder="https://linkedin.com/in/yourprofile"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-300 text-sm mb-2">GitHub URL</label>
+                      <input
+                        type="url"
+                        value={editedResumeData.contact.github || ''}
+                        onChange={(e) => updateContact('github', e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://github.com/yourusername"
                       />
                     </div>
                     <div>

@@ -13,7 +13,8 @@ export function buildVCardString(contact: Contact): string {
   const name = contact.name || 'Contact';
   const email = contact.email || '';
   const phone = contact.phone || '';
-  const website = contact.website || contact.github || contact.linkedin || '';
+  // Prefer LinkedIn as website if present, else website, then GitHub
+  const website = contact.linkedin || contact.website || contact.github || '';
   const location = contact.location || '';
 
   const lines: string[] = [];
