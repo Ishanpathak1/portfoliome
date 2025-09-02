@@ -46,7 +46,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
         <div className="space-y-8">
           {experience.map((job, index) => (
             <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3">
                 <div>
                   <h3 className="text-xl font-semibold text-white">{job.position}</h3>
                   <p className="text-lg" style={{ color: currentColors.accent }}>{job.company}</p>
@@ -54,9 +54,9 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                     <p className="text-gray-400 text-sm">{job.location}</p>
                   )}
                 </div>
-                <div className="flex items-center text-gray-400 text-sm">
+                <div className="mt-3 sm:mt-0 flex items-center text-gray-400 text-sm bg-gray-900/40 rounded-md px-2 py-1 self-start sm:self-auto">
                   <Calendar className="w-4 h-4 mr-1" />
-                  <span>
+                  <span className="whitespace-nowrap">
                     {formatDate(job.startDate)} - {job.endDate ? formatDate(job.endDate) : 'Present'}
                   </span>
                 </div>
@@ -121,15 +121,15 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
         <div className="grid lg:grid-cols-2 gap-8">
           {projects.map((project, index) => (
             <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
                 <h3 className="text-xl font-semibold text-white">{project.name}</h3>
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto">
                   {project.link && (
                     <a
                       href={project.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-white transition-all duration-300 hover:scale-105 shadow-md"
+                      className="inline-flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-medium text-white transition-all duration-300 hover:scale-105 shadow-md w-full sm:w-auto"
                       style={{ backgroundColor: currentColors.accent }}
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -141,7 +141,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 shadow-md"
+                      className="inline-flex items-center justify-center space-x-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 shadow-md w-full sm:w-auto"
                     >
                       <Github className="w-4 h-4" />
                       <span>View Code</span>
@@ -183,7 +183,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
         <div className="space-y-6">
           {education.map((edu, index) => (
             <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                 <div>
                   <h3 className="text-xl font-semibold text-white">{edu.degree}</h3>
                   <p className="text-lg" style={{ color: currentColors.accent }}>{edu.institution}</p>
@@ -191,9 +191,9 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                     <p className="text-gray-400 text-sm">{edu.location}</p>
                   )}
                 </div>
-                <div className="flex items-center text-gray-400 text-sm">
+                <div className="mt-3 sm:mt-0 flex items-center text-gray-400 text-sm bg-gray-900/40 rounded-md px-2 py-1 self-start sm:self-auto">
                   <Calendar className="w-4 h-4 mr-1" />
-                  <span>
+                  <span className="whitespace-nowrap">
                     {edu.graduationDate ? formatDate(edu.graduationDate) : 'In Progress'}
                   </span>
                 </div>
