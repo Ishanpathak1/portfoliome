@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { 
   Mail, Phone, Linkedin, MapPin, Award, TrendingUp, Users, 
-  Building2, Calendar, ExternalLink, ChevronRight, Star,
+  Building2, Calendar, ExternalLink, ChevronRight,
   Target, Globe, BarChart3, Briefcase, GraduationCap,
   Quote, ArrowUpRight, Play, Pause, Volume2, VolumeX,
   Code
@@ -188,19 +188,11 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 ml-3 sm:ml-4">{skillCategory.category}</h3>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
                   {(skillCategory.items || []).map((skill, skillIndex) => (
-                    <div key={skillIndex} className="flex items-center justify-between">
-                      <span className="text-gray-700 font-medium">{skill}</span>
-                      <div className="flex space-x-1">
-                        {[...Array(5)].map((_, starIndex) => (
-                          <Star 
-                            key={starIndex} 
-                            className={`w-4 h-4 ${starIndex < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
+                    <span key={skillIndex} className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-200">
+                      {skill}
+                    </span>
                   ))}
                 </div>
               </div>

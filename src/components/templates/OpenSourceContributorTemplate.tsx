@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  Github, Star, Users, Award, 
+  Github, Users, Award, 
   ExternalLink, MessageSquare, Heart, Zap, Folder,
   Code2, Calendar, MapPin, Mail, Phone, Linkedin,
   Briefcase, GraduationCap, Activity, TrendingUp,
@@ -283,20 +283,11 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                   <h3 className="text-xl font-bold" style={{ color: colors.text }}>{skillCategory.category}</h3>
                 </div>
 
-                <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
                   {skillCategory.items.map((item, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <span className="font-mono" style={{ color: colors.textSecondary }}>{item}</span>
-                      <div className="flex space-x-1">
-                        {[...Array(5)].map((_, j) => (
-                          <div
-                            key={j}
-                            className={`w-2 h-2 rounded-full ${j < 4 ? 'bg-current' : 'bg-gray-600'}`}
-                            style={{ color: j < 4 ? colors.primary : colors.border }}
-                          />
-                        ))}
-                      </div>
-                    </div>
+                    <span key={i} className="px-2 py-1 text-xs rounded-full border" style={{ backgroundColor: colors.background, borderColor: colors.border, color: colors.text }}>
+                      {item}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -618,9 +609,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
               <div className="px-6 py-3 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
                 <Github className="w-6 h-6 mx-auto" style={{ color: colors.primary }} />
               </div>
-              <div className="px-6 py-3 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
-                <Star className="w-6 h-6 mx-auto" style={{ color: colors.warning }} />
-              </div>
+              {/* Removed star icon to avoid fake ratings */}
               <div className="px-6 py-3 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
                 <Users className="w-6 h-6 mx-auto" style={{ color: colors.success }} />
               </div>

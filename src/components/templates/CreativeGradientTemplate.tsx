@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Phone, Github, Linkedin, Calendar, Award, Code, Briefcase, Star, Zap, Heart, Target, Sparkles, ExternalLink, Sun, Moon, Palette, GraduationCap, MapPin } from 'lucide-react';
+import { Mail, Phone, Github, Linkedin, Calendar, Award, Code, Briefcase, Zap, Heart, Target, Sparkles, ExternalLink, Sun, Moon, Palette, GraduationCap, MapPin } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
@@ -160,31 +160,16 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                   </h3>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="flex flex-wrap gap-2">
                   {(skillGroup.items || []).map((skill, i) => (
-                    <div 
-                      key={i} 
-                      className={`flex items-center justify-between p-3 ${
-                        isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
-                      } rounded-xl transition-all duration-300 hover:scale-105 group/skill`}
+                    <span 
+                      key={i}
+                      className={`px-3 py-1 text-xs md:text-sm font-medium rounded-full ${
+                        isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'
+                      }`}
                     >
-                      <span className={`font-medium text-sm md:text-base ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                        {skill}
-                      </span>
-                      <div className="flex space-x-1">
-                        {[...Array(5)].map((_, starIndex) => (
-                          <Star 
-                            key={starIndex} 
-                            className={`w-3 h-3 md:w-4 md:h-4 ${
-                              starIndex < 4 
-                                ? `text-yellow-400 fill-current` 
-                                : 'text-gray-400'
-                            } group-hover/skill:text-yellow-400 group-hover/skill:fill-current transition-colors duration-300`}
-                            style={{ transitionDelay: `${starIndex * 50}ms` }}
-                          />
-                        ))}
-                      </div>
-                    </div>
+                      {skill}
+                    </span>
                   ))}
                 </div>
               </div>

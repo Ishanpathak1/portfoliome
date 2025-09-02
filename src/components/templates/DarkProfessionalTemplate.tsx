@@ -224,7 +224,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
               <div className="flex items-start">
                 <Award className="w-6 h-6 mr-3 mt-1" style={{ color: currentColors.accent }} />
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{cert}</h3>
+                  <h3 className="text-lg font-semibold text-white break-words break-all sm:break-normal">{cert}</h3>
                 </div>
               </div>
             </div>
