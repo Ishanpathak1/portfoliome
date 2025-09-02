@@ -519,7 +519,7 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
             {certifications.map((cert, index) => (
               <div key={index} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center space-x-3 mb-3">
-                  <CheckCircle className="w-5 h-5" style={{ color: colors.success }} />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: colors.success }} />
                   <h3 className="text-lg font-semibold text-gray-900">{cert}</h3>
                 </div>
               </div>
