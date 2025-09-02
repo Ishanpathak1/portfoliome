@@ -388,11 +388,12 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         className="fixed top-4 left-4 z-50 p-3 rounded-full bg-gray-800 text-white hover:bg-gray-700 shadow-lg transition-all duration-300 lg:hidden"
+        aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
       >
         {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -407,7 +408,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
 
       <div className="flex">
         {/* Sidebar */}
-        <div className={`w-80 bg-gray-800 min-h-screen p-4 lg:p-8 border-r border-gray-700 fixed lg:static h-full z-40 transition-transform duration-300 overflow-y-auto ${
+        <div className={`w-80 bg-gray-800 min-h-screen p-4 lg:p-8 border-r border-gray-700 fixed top-0 left-0 lg:static h-full z-40 transition-transform duration-300 overflow-y-auto ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}>
           {/* Profile Section */}
@@ -498,7 +499,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-4 lg:p-12 lg:ml-0">
+        <div className="flex-1 p-4 lg:p-12 lg:ml-0 w-full mx-auto max-w-3xl lg:max-w-none lg:mx-0">
           {/* About Section */}
           {summary && (
             <section className="mb-8 lg:mb-12">

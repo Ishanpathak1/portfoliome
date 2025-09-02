@@ -376,65 +376,83 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {projects.map((project, index) => (
-              <div 
-                key={index} 
-                className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer"
-                onClick={() => setSelectedProject(selectedProject === index ? null : index)}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">{project.name}</h3>
-                  <ChevronRight 
-                    className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
-                      selectedProject === index ? 'rotate-90' : ''
-                    }`}
-                  />
-                </div>
-                
-                <p className="text-gray-600 mb-4 leading-relaxed">{project.description}</p>
-                
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {(project.technologies || []).map((tech, techIndex) => (
-                    <span
-                      key={techIndex}
-                      className="px-2 py-1 bg-white text-xs font-medium rounded border border-gray-200"
-                      style={{ color: colors.primary }}
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-
-                {(project.link || project.github) && (
-                  <div className="flex space-x-3">
-                    {project.link && (
-                      <a 
-                        href={project.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-1 text-sm font-medium hover:underline"
-                        style={{ color: colors.primary }}
+            {projects.map((project, index) => {
+              const hasLinks = Boolean(project.link || project.github);
+              const isExpanded = selectedProject === index;
+              return (
+                <div 
+                  key={index} 
+                  className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-900">{project.name}</h3>
+                    {hasLinks && (
+                      <button
+                        type="button"
+                        aria-label={isExpanded ? 'Hide project actions' : 'Show project actions'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedProject(isExpanded ? null : index);
+                        }}
+                        className="p-1 rounded hover:bg-gray-100 transition-colors"
                       >
-                        <ExternalLink className="w-4 h-4" />
-                        <span>Live Demo</span>
-                      </a>
-                    )}
-                    {project.github && (
-                      <a 
-                        href={project.github} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-1 text-sm font-medium hover:underline"
-                        style={{ color: colors.primary }}
-                      >
-                        <Github className="w-4 h-4" />
-                        <span>Code</span>
-                      </a>
+                        <ChevronRight 
+                          className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                            isExpanded ? 'rotate-90' : ''
+                          }`}
+                        />
+                      </button>
                     )}
                   </div>
-                )}
-              </div>
-            ))}
+                  
+                  {isExpanded ? (
+                    hasLinks ? (
+                      <div className="flex space-x-3">
+                        {project.link && (
+                          <a 
+                            href={project.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all duration-200 shadow-sm hover:shadow"
+                            style={{ backgroundColor: colors.primary }}
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            <span>See Live</span>
+                          </a>
+                        )}
+                        {project.github && (
+                          <a 
+                            href={project.github} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-200 hover:bg-white"
+                            style={{ color: colors.primary, borderColor: colors.primary }}
+                          >
+                            <Github className="w-4 h-4" />
+                            <span>See Code</span>
+                          </a>
+                        )}
+                      </div>
+                    ) : null
+                  ) : (
+                    <>
+                      <p className="text-gray-600 mb-4 leading-relaxed">{project.description}</p>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {(project.technologies || []).map((tech, techIndex) => (
+                          <span
+                            key={techIndex}
+                            className="px-2 py-1 bg-white text-xs font-medium rounded border border-gray-200"
+                            style={{ color: colors.primary }}
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -105,6 +105,19 @@ function DashboardContent() {
   const [resumeUpdateLoading, setResumeUpdateLoading] = useState(false);
   const [resumeUpdateError, setResumeUpdateError] = useState<string | null>(null);
   const [resumeUpdateSummary, setResumeUpdateSummary] = useState<{ experience: number; projects: number; education: number; skills: number } | null>(null);
+  const [resumeParsedPending, setResumeParsedPending] = useState<ResumeData | null>(null);
+  type MergePreview = {
+    experience: { toAdd: Experience[]; duplicates: Experience[] };
+    education: { toAdd: Education[]; duplicates: Education[] };
+    projects: { toAdd: Project[]; duplicates: Project[] };
+    skills: {
+      newCategories: SkillCategory[];
+      addedItems: { category: string; items: string[] }[];
+      duplicateItems: { category: string; items: string[] }[];
+    };
+  };
+  const [resumeMergePreview, setResumeMergePreview] = useState<MergePreview | null>(null);
+  const [showMergePreview, setShowMergePreview] = useState(false);
 
   // Toast notifications
   const { toasts, removeToast, showSuccess, showError } = useToast();
@@ -132,16 +145,142 @@ function DashboardContent() {
   };
 
   const mergeResumeData = (currentData: ResumeData, parsed: ResumeData): ResumeData => {
+    // Helper: append and dedupe by a computed key
+    const appendDedupe = <T,>(base: T[], incoming: T[], keyFn: (item: T) => string): T[] => {
+      const result: T[] = [...(base || [])];
+      const seen = new Set<string>(result.map(keyFn));
+      for (const item of incoming || []) {
+        const key = keyFn(item);
+        if (!key || !seen.has(key)) {
+          result.push(item);
+          if (key) seen.add(key);
+        }
+      }
+      return result;
+    };
+
+    // Experience key: company name only (per user request)
+    const experience = parsed.experience && parsed.experience.length > 0
+      ? appendDedupe(
+          currentData.experience || [],
+          parsed.experience,
+          (e) => `${(e.company || '').trim().toLowerCase()}`
+        )
+      : currentData.experience;
+
+    // Education key: institution only (per user request)
+    const education = parsed.education && parsed.education.length > 0
+      ? appendDedupe(
+          currentData.education || [],
+          parsed.education,
+          (ed) => `${(ed.institution || '').trim().toLowerCase()}`
+        )
+      : currentData.education;
+
+    // Projects key: project name only (per user request)
+    const projects = parsed.projects && parsed.projects.length > 0
+      ? appendDedupe(
+          currentData.projects || [],
+          parsed.projects,
+          (p) => {
+            const name = (p.name || '').trim().toLowerCase();
+            return `${name}`;
+          }
+        )
+      : currentData.projects;
+
+    // Skills: merge categories by category name; dedupe items within each category
+    const mergeSkills = (base: SkillCategory[] = [], incoming: SkillCategory[] = []): SkillCategory[] => {
+      const categoryMap = new Map<string, SkillCategory>();
+      for (const cat of base) {
+        const key = (cat.category || '').trim().toLowerCase();
+        categoryMap.set(key, { category: cat.category, items: [...(cat.items || [])] });
+      }
+      for (const cat of incoming) {
+        const key = (cat.category || '').trim().toLowerCase();
+        if (!categoryMap.has(key)) {
+          categoryMap.set(key, { category: cat.category, items: [...(cat.items || [])] });
+        } else {
+          const existing = categoryMap.get(key)!;
+          const seen = new Set(existing.items.map(i => i.trim().toLowerCase()));
+          for (const item of cat.items || []) {
+            const norm = item.trim().toLowerCase();
+            if (!seen.has(norm)) {
+              existing.items.push(item);
+              seen.add(norm);
+            }
+          }
+        }
+      }
+      return Array.from(categoryMap.values());
+    };
+
     const merged: ResumeData = {
       ...currentData,
       contact: { ...currentData.contact, ...parsed.contact },
       summary: parsed.summary || currentData.summary,
-      experience: parsed.experience && parsed.experience.length > 0 ? parsed.experience : currentData.experience,
-      education: parsed.education && parsed.education.length > 0 ? parsed.education : currentData.education,
-      projects: parsed.projects && parsed.projects.length > 0 ? parsed.projects : currentData.projects,
-      skills: parsed.skills && parsed.skills.length > 0 ? parsed.skills : currentData.skills,
+      experience,
+      education,
+      projects,
+      skills: parsed.skills && parsed.skills.length > 0 ? mergeSkills(currentData.skills || [], parsed.skills) : currentData.skills,
     };
     return ensureResumeDataStructure(merged);
+  };
+
+  const computeMergePreview = (currentData: ResumeData, parsed: ResumeData): MergePreview => {
+    const norm = (s?: string) => (s || '').trim().toLowerCase();
+    // Experience duplicate: company name only (per request)
+    const expKey = (e: Experience) => `${norm(e.company)}`;
+    // Education duplicate: institution only (per request)
+    const eduKey = (e: Education) => `${norm(e.institution)}`;
+    // Projects duplicate: name only (per request)
+    const projKey = (p: Project) => `${norm(p.name)}`;
+
+    const currentExpKeys = new Set((currentData.experience || []).map(expKey));
+    const currentEduKeys = new Set((currentData.education || []).map(eduKey));
+    const currentProjKeys = new Set((currentData.projects || []).map(projKey));
+
+    const expIncoming = parsed.experience || [];
+    const eduIncoming = parsed.education || [];
+    const projIncoming = parsed.projects || [];
+
+    const experience = {
+      toAdd: expIncoming.filter(e => !currentExpKeys.has(expKey(e))),
+      duplicates: expIncoming.filter(e => currentExpKeys.has(expKey(e)))
+    };
+    const education = {
+      toAdd: eduIncoming.filter(e => !currentEduKeys.has(eduKey(e))),
+      duplicates: eduIncoming.filter(e => currentEduKeys.has(eduKey(e)))
+    };
+    const projects = {
+      toAdd: projIncoming.filter(p => !currentProjKeys.has(projKey(p))),
+      duplicates: projIncoming.filter(p => currentProjKeys.has(projKey(p)))
+    };
+
+    // Skills
+    const currentByCategory = new Map<string, SkillCategory>();
+    for (const cat of currentData.skills || []) {
+      currentByCategory.set(norm(cat.category), { category: cat.category, items: [...(cat.items || [])] });
+    }
+    const newCategories: SkillCategory[] = [];
+    const addedItems: { category: string; items: string[] }[] = [];
+    const duplicateItems: { category: string; items: string[] }[] = [];
+    for (const cat of parsed.skills || []) {
+      const key = norm(cat.category);
+      const incomingItems = (cat.items || []);
+      if (!currentByCategory.has(key)) {
+        if ((cat.items || []).length > 0 || cat.category) newCategories.push({ category: cat.category, items: [...incomingItems] });
+      } else {
+        const existing = currentByCategory.get(key)!;
+        const seen = new Set((existing.items || []).map(i => norm(i)));
+        const toAddItems = incomingItems.filter(i => !seen.has(norm(i)));
+        const dupItems = incomingItems.filter(i => seen.has(norm(i)));
+        if (toAddItems.length) addedItems.push({ category: existing.category, items: toAddItems });
+        if (dupItems.length) duplicateItems.push({ category: existing.category, items: dupItems });
+      }
+    }
+
+    return { experience, education, projects, skills: { newCategories, addedItems, duplicateItems } };
   };
 
   const handleResumeUpdateUpload = async (file: File) => {
@@ -166,8 +305,21 @@ function DashboardContent() {
       const parsed: ResumeData = ensureResumeDataStructure(data.data);
 
       const current = editedResumeData || portfolio?.resumeData || ({} as ResumeData);
+      // Do not apply immediately; show preview and store parsed pending until Save
+      setResumeParsedPending(parsed);
       const next = resumeUpdateMode === 'replace' ? parsed : mergeResumeData(current as ResumeData, parsed);
-      setEditedResumeData(next);
+      if (resumeUpdateMode === 'replace') {
+        setEditedResumeData(next);
+      }
+
+      if (resumeUpdateMode === 'merge') {
+        const preview = computeMergePreview(current as ResumeData, parsed);
+        setResumeMergePreview(preview);
+        setShowMergePreview(true);
+      } else {
+        setResumeMergePreview(null);
+        setShowMergePreview(false);
+      }
 
       setResumeUpdateSummary({
         experience: parsed.experience.length,
@@ -419,6 +571,12 @@ function DashboardContent() {
 
     setSaving(true);
     try {
+      // If merge mode and there's a parsed resume waiting, apply merge just-in-time before save
+      if (resumeUpdateMode === 'merge' && resumeParsedPending && editedResumeData) {
+        const mergedNow = mergeResumeData(editedResumeData, resumeParsedPending);
+        setEditedResumeData(mergedNow);
+      }
+
       // Create a timeout promise to handle long requests
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Request timed out')), 12000); // 12 second timeout
@@ -2300,6 +2458,161 @@ function DashboardContent() {
                     {resumeUpdateSummary && (
                       <div className="text-gray-300 text-sm">
                         Parsed: {resumeUpdateSummary.experience} experience, {resumeUpdateSummary.projects} projects, {resumeUpdateSummary.education} education, {resumeUpdateSummary.skills} skill groups.
+                      </div>
+                    )}
+
+                    {resumeUpdateMode === 'merge' && resumeMergePreview && (
+                      <div className="mt-3 bg-white/5 border border-white/10 rounded-lg">
+                        <div className="flex items-center justify-between px-3 py-2">
+                          <div className="text-white font-medium">Merge Preview</div>
+                          <button
+                            type="button"
+                            onClick={() => setShowMergePreview(v => !v)}
+                            className="text-sm text-gray-300 hover:text-white"
+                          >
+                            {showMergePreview ? 'Hide details' : 'Show details'}
+                          </button>
+                        </div>
+                        <div className="px-3 pb-3 text-sm text-gray-300 space-y-2">
+                          <div>
+                            <span className="text-white">Experience:</span> +{resumeMergePreview.experience.toAdd.length} new, {resumeMergePreview.experience.duplicates.length} duplicates
+                          </div>
+                          <div>
+                            <span className="text-white">Projects:</span> +{resumeMergePreview.projects.toAdd.length} new, {resumeMergePreview.projects.duplicates.length} duplicates
+                          </div>
+                          <div>
+                            <span className="text-white">Education:</span> +{resumeMergePreview.education.toAdd.length} new, {resumeMergePreview.education.duplicates.length} duplicates
+                          </div>
+                          <div>
+                            <span className="text-white">Skills:</span> +{resumeMergePreview.skills.newCategories.length} new categories, +{resumeMergePreview.skills.addedItems.reduce((n, g) => n + g.items.length, 0)} new items, {resumeMergePreview.skills.duplicateItems.reduce((n, g) => n + g.items.length, 0)} duplicates
+                          </div>
+
+                          {showMergePreview && (
+                            <div className="mt-2 space-y-3">
+                              {/* Experience details */}
+                              {(resumeMergePreview.experience.toAdd.length > 0 || resumeMergePreview.experience.duplicates.length > 0) && (
+                                <div>
+                                  <div className="text-white font-medium mb-1">Experience</div>
+                                  {resumeMergePreview.experience.toAdd.length > 0 && (
+                                    <div className="mb-1">
+                                      <div className="text-green-400">To add</div>
+                                      <ul className="list-disc list-inside">
+                                        {resumeMergePreview.experience.toAdd.map((e, i) => (
+                                          <li key={`exp-add-${i}`}>{e.position || e.title} @ {e.company} {e.startDate ? `(${e.startDate})` : ''}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {resumeMergePreview.experience.duplicates.length > 0 && (
+                                    <div>
+                                      <div className="text-gray-400">Duplicates</div>
+                                      <ul className="list-disc list-inside text-gray-400">
+                                        {resumeMergePreview.experience.duplicates.map((e, i) => (
+                                          <li key={`exp-dup-${i}`}>{e.position || e.title} @ {e.company} {e.startDate ? `(${e.startDate})` : ''}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Projects details */}
+                              {(resumeMergePreview.projects.toAdd.length > 0 || resumeMergePreview.projects.duplicates.length > 0) && (
+                                <div>
+                                  <div className="text-white font-medium mb-1">Projects</div>
+                                  {resumeMergePreview.projects.toAdd.length > 0 && (
+                                    <div className="mb-1">
+                                      <div className="text-green-400">To add</div>
+                                      <ul className="list-disc list-inside">
+                                        {resumeMergePreview.projects.toAdd.map((p, i) => (
+                                          <li key={`proj-add-${i}`}>{p.name}{p.link || p.github ? ` – ${p.link || p.github}` : ''}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {resumeMergePreview.projects.duplicates.length > 0 && (
+                                    <div>
+                                      <div className="text-gray-400">Duplicates</div>
+                                      <ul className="list-disc list-inside text-gray-400">
+                                        {resumeMergePreview.projects.duplicates.map((p, i) => (
+                                          <li key={`proj-dup-${i}`}>{p.name}{p.link || p.github ? ` – ${p.link || p.github}` : ''}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Education details */}
+                              {(resumeMergePreview.education.toAdd.length > 0 || resumeMergePreview.education.duplicates.length > 0) && (
+                                <div>
+                                  <div className="text-white font-medium mb-1">Education</div>
+                                  {resumeMergePreview.education.toAdd.length > 0 && (
+                                    <div className="mb-1">
+                                      <div className="text-green-400">To add</div>
+                                      <ul className="list-disc list-inside">
+                                        {resumeMergePreview.education.toAdd.map((e, i) => (
+                                          <li key={`edu-add-${i}`}>{e.degree} @ {e.institution}{e.graduationDate ? ` – ${e.graduationDate}` : ''}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {resumeMergePreview.education.duplicates.length > 0 && (
+                                    <div>
+                                      <div className="text-gray-400">Duplicates</div>
+                                      <ul className="list-disc list-inside text-gray-400">
+                                        {resumeMergePreview.education.duplicates.map((e, i) => (
+                                          <li key={`edu-dup-${i}`}>{e.degree} @ {e.institution}{e.graduationDate ? ` – ${e.graduationDate}` : ''}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Skills details */}
+                              {(resumeMergePreview.skills.newCategories.length > 0 || resumeMergePreview.skills.addedItems.length > 0 || resumeMergePreview.skills.duplicateItems.length > 0) && (
+                                <div>
+                                  <div className="text-white font-medium mb-1">Skills</div>
+                                  {resumeMergePreview.skills.newCategories.length > 0 && (
+                                    <div className="mb-1">
+                                      <div className="text-green-400">New categories</div>
+                                      <ul className="list-disc list-inside">
+                                        {resumeMergePreview.skills.newCategories.map((c, i) => (
+                                          <li key={`skill-cat-add-${i}`}>{c.category} {c.items?.length ? `(${c.items.length})` : ''}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {resumeMergePreview.skills.addedItems.length > 0 && (
+                                    <div className="mb-1">
+                                      <div className="text-green-400">New items</div>
+                                      <ul className="list-disc list-inside">
+                                        {resumeMergePreview.skills.addedItems.map((g, i) => (
+                                          <li key={`skill-add-${i}`}>
+                                            <span className="text-white">{g.category}:</span> {g.items.join(', ')}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {resumeMergePreview.skills.duplicateItems.length > 0 && (
+                                    <div>
+                                      <div className="text-gray-400">Duplicates</div>
+                                      <ul className="list-disc list-inside text-gray-400">
+                                        {resumeMergePreview.skills.duplicateItems.map((g, i) => (
+                                          <li key={`skill-dup-${i}`}>
+                                            <span className="text-white/80">{g.category}:</span> {g.items.join(', ')}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
