@@ -2186,15 +2186,25 @@ function DashboardContent() {
                     </div>
                     <div className="bg-white/5 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-white">
-                        {editedPersonalization?.sectionOrder?.length || 0}
+                        {(() => {
+                          const defaultSectionIds = ['summary','experience','education','skills','projects','certifications'];
+                          const customCount = editedResumeData.customSections?.length || 0;
+                          return defaultSectionIds.length + customCount;
+                        })()}
                       </div>
                       <div className="text-gray-300 text-sm">Total Sections</div>
                     </div>
                     <div className="bg-white/5 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-white">
-                        {editedPersonalization?.hiddenSections?.length || 0}
+                        {(() => {
+                          const defaultSectionIds = ['summary','experience','education','skills','projects','certifications'];
+                          const customCount = editedResumeData.customSections?.length || 0;
+                          const total = defaultSectionIds.length + customCount;
+                          const hidden = editedPersonalization?.hiddenSections?.length || 0;
+                          return Math.max(total - hidden, 0);
+                        })()}
                       </div>
-                      <div className="text-gray-300 text-sm">Hidden Sections</div>
+                      <div className="text-gray-300 text-sm">Visible Sections</div>
                     </div>
                   </div>
                 </div>

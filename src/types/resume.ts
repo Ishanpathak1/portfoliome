@@ -55,6 +55,7 @@ export interface CustomCard {
   title: string;
   description?: string;
   date?: string; // ISO date string
+  link?: string; // Optional external URL
 }
 
 export interface CustomSection {

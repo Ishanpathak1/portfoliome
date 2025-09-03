@@ -951,6 +951,14 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                             {item.description}
                           </p>
                         )}
+                        {item.link && (
+                          <div className="mt-2">
+                            <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-cyan-400 font-mono text-xs hover:underline">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12.9 3h3.6A4.5 4.5 0 0 1 21 7.5v3.6a1 1 0 1 1-2 0V7.5A2.5 2.5 0 0 0 16.5 5h-3.6a1 1 0 0 1 0-2z"/><path d="M7.5 21h3.6a1 1 0 1 0 0-2H7.5A2.5 2.5 0 0 1 5 16.5v-3.6a1 1 0 1 0-2 0v3.6A4.5 4.5 0 0 0 7.5 21z"/><path d="M8 8a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1z"/><path d="M15 15a1 1 0 0 1-1 1H8a1 1 0 1 1 0-2h6a1 1 0 0 1 1 1z"/><path d="M20 4a1 1 0 0 1 0 2 2 2 0 0 0-2 2 1 1 0 1 1-2 0 4 4 0 0 1 4-4z"/></svg>
+                              <span>Open link</span>
+                            </a>
+                          </div>
+                        )}
                         {item.date && (
                           <div className="text-green-400 font-mono text-xs">
                             {formatDate(item.date)}
@@ -978,6 +986,14 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                         {item.description && (
                           <div className="text-cyan-400 font-mono text-xs md:text-sm">
                             {item.description}
+                          </div>
+                        )}
+                        {item.link && (
+                          <div className="mt-2">
+                            <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-cyan-400 font-mono text-xs md:text-sm hover:underline">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12.9 3h3.6A4.5 4.5 0 0 1 21 7.5v3.6a1 1 0 1 1-2 0V7.5A2.5 2.5 0 0 0 16.5 5h-3.6a1 1 0 0 1 0-2z"/><path d="M7.5 21h3.6a1 1 0 1 0 0-2H7.5A2.5 2.5 0 0 1 5 16.5v-3.6a1 1 0 1 0-2 0v3.6A4.5 4.5 0 0 0 7.5 21z"/><path d="M8 8a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1z"/><path d="M15 15a1 1 0 0 1-1 1H8a1 1 0 1 1 0-2h6a1 1 0 0 1 1 1z"/><path d="M20 4a1 1 0 0 1 0 2 2 2 0 0 0-2 2 1 1 0 1 1-2 0 4 4 0 0 1 4-4z"/></svg>
+                              <span>Open link</span>
+                            </a>
                           </div>
                         )}
                         {item.date && (

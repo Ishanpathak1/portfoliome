@@ -75,6 +75,7 @@ export function SectionManager({
     ? sectionOrder.map(id => allSections.find(s => s.id === id)).filter(Boolean)
     : allSections;
 
+
   const addCustomSection = () => {
     if (!newSectionTitle.trim()) return;
 
@@ -85,7 +86,7 @@ export function SectionManager({
         newSectionType === 'list'
           ? newSectionContent.split('\n').filter(line => line.trim())
           : newSectionType === 'cards'
-          ? newSectionCards.filter(c => c && (c.title?.trim() || c.description?.trim() || c.date?.trim()))
+          ? newSectionCards.filter(c => c && (c.title?.trim() || c.description?.trim() || c.date?.trim() || c.link?.trim()))
           : newSectionContent,
       type: newSectionType,
       order: customSections.length,
@@ -194,6 +195,7 @@ export function SectionManager({
         title: String(it?.title || ''),
         description: it?.description ? String(it.description) : undefined,
         date: it?.date ? String(it.date) : undefined,
+        link: it?.link ? String(it.link) : undefined,
       }));
       setEditCards(cards);
       setEditTextContent('');
@@ -219,7 +221,7 @@ export function SectionManager({
         editType === 'list'
           ? editListItems.filter(item => item.trim())
           : editType === 'cards'
-          ? editCards.filter(c => c && (c.title?.trim() || c.description?.trim() || c.date?.trim()))
+          ? editCards.filter(c => c && (c.title?.trim() || c.description?.trim() || c.date?.trim() || c.link?.trim()))
           : editTextContent
     };
     updateCustomSection(sectionId, updates);
@@ -289,7 +291,7 @@ export function SectionManager({
                   <button
                     onClick={() => setNewSectionCards([...
                       newSectionCards,
-                      { title: '', description: '', date: '' }
+                      { title: '', description: '', date: '', link: '' }
                     ])}
                     className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
                   >
@@ -330,6 +332,17 @@ export function SectionManager({
                           next[i] = { ...next[i], date: e.target.value };
                           setNewSectionCards(next);
                         }}
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                      />
+                      <input
+                        type="url"
+                        value={card.link || ''}
+                        onChange={(e) => {
+                          const next = [...newSectionCards];
+                          next[i] = { ...next[i], link: e.target.value };
+                          setNewSectionCards(next);
+                        }}
+                        placeholder="Optional: https://example.com"
                         className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
                       />
                       <div className="flex justify-end">
@@ -629,7 +642,7 @@ export function SectionManager({
                           <div className="flex items-center justify-between mb-2">
                             <label className="block text-white text-sm">Cards</label>
                             <button
-                              onClick={() => setEditCards([...editCards, { title: '', description: '', date: '' }])}
+                              onClick={() => setEditCards([...editCards, { title: '', description: '', date: '', link: '' }])}
                               className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
                             >
                               Add Card
@@ -669,6 +682,17 @@ export function SectionManager({
                                     next[i] = { ...next[i], date: e.target.value };
                                     setEditCards(next);
                                   }}
+                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                />
+                                <input
+                                  type="url"
+                                  value={card.link || ''}
+                                  onChange={(e) => {
+                                    const next = [...editCards];
+                                    next[i] = { ...next[i], link: e.target.value };
+                                    setEditCards(next);
+                                  }}
+                                  placeholder="Optional: https://example.com"
                                   className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
                                 />
                                 <div className="flex justify-end">
