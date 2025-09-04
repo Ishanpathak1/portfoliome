@@ -1479,7 +1479,7 @@ function DashboardContent() {
                         onClick={() => setEditedPersonalization({ ...editedPersonalization, templateId: template.id })}
                         className={`text-left p-4 rounded-xl border-2 transition-all duration-300 ${
                           editedPersonalization.templateId === template.id
-                            ? 'border-purple-400 bg-purple-50 text-[rgb(var(--fg))]'
+                            ? 'border-purple-400 bg-purple-50 text-[rgb(var(--fg))] dark:bg-purple-500/10 dark:text-white dark:ring-2 dark:ring-purple-400/40 dark:ring-offset-2 dark:ring-offset-slate-900'
                             : 'border-[rgb(var(--border))] bg-[rgb(var(--card))] hover:bg-[rgb(var(--border))]/40'
                         }`}
                       >

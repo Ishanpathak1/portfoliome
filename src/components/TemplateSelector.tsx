@@ -53,8 +53,8 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange }: Templat
             key={template.id}
             className={`relative group cursor-pointer transition-all duration-300 ${
               selectedTemplate === template.id 
-                ? 'scale-105 ring-2 ring-blue-400' 
-                : 'hover:scale-102'
+                ? 'scale-105 ring-2 ring-blue-400 dark:ring-blue-400 ring-offset-2 ring-offset-slate-900' 
+                : 'hover:scale-[1.02]'
             }`}
             onClick={() => handleTemplateChange(template.id as TemplateId)}
             onMouseEnter={() => setHoveredTemplate(template.id)}
@@ -62,7 +62,7 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange }: Templat
           >
             <div className={`
               relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden
-              ${selectedTemplate === template.id ? 'bg-white/20' : 'hover:bg-white/15'}
+              ${selectedTemplate === template.id ? 'bg-white/20 border-blue-500/40 shadow-lg shadow-blue-500/20' : 'hover:bg-white/15'}
               transition-all duration-300
             `}>
               {/* Template Preview */}
@@ -246,7 +246,7 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange }: Templat
 
               {/* Hover Effect */}
               {(hoveredTemplate === template.id || selectedTemplate === template.id) && (
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 dark:from-blue-500/20 to-purple-500/10 dark:to-purple-500/20 rounded-2xl pointer-events-none" />
               )}
             </div>
           </div>
