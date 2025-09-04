@@ -1032,7 +1032,7 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[rgb(var(--bg))] flex items-center justify-center">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
           <p className="text-white mt-4 text-center">Loading your dashboard...</p>
@@ -1043,17 +1043,17 @@ function DashboardContent() {
 
   if (!portfolio) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[rgb(var(--bg))] flex items-center justify-center px-6">
         <div className="max-w-2xl mx-auto text-center">
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12">
-            <FileText className="w-16 h-16 text-purple-400 mx-auto mb-6" />
+            <FileText className="w-16 h-16 text-[rgb(var(--accent-600))] mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-white mb-4">No Portfolio Found</h1>
             <p className="text-gray-300 mb-8">
               You haven't created a portfolio yet. Create your first portfolio to get started!
             </p>
             <a 
               href="/"
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center space-x-2 bg-[rgb(var(--accent-600))] hover:bg-[rgb(var(--accent))] text-white px-8 py-4 rounded-full font-semibold hover:scale-105 transition-all duration-300"
             >
               <Upload className="w-5 h-5" />
               <span>Create Portfolio</span>
@@ -1066,11 +1066,11 @@ function DashboardContent() {
 
   return (
     <NavigationPadding>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen bg-[rgb(var(--bg))]">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Tab Navigation */}
-        <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg mb-6 sm:mb-8 mobile-menu-container z-40">
+        <div className="relative bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg mb-6 sm:mb-8 mobile-menu-container z-40">
           {/* Mobile: Hamburger Menu */}
           <div className="sm:hidden">
             <div className="flex items-center justify-between p-4">
@@ -1080,15 +1080,15 @@ function DashboardContent() {
                   const Icon = activeTabData?.icon || BarChart3;
                   return (
                     <>
-                      <Icon className="w-5 h-5 text-white" />
-                      <span className="text-white font-medium">{activeTabData?.title}</span>
+                      <Icon className="w-5 h-5 text-[rgb(var(--fg))]" />
+                      <span className="text-[rgb(var(--fg))] font-medium">{activeTabData?.title}</span>
                     </>
                   );
                 })()}
               </div>
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="p-2 text-gray-300 hover:text-white transition-colors"
+                className="p-2 text-gray-600 hover:text-[rgb(var(--fg))] transition-colors"
               >
                 {showMobileMenu ? (
                   <X className="w-5 h-5" />
@@ -1100,7 +1100,7 @@ function DashboardContent() {
             
             {/* Mobile Menu Dropdown */}
             {showMobileMenu && (
-              <div className="absolute top-full left-0 right-0 z-40 border-t border-white/20 bg-white/100 ">
+              <div className="absolute top-full left-0 right-0 z-40 border-t border-[rgb(var(--border))] bg-[rgb(var(--card))] ">
                 <div className="px-4 py-3 space-y-1">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
@@ -1113,8 +1113,8 @@ function DashboardContent() {
                       }}
                       className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
                         activeTab === tab.id
-                          ? 'bg-white/20 text-black'
-                          : 'text-gray-900 hover:text-purple-500 hover:bg-grey/10'
+                          ? 'bg-[rgb(var(--accent-600))]/15 text-[rgb(var(--fg))]'
+                          : 'text-gray-700 hover:text-[rgb(var(--fg))] hover:bg-[rgb(var(--border))]/40'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -1127,8 +1127,8 @@ function DashboardContent() {
             )}
           </div>
 
-          {/* Desktop: Horizontal tabs */}
-          <div className="hidden sm:block p-1">
+          {/* Show horizontal tabs on small/medium only; hide on desktop where sidebar is used */}
+          <div className="hidden sm:block lg:hidden p-1">
             <div className="flex space-x-1">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -1138,8 +1138,8 @@ function DashboardContent() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-300 whitespace-nowrap ${
                       activeTab === tab.id
-                        ? 'bg-white text-gray-900 shadow-lg'
-                        : 'text-gray-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-[rgb(var(--card))] text-[rgb(var(--fg))] shadow-lg border border-[rgb(var(--border))]'
+                        : 'text-gray-600 hover:text-[rgb(var(--fg))] hover:bg-[rgb(var(--border))]/40'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -1157,18 +1157,18 @@ function DashboardContent() {
           <div className={`${activeTab === 'cover-letter' ? 'xl:col-span-12' : 'lg:col-span-2'} order-2 lg:order-1`}>
             {activeTab === 'cover-letter' && (
               <div className="space-y-4 sm:space-y-6">
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
-                  <h2 className="text-xl font-bold text-white mb-4">Generate your cover letter</h2>
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
+                  <h2 className="text-xl font-bold text-[rgb(var(--fg))] mb-4">Generate your cover letter</h2>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                     {/* Left: JD input and controls */}
                     <div className="space-y-3 xl:col-span-4">
-                      <label className="block text-sm text-gray-200">Paste job description</label>
-                      <textarea className="w-full rounded-lg p-3 bg-white/5 border border-white/10 text-white min-h-[260px]" value={jdText} onChange={(e)=>setJdText(e.target.value)} />
-                      <label className="block text-sm text-gray-200">Optional prompt to guide tone/focus</label>
-                      <input className="w-full rounded-lg p-3 bg-white/5 border border-white/10 text-white" placeholder="Optional: emphasize leadership, keep to 350 words, etc." value={extraPrompt} onChange={(e)=>setExtraPrompt(e.target.value)} />
+                      <label className="block text-sm text-[rgb(var(--muted))]">Paste job description</label>
+                      <textarea className="w-full rounded-lg p-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] text-[rgb(var(--fg))] min-h-[260px]" value={jdText} onChange={(e)=>setJdText(e.target.value)} />
+                      <label className="block text-sm text-[rgb(var(--muted))]">Optional prompt to guide tone/focus</label>
+                      <input className="w-full rounded-lg p-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] text-[rgb(var(--fg))]" placeholder="Optional: emphasize leadership, keep to 350 words, etc." value={extraPrompt} onChange={(e)=>setExtraPrompt(e.target.value)} />
                       <div className="grid grid-cols-2 gap-3">
-                        <input placeholder="Company name (required)" className="rounded-lg p-3 bg-white/5 border border-white/10 text-white" value={clCompany} onChange={(e)=>setClCompany(e.target.value)} />
-                        <select className="rounded-lg p-3 bg-white/5 border border-white/10 text-white" value={clStatus} onChange={(e)=>setClStatus(e.target.value as any)}>
+                        <input placeholder="Company name (required)" className="rounded-lg p-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] text-[rgb(var(--fg))]" value={clCompany} onChange={(e)=>setClCompany(e.target.value)} />
+                        <select className="rounded-lg p-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] text-[rgb(var(--fg))]" value={clStatus} onChange={(e)=>setClStatus(e.target.value as any)}>
                           <option className="text-black" value="Waiting">Applied (waiting)</option>
                           <option className="text-black" value="Approved">Approved</option>
                           <option className="text-black" value="Rejected">Rejected</option>
@@ -1209,7 +1209,7 @@ function DashboardContent() {
                       >{clLoading ? 'Generating…' : 'Generate'}</button>
                     </div>
                     {/* Right: Demo-style preview with quick edits */}
-                    <div className="bg-white rounded-xl p-0 border border-white/10 text-gray-900 overflow-hidden xl:col-span-8">
+                    <div className="bg-white rounded-xl p-0 border border-[rgb(var(--border))] text-gray-900 overflow-hidden xl:col-span-8">
                       <div className="h-1.5 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600" />
                       <div className="p-6">
                         <div className="flex items-end justify-between">
@@ -1287,41 +1287,41 @@ function DashboardContent() {
             )}
             {activeTab === 'jobs' && (
               <div className="space-y-6">
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h2 className="text-2xl font-bold text-white flex items-center space-x-3">
+                      <h2 className="text-2xl font-bold text-[rgb(var(--fg))] flex items-center space-x-3">
                         <Briefcase className="w-6 h-6 text-purple-400" />
                         <span>My Jobs</span>
                       </h2>
-                      <p className="text-gray-300 mt-1">Track your applications and update their status</p>
+                      <p className="text-[rgb(var(--muted))] mt-1">Track your applications and update their status</p>
                     </div>
                   </div>
 
-                  <div className="overflow-hidden rounded-lg border border-white/10">
-                    <table className="min-w-full divide-y divide-white/10">
-                      <thead>
-                        <tr className="bg-white/5">
-                          <th className="px-4 py-2 text-left text-sm font-semibold text-white">Company</th>
-                          <th className="px-4 py-2 text-left text-sm font-semibold text-white">Status</th>
-                          <th className="px-4 py-2 text-right text-sm font-semibold text-white">Actions</th>
+                  <div className="overflow-hidden rounded-lg border border-[rgb(var(--border))]">
+                    <table className="min-w-full divide-y divide-[rgb(var(--border))]">
+                      <thead className="bg-[rgb(var(--card))]">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-sm font-semibold text-[rgb(var(--fg))]">Company</th>
+                          <th className="px-4 py-2 text-left text-sm font-semibold text-[rgb(var(--fg))]">Status</th>
+                          <th className="px-4 py-2 text-right text-sm font-semibold text-[rgb(var(--fg))]">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/10">
+                      <tbody className="divide-y divide-[rgb(var(--border))]">
                         {jobs.length === 0 && (
                           <tr>
-                            <td colSpan={3} className="px-4 py-6 text-center text-gray-300">No applications yet.</td>
+                            <td colSpan={3} className="px-4 py-6 text-center text-[rgb(var(--muted))]">No applications yet.</td>
                           </tr>
                         )}
                         {jobs.map((j) => (
                           <tr key={j.id}>
-                            <td className="px-4 py-3 text-white">{j.company}</td>
+                            <td className="px-4 py-3 text-[rgb(var(--fg))]">{j.company}</td>
                             <td className="px-4 py-3">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${j.status === 'APPLIED' ? 'bg-blue-500/20 text-blue-300' : j.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>{j.status}</span>
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${j.status === 'APPLIED' ? 'bg-blue-100 text-blue-700' : j.status === 'ACCEPTED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} dark:${j.status === 'APPLIED' ? 'bg-blue-500/20 text-blue-300' : j.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>{j.status}</span>
                             </td>
                             <td className="px-4 py-3 text-right">
                               <select
-                                className="rounded-lg p-2 bg-white/5 border border-white/10 text-white"
+                                className="rounded-lg p-2 bg-[rgb(var(--card))] border border-[rgb(var(--border))] text-[rgb(var(--fg))]"
                                 defaultValue={j.status}
                                 onChange={async (e)=>{
                                   const next = e.target.value as 'APPLIED'|'ACCEPTED'|'REJECTED';
@@ -1350,60 +1350,60 @@ function DashboardContent() {
             {activeTab === 'overview' && (
               <div className="space-y-4 sm:space-y-6">
                 {/* Portfolio Stats */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Portfolio Overview</h2>
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
+                  <h2 className="text-xl sm:text-2xl font-bold text-[rgb(var(--fg))] mb-4 sm:mb-6">Portfolio Overview</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
+                    <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 text-center shadow-sm">
                       <BarChart3 className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">{portfolio.views}</div>
-                      <div className="text-gray-300 text-sm">Total Views</div>
+                      <div className="text-2xl font-bold text-[rgb(var(--fg))]">{portfolio.views}</div>
+                      <div className="text-[rgb(var(--muted))] text-sm">Total Views</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
+                    <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 text-center shadow-sm">
                       <Link className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">1</div>
-                      <div className="text-gray-300 text-sm">Portfolio</div>
+                      <div className="text-2xl font-bold text-[rgb(var(--fg))]">1</div>
+                      <div className="text-[rgb(var(--muted))] text-sm">Portfolio</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
+                    <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 text-center shadow-sm">
                       <Palette className="w-8 h-8 text-pink-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white capitalize">{portfolio.templateId.replace('-', ' ')}</div>
-                      <div className="text-gray-300 text-sm">Current Template</div>
+                      <div className="text-2xl font-bold text-[rgb(var(--fg))] capitalize">{portfolio.templateId.replace('-', ' ')}</div>
+                      <div className="text-[rgb(var(--muted))] text-sm">Current Template</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Quick Actions */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
+                  <h3 className="text-lg font-bold text-[rgb(var(--fg))] mb-4">Quick Actions</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
                       onClick={() => setActiveTab('design')}
-                      className="flex items-center space-x-3 bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-300"
+                      className="flex items-center space-x-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--border))]/40 p-4 rounded-xl transition-all duration-300 shadow-sm"
                     >
                       <Palette className="w-6 h-6 text-purple-400" />
                       <div className="text-left">
-                        <div className="text-white font-medium">Change Theme</div>
-                        <div className="text-gray-300 text-sm">Switch templates & colors</div>
+                        <div className="text-[rgb(var(--fg))] font-medium">Change Theme</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">Switch templates & colors</div>
                       </div>
                     </button>
                     <button
                       onClick={() => setActiveTab('content')}
-                      className="flex items-center space-x-3 bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-300"
+                      className="flex items-center space-x-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--border))]/40 p-4 rounded-xl transition-all duration-300 shadow-sm"
                     >
                       <Edit className="w-6 h-6 text-green-400" />
                       <div className="text-left">
-                        <div className="text-white font-medium">Edit Content</div>
-                        <div className="text-gray-300 text-sm">Update your information</div>
+                        <div className="text-[rgb(var(--fg))] font-medium">Edit Content</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">Update your information</div>
                       </div>
                     </button>
                   </div>
                 </div>
 
                 {/* Portfolio URL */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Your Portfolio URL</h3>
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
+                  <h3 className="text-lg font-bold text-[rgb(var(--fg))] mb-4">Your Portfolio URL</h3>
                   <div className="flex items-center space-x-3 mb-6">
-                    <div className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3">
-                      <code className="text-purple-300 text-sm break-all">
+                    <div className="flex-1 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg p-3 shadow-sm">
+                      <code className="text-[rgb(var(--fg))] text-sm break-all">
                         {getPortfolioUrl(portfolio.slug)}
                       </code>
                     </div>
@@ -1417,18 +1417,18 @@ function DashboardContent() {
                   </div>
                   
                   {/* QR Code Section */}
-                  <div className="border-t border-white/10 pt-6">
+                  <div className="border-t border-[rgb(var(--border))] pt-6">
                     <div className="flex items-center space-x-2 mb-4">
                       <QrCode className="w-5 h-5 text-purple-400" />
-                      <h4 className="text-md font-semibold text-white">QR Code</h4>
-                      <div className="flex items-center space-x-1 bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full text-xs">
+                      <h4 className="text-md font-semibold text-[rgb(var(--fg))]">QR Code</h4>
+                      <div className="flex items-center space-x-1 bg-purple-500/20 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-full text-xs">
                         <Smartphone className="w-3 h-3" />
                         <span>Scan to open on mobile</span>
                       </div>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                      <div className="bg-white p-4 rounded-xl shadow-lg">
+                      <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] p-4 rounded-xl shadow-sm">
                         {qrCodeUrl ? (
                           <img 
                             src={qrCodeUrl} 
@@ -1443,7 +1443,7 @@ function DashboardContent() {
                       </div>
                       
                       <div className="flex-1 text-center sm:text-left">
-                        <p className="text-gray-300 text-sm">
+                        <p className="text-[rgb(var(--muted))] text-sm">
                           Scan this QR code with your phone camera to quickly access your portfolio on mobile devices.
                         </p>
                       </div>
@@ -1454,12 +1454,12 @@ function DashboardContent() {
             )}
 
             {activeTab === 'design' && editedPersonalization && (
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Design & Theme</h2>
+              <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
+                <h2 className="text-xl sm:text-2xl font-bold text-[rgb(var(--fg))] mb-4 sm:mb-6">Design & Theme</h2>
                 
                 {/* Template Selection */}
                 <div className="mb-6 sm:mb-8">
-                  <h3 className="text-lg font-medium text-white mb-4">Choose Template</h3>
+                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Choose Template</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     {[
                       { id: 'modern-glassmorphism', name: 'Modern Glassmorphism', desc: 'Sleek with glass effects' },
@@ -1479,12 +1479,12 @@ function DashboardContent() {
                         onClick={() => setEditedPersonalization({ ...editedPersonalization, templateId: template.id })}
                         className={`text-left p-4 rounded-xl border-2 transition-all duration-300 ${
                           editedPersonalization.templateId === template.id
-                            ? 'border-purple-400 bg-purple-500/20'
-                            : 'border-white/20 bg-white/5 hover:bg-white/10'
+                            ? 'border-purple-400 bg-purple-50 text-[rgb(var(--fg))]'
+                            : 'border-[rgb(var(--border))] bg-[rgb(var(--card))] hover:bg-[rgb(var(--border))]/40'
                         }`}
                       >
-                        <div className="text-white font-medium">{template.name}</div>
-                        <div className="text-gray-300 text-sm">{template.desc}</div>
+                        <div className="text-[rgb(var(--fg))] font-medium">{template.name}</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">{template.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -1492,14 +1492,14 @@ function DashboardContent() {
 
                 {/* Color Scheme */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-medium text-white mb-4">Color Scheme</h3>
+                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Color Scheme</h3>
                   <div className="flex space-x-3">
                     {['blue', 'green', 'purple', 'orange', 'red'].map((color) => (
                       <button
                         key={color}
                         onClick={() => setEditedPersonalization({ ...editedPersonalization, colorScheme: color as any })}
                         className={`w-12 h-12 rounded-full border-4 transition-all duration-300 ${
-                          editedPersonalization.colorScheme === color ? 'border-white scale-110' : 'border-transparent'
+                          editedPersonalization.colorScheme === color ? 'border-[rgb(var(--border))] scale-110' : 'border-transparent'
                         } bg-${color}-500`}
                       />
                     ))}
@@ -1509,7 +1509,7 @@ function DashboardContent() {
                 <button
                   onClick={saveChanges}
                   disabled={saving}
-                  className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors"
+                  className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors"
                 >
                   {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   <span>{saving ? 'Saving...' : 'Save Changes'}</span>
@@ -1520,9 +1520,9 @@ function DashboardContent() {
             {activeTab === 'content' && editedResumeData && (
               <div className="space-y-4 sm:space-y-6">
                 {/* Contact Information */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4 sm:mb-6">
-                    <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center space-x-2">
+                    <h2 className="text-xl sm:text-2xl font-bold text-[rgb(var(--fg))] flex items-center space-x-2">
                       <User className="w-5 h-5 sm:w-6 sm:h-6" />
                       <span>Contact Information</span>
                     </h2>
@@ -1530,84 +1530,84 @@ function DashboardContent() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">Full Name</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">Full Name</label>
                       <input
                         type="text"
                         value={editedResumeData.contact.name}
                         onChange={(e) => updateContact('name', e.target.value)}
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full input-field"
                         placeholder="Your full name"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">Email</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">Email</label>
                       <input
                         type="email"
                         value={editedResumeData.contact.email}
                         onChange={(e) => updateContact('email', e.target.value)}
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full input-field"
                         placeholder="your.email@example.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">Phone</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">Phone</label>
                       <input
                         type="tel"
                         value={editedResumeData.contact.phone || ''}
                         onChange={(e) => updateContact('phone', e.target.value)}
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full input-field"
                         placeholder="+1 (555) 123-4567"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">Location</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">Location</label>
                       <input
                         type="text"
                         value={editedResumeData.contact.location || ''}
                         onChange={(e) => updateContact('location', e.target.value)}
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full input-field"
                         placeholder="City, State/Country"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">LinkedIn URL</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">LinkedIn URL</label>
                       <input
                         type="url"
                         value={editedResumeData.contact.linkedin || ''}
                         onChange={(e) => updateContact('linkedin', e.target.value)}
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full input-field"
                         placeholder="https://linkedin.com/in/yourprofile"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">GitHub URL</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">GitHub URL</label>
                       <input
                         type="url"
                         value={editedResumeData.contact.github || ''}
                         onChange={(e) => updateContact('github', e.target.value)}
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full input-field"
                         placeholder="https://github.com/yourusername"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">Website/Portfolio</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">Website/Portfolio</label>
                       <input
                         type="url"
                         value={editedResumeData.contact.website || ''}
                         onChange={(e) => updateContact('website', e.target.value)}
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full input-field"
                         placeholder="https://yourwebsite.com"
                       />
                     </div>
                   </div>
 
                   <div className="mt-6">
-                    <label className="block text-gray-300 text-sm mb-2">Professional Summary</label>
+                    <label className="block text-[rgb(var(--muted))] text-sm mb-2">Professional Summary</label>
                     <textarea
                       value={editedResumeData.summary}
                       onChange={(e) => setEditedResumeData({ ...editedResumeData, summary: e.target.value })}
                       rows={4}
-                      className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full input-field"
                       placeholder="Write a brief professional summary..."
                     />
                   </div>
@@ -1615,7 +1615,7 @@ function DashboardContent() {
                   <button
                     onClick={saveChanges}
                     disabled={saving}
-                    className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors mt-6"
+                    className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors mt-6"
                   >
                     {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     <span>{saving ? 'Saving...' : 'Save Contact Info'}</span>
@@ -1623,15 +1623,15 @@ function DashboardContent() {
                 </div>
 
                 {/* Work Experience */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                    <h2 className="text-2xl font-bold text-[rgb(var(--fg))] flex items-center space-x-2">
                       <Briefcase className="w-6 h-6" />
                       <span>Work Experience</span>
                     </h2>
                     <button
                       onClick={addExperience}
-                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Experience</span>
@@ -1640,37 +1640,37 @@ function DashboardContent() {
 
                   <div className="space-y-4">
                     {editedResumeData.experience.map((exp, index) => (
-                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                      <div key={index} className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg p-4">
                         {editingSection === 'experience' && editingIndex === index ? (
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Company</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Company</label>
                                 <input
                                   type="text"
                                   value={exp.company}
                                   onChange={(e) => updateExperience(index, 'company', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="Company name"
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Position</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Position</label>
                                 <input
                                   type="text"
                                   value={exp.position}
                                   onChange={(e) => updateExperience(index, 'position', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="Job title"
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Location</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Location</label>
                                 <input
                                   type="text"
                                   value={exp.location}
                                   onChange={(e) => updateExperience(index, 'location', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="City, State/Country"
                                 />
                               </div>
@@ -1681,48 +1681,48 @@ function DashboardContent() {
                                   onChange={(e) => updateExperience(index, 'current', e.target.checked)}
                                   className="rounded"
                                 />
-                                <label className="text-gray-300 text-sm">Current position</label>
+                                <label className="text-[rgb(var(--muted))] text-sm">Current position</label>
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Start Date</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Start Date</label>
                                 <input
                                   type="text"
                                   value={exp.startDate}
                                   onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="January 2023"
                                 />
                               </div>
                               {!exp.current && (
                                 <div>
-                                  <label className="block text-gray-300 text-sm mb-2">End Date</label>
+                                  <label className="block text-[rgb(var(--muted))] text-sm mb-2">End Date</label>
                                   <input
                                     type="text"
                                     value={exp.endDate}
                                     onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
-                                    className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="w-full input-field"
                                     placeholder="December 2023"
                                   />
                                 </div>
                               )}
                             </div>
-                                                          <div>
-                                <label className="block text-gray-300 text-sm mb-2">Responsibilities (one per line)</label>
-                                <textarea
-                                  value={(exp.responsibilities || []).join('\n')}
-                                  onChange={(e) => updateExperience(index, 'responsibilities', e.target.value.split('\n').filter(r => r.trim()))}
-                                  rows={4}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                  placeholder="• Developed and maintained web applications&#10;• Collaborated with cross-functional teams&#10;• Improved system performance by 40%"
-                                />
-                              </div>
+                            <div>
+                              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Responsibilities (one per line)</label>
+                              <textarea
+                                value={(exp.responsibilities || []).join('\\n')}
+                                onChange={(e) => updateExperience(index, 'responsibilities', e.target.value.split('\\n').filter(r => r.trim()))}
+                                rows={4}
+                                className="w-full input-field"
+                                placeholder="• Developed and maintained web applications&#10;• Collaborated with cross-functional teams&#10;• Improved system performance by 40%"
+                              />
+                            </div>
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => {
                                   setEditingSection(null);
                                   setEditingIndex(null);
                                 }}
-                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="btn-secondary flex items-center space-x-2"
                               >
                                 <X className="w-4 h-4" />
                                 <span>Cancel</span>
@@ -1730,7 +1730,7 @@ function DashboardContent() {
                               <button
                                 onClick={saveChanges}
                                 disabled={saving}
-                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
                               >
                                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                 <span>{saving ? 'Saving...' : 'Save'}</span>
@@ -1740,18 +1740,18 @@ function DashboardContent() {
                         ) : (
                           <div className="flex items-start justify-between">
                             <div>
-                              <h4 className="text-white font-medium">{exp.position || 'New Position'}</h4>
-                              <p className="text-gray-300">{exp.company} {exp.location && `• ${exp.location}`}</p>
-                              <p className="text-gray-400 text-sm">
+                              <h4 className="text-[rgb(var(--fg))] font-medium">{exp.position || 'New Position'}</h4>
+                              <p className="text-[rgb(var(--muted))]">{exp.company} {exp.location && `• ${exp.location}`}</p>
+                              <p className="text-[rgb(var(--muted))] text-sm">
                                 {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                               </p>
                               {exp.responsibilities && exp.responsibilities.length > 0 && (
-                                <ul className="text-gray-300 text-sm mt-2 space-y-1">
+                                <ul className="text-[rgb(var(--muted))] text-sm mt-2 space-y-1">
                                   {exp.responsibilities.slice(0, 2).map((resp, i) => (
                                     <li key={i}>• {resp}</li>
                                   ))}
                                   {exp.responsibilities.length > 2 && (
-                                    <li className="text-gray-400">... and {exp.responsibilities.length - 2} more</li>
+                                    <li className="text-[rgb(var(--muted))]">... and {exp.responsibilities.length - 2} more</li>
                                   )}
                                 </ul>
                               )}
@@ -1762,13 +1762,13 @@ function DashboardContent() {
                                   setEditingSection('experience');
                                   setEditingIndex(index);
                                 }}
-                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                                className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => deleteExperience(index)}
-                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                                className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -2155,14 +2155,14 @@ function DashboardContent() {
             {activeTab === 'custom' && editedResumeData && (
               <div className="space-y-6">
                 {/* Custom Sections Header */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h2 className="text-2xl font-bold text-white flex items-center space-x-3">
+                      <h2 className="text-2xl font-bold text-[rgb(var(--fg))] flex items-center space-x-3">
                         <Layers className="w-6 h-6 text-purple-400" />
                         <span>Custom Sections</span>
                       </h2>
-                      <p className="text-gray-300 mt-1">Add and organize custom sections for your portfolio</p>
+                      <p className="text-[rgb(var(--muted))] mt-1">Add and organize custom sections for your portfolio</p>
                     </div>
                     <div className="flex items-center space-x-3">
                       <button
@@ -2178,24 +2178,24 @@ function DashboardContent() {
                   
                   {/* Quick Stats */}
                   <div className="grid grid-cols-3 gap-4 mt-6">
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-white">
+                    <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-[rgb(var(--fg))]">
                         {editedResumeData.customSections?.length || 0}
                       </div>
-                      <div className="text-gray-300 text-sm">Custom Sections</div>
+                      <div className="text-[rgb(var(--muted))] text-sm">Custom Sections</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-white">
+                    <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-[rgb(var(--fg))]">
                         {(() => {
                           const defaultSectionIds = ['summary','experience','education','skills','projects','certifications'];
                           const customCount = editedResumeData.customSections?.length || 0;
                           return defaultSectionIds.length + customCount;
                         })()}
                       </div>
-                      <div className="text-gray-300 text-sm">Total Sections</div>
+                      <div className="text-[rgb(var(--muted))] text-sm">Total Sections</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-white">
+                    <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-[rgb(var(--fg))]">
                         {(() => {
                           const defaultSectionIds = ['summary','experience','education','skills','projects','certifications'];
                           const customCount = editedResumeData.customSections?.length || 0;
@@ -2204,20 +2204,20 @@ function DashboardContent() {
                           return Math.max(total - hidden, 0);
                         })()}
                       </div>
-                      <div className="text-gray-300 text-sm">Visible Sections</div>
+                      <div className="text-[rgb(var(--muted))] text-sm">Visible Sections</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Section Headings Customization */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-bold text-white flex items-center space-x-3">
+                      <h3 className="text-xl font-bold text-[rgb(var(--fg))] flex items-center space-x-3">
                         <Edit className="w-5 h-5 text-purple-400" />
                         <span>Section Headings</span>
                       </h3>
-                      <p className="text-gray-300 mt-1">
+                      <p className="text-[rgb(var(--muted))] mt-1">
                         {editedPersonalization?.templateId === 'developer-terminal' 
                           ? 'Section headings are not customizable for this template'
                           : 'Customize section headings to match your profession'
@@ -2225,7 +2225,7 @@ function DashboardContent() {
                       </p>
                     </div>
                     {editedPersonalization?.templateId === 'developer-terminal' ? (
-                      <span className="text-gray-400 px-4 py-2 rounded-lg bg-gray-500/20">
+                      <span className="text-[rgb(var(--muted))] px-4 py-2 rounded-lg bg-[rgb(var(--border))]/40">
                         Not customizable
                       </span>
                     ) : (
@@ -2241,23 +2241,23 @@ function DashboardContent() {
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                     {Object.entries(getAllSectionHeadings(editedPersonalization?.sectionHeadings)).map(([key, value]) => (
-                      <div key={key} className="bg-white/5 rounded-lg p-3">
-                        <div className="text-sm text-gray-400 capitalize">{key}</div>
-                        <div className="text-white font-medium">{value}</div>
+                      <div key={key} className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg p-3">
+                        <div className="text-sm text-[rgb(var(--muted))] capitalize">{key}</div>
+                        <div className="text-[rgb(var(--fg))] font-medium">{value}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Template Text Customization */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-bold text-white flex items-center space-x-3">
+                      <h3 className="text-xl font-bold text-[rgb(var(--fg))] flex items-center space-x-3">
                         <Type className="w-5 h-5 text-purple-400" />
                         <span>Template Text</span>
                       </h3>
-                      <p className="text-gray-300 mt-1">
+                      <p className="text-[rgb(var(--muted))] mt-1">
                         {editedPersonalization?.templateId === 'developer-terminal' 
                           ? 'Template text is not customizable for this template'
                           : 'Customize template-specific text content'
@@ -2265,7 +2265,7 @@ function DashboardContent() {
                       </p>
                     </div>
                     {editedPersonalization?.templateId === 'developer-terminal' ? (
-                      <span className="text-gray-400 px-4 py-2 rounded-lg bg-gray-500/20">
+                      <span className="text-[rgb(var(--muted))] px-4 py-2 rounded-lg bg-[rgb(var(--border))]/40">
                         Not customizable
                       </span>
                     ) : (
@@ -2281,17 +2281,17 @@ function DashboardContent() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     {Object.entries(getAllTemplateText(editedPersonalization?.templateText, editedPersonalization?.templateId || 'corporate-executive')).map(([key, value]) => (
-                      <div key={key} className="bg-white/5 rounded-lg p-3">
-                        <div className="text-sm text-gray-400 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                        <div className="text-white font-medium text-sm truncate">{value}</div>
+                      <div key={key} className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg p-3">
+                        <div className="text-sm text-[rgb(var(--muted))] capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                        <div className="text-[rgb(var(--fg))] font-medium text-sm truncate">{value}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Section Manager */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                  <h3 className="text-lg font-semibold text-white mb-6">Section Manager</h3>
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-[rgb(var(--fg))] mb-6">Section Manager</h3>
                   
                   <SectionManager
                     resumeData={editedResumeData}
@@ -2327,9 +2327,9 @@ function DashboardContent() {
                 </div>
 
                 {/* Live Preview */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white">Live Preview</h3>
+                    <h3 className="text-lg font-semibold text-[rgb(var(--fg))]">Live Preview</h3>
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center space-x-1">
                         <div className="w-2 h-2 bg-red-400 rounded-full"></div>
@@ -2340,7 +2340,7 @@ function DashboardContent() {
                         href={`/${portfolio.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-1 text-gray-300 hover:text-white text-sm transition-colors"
+                        className="flex items-center space-x-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] text-sm transition-colors"
                       >
                         <ExternalLink className="w-4 h-4" />
                         <span>Open in New Tab</span>
@@ -2348,7 +2348,7 @@ function DashboardContent() {
                     </div>
                   </div>
                   
-                  <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden" style={{ height: '600px' }}>
+                  <div className="bg-[rgb(var(--card))] rounded-lg border border-[rgb(var(--border))] overflow-hidden" style={{ height: '600px' }}>
                     <div className="w-full h-full overflow-auto relative">
                       <div className="transform scale-75 origin-top-left w-[133.33%] h-[133.33%]">
                         <PortfolioRenderer 
@@ -2366,19 +2366,19 @@ function DashboardContent() {
             )}
 
             {activeTab === 'settings' && (
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-6">Portfolio Settings</h2>
+              <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
+                <h2 className="text-2xl font-bold text-[rgb(var(--fg))] mb-6">Portfolio Settings</h2>
                 
                 {/* Slug Editor */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-medium text-white mb-4">Custom URL</h3>
+                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Custom URL</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-gray-300 text-sm mb-2">Portfolio URL Slug</label>
+                      <label className="block text-[rgb(var(--muted))] text-sm mb-2">Portfolio URL Slug</label>
                       <div className="flex items-center space-x-3">
                         <div className="flex-1">
                           <div className="flex">
-                            <div className="bg-white/5 border border-white/20 border-r-0 rounded-l-lg px-3 py-2 text-gray-300 text-sm">
+                            <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] border-r-0 rounded-l-lg px-3 py-2 text-[rgb(var(--muted))] text-sm">
                               {getBaseUrl()}/
                             </div>
                             <input
@@ -2389,20 +2389,20 @@ function DashboardContent() {
                                 setEditedSlug(newSlug);
                                 checkSlugAvailability(newSlug);
                               }}
-                              className="flex-1 bg-white/5 border border-white/20 rounded-r-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              className="flex-1 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-r-lg px-3 py-2 text-[rgb(var(--fg))] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ring))]"
                               placeholder="your-custom-slug"
                             />
                           </div>
                         </div>
-                        {checkingSlug && <RefreshCw className="w-5 h-5 text-gray-400 animate-spin" />}
+                        {checkingSlug && <RefreshCw className="w-5 h-5 text-[rgb(var(--muted))] animate-spin" />}
                         {slugAvailable === true && editedSlug !== portfolio.slug && <Check className="w-5 h-5 text-green-400" />}
                         {slugAvailable === false && <span className="text-red-400 text-sm">Taken</span>}
                       </div>
                       {slugAvailable === false && (
-                        <p className="text-red-400 text-sm mt-1">This URL is already taken. Please try a different one.</p>
+                        <p className="text-red-600 text-sm mt-1">This URL is already taken. Please try a different one.</p>
                       )}
                       {slugAvailable === true && editedSlug !== portfolio.slug && (
-                        <p className="text-green-400 text-sm mt-1">This URL is available!</p>
+                        <p className="text-green-600 text-sm mt-1">This URL is available!</p>
                       )}
                     </div>
                   </div>
@@ -2410,26 +2410,26 @@ function DashboardContent() {
 
                 {/* Privacy Settings */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-medium text-white mb-4">Privacy</h3>
-                  <div className="bg-white/5 rounded-xl p-4">
+                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Privacy</h3>
+                  <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-white font-medium">Portfolio Visibility</div>
-                        <div className="text-gray-300 text-sm">Your portfolio is currently public and searchable</div>
+                        <div className="text-[rgb(var(--fg))] font-medium">Portfolio Visibility</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">Your portfolio is currently public and searchable</div>
                       </div>
-                      <div className="text-green-400 font-medium">Public</div>
+                      <div className="text-green-600 font-medium">Public</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Update from Resume */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-medium text-white mb-4">Update from Resume</h3>
-                  <div className="bg-white/5 rounded-xl p-4 space-y-4">
+                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Update from Resume</h3>
+                  <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div className="text-gray-300 text-sm">Upload a new resume to refresh your portfolio content.</div>
+                      <div className="text-[rgb(var(--muted))] text-sm">Upload a new resume to refresh your portfolio content.</div>
                       <div className="flex items-center gap-3">
-                        <label className="inline-flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
+                        <label className="inline-flex items-center gap-2 text-[rgb(var(--muted))] text-sm cursor-pointer">
                           <input
                             type="radio"
                             name="resume-update-mode"
@@ -2438,7 +2438,7 @@ function DashboardContent() {
                           />
                           <span>Merge</span>
                         </label>
-                        <label className="inline-flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
+                        <label className="inline-flex items-center gap-2 text-[rgb(var(--muted))] text-sm cursor-pointer">
                           <input
                             type="radio"
                             name="resume-update-mode"
@@ -2473,39 +2473,39 @@ function DashboardContent() {
                         <Upload className="w-4 h-4" />
                         <span>{resumeUpdateLoading ? 'Processing…' : 'Upload Resume'}</span>
                       </label>
-                      {resumeUpdateError && <span className="text-red-400 text-sm">{resumeUpdateError}</span>}
+                      {resumeUpdateError && <span className="text-red-600 text-sm">{resumeUpdateError}</span>}
                     </div>
 
                     {resumeUpdateSummary && (
-                      <div className="text-gray-300 text-sm">
+                      <div className="text-[rgb(var(--muted))] text-sm">
                         Parsed: {resumeUpdateSummary.experience} experience, {resumeUpdateSummary.projects} projects, {resumeUpdateSummary.education} education, {resumeUpdateSummary.skills} skill groups.
                       </div>
                     )}
 
                     {resumeUpdateMode === 'merge' && resumeMergePreview && (
-                      <div className="mt-3 bg-white/5 border border-white/10 rounded-lg">
+                      <div className="mt-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg">
                         <div className="flex items-center justify-between px-3 py-2">
-                          <div className="text-white font-medium">Merge Preview</div>
+                          <div className="text-[rgb(var(--fg))] font-medium">Merge Preview</div>
                           <button
                             type="button"
                             onClick={() => setShowMergePreview(v => !v)}
-                            className="text-sm text-gray-300 hover:text-white"
+                            className="text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))]"
                           >
                             {showMergePreview ? 'Hide details' : 'Show details'}
                           </button>
                         </div>
-                        <div className="px-3 pb-3 text-sm text-gray-300 space-y-2">
+                        <div className="px-3 pb-3 text-sm text-[rgb(var(--muted))] space-y-2">
                           <div>
-                            <span className="text-white">Experience:</span> +{resumeMergePreview.experience.toAdd.length} new, {resumeMergePreview.experience.duplicates.length} duplicates
+                            <span className="text-[rgb(var(--fg))]">Experience:</span> +{resumeMergePreview.experience.toAdd.length} new, {resumeMergePreview.experience.duplicates.length} duplicates
                           </div>
                           <div>
-                            <span className="text-white">Projects:</span> +{resumeMergePreview.projects.toAdd.length} new, {resumeMergePreview.projects.duplicates.length} duplicates
+                            <span className="text-[rgb(var(--fg))]">Projects:</span> +{resumeMergePreview.projects.toAdd.length} new, {resumeMergePreview.projects.duplicates.length} duplicates
                           </div>
                           <div>
-                            <span className="text-white">Education:</span> +{resumeMergePreview.education.toAdd.length} new, {resumeMergePreview.education.duplicates.length} duplicates
+                            <span className="text-[rgb(var(--fg))]">Education:</span> +{resumeMergePreview.education.toAdd.length} new, {resumeMergePreview.education.duplicates.length} duplicates
                           </div>
                           <div>
-                            <span className="text-white">Skills:</span> +{resumeMergePreview.skills.newCategories.length} new categories, +{resumeMergePreview.skills.addedItems.reduce((n, g) => n + g.items.length, 0)} new items, {resumeMergePreview.skills.duplicateItems.reduce((n, g) => n + g.items.length, 0)} duplicates
+                            <span className="text-[rgb(var(--fg))]">Skills:</span> +{resumeMergePreview.skills.newCategories.length} new categories, +{resumeMergePreview.skills.addedItems.reduce((n, g) => n + g.items.length, 0)} new items, {resumeMergePreview.skills.duplicateItems.reduce((n, g) => n + g.items.length, 0)} duplicates
                           </div>
 
                           {showMergePreview && (
@@ -2656,17 +2656,17 @@ function DashboardContent() {
             {activeTab !== 'cover-letter' && (
             <>
             {/* Current Template Preview */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Current Template</h3>
-              <div className="aspect-video bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+            <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-[rgb(var(--fg))] mb-4">Current Template</h3>
+              <div className="aspect-video bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg overflow-hidden">
                 {renderTemplatePreview(portfolio.templateId)}
               </div>
               <div className="mt-4 space-y-2">
                 <div className="text-center">
-                  <div className="text-sm font-medium text-white capitalize">
+                  <div className="text-sm font-medium text-[rgb(var(--fg))] capitalize">
                     {portfolio.templateId.replace('-', ' ')}
                   </div>
-                  <div className="text-xs text-gray-300">
+                  <div className="text-xs text-[rgb(var(--muted))]">
                     {portfolio.personalization?.colorScheme && (
                       <span className="capitalize">{portfolio.personalization.colorScheme} theme</span>
                     )}
@@ -2676,7 +2676,7 @@ function DashboardContent() {
                   href={`/${portfolio.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center bg-white/10 hover:bg-white/20 border border-white/20 text-white py-2 rounded-lg transition-colors text-sm sm:text-base"
+                  className="block w-full text-center bg-[rgb(var(--card))] hover:bg-[rgb(var(--border))]/40 border border-[rgb(var(--border))] text-[rgb(var(--fg))] py-2 rounded-lg transition-colors text-sm sm:text-base"
                 >
                   View Live Portfolio
                 </a>
@@ -2684,24 +2684,24 @@ function DashboardContent() {
             </div>
 
             {/* Portfolio Info */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Portfolio Info</h3>
+            <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-[rgb(var(--fg))] mb-4">Portfolio Info</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Created:</span>
-                  <span className="text-white">{new Date(portfolio.createdAt).toLocaleDateString()}</span>
+                  <span className="text-[rgb(var(--muted))]">Created:</span>
+                  <span className="text-[rgb(var(--fg))]">{new Date(portfolio.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Last Updated:</span>
-                  <span className="text-white">{new Date(portfolio.updatedAt).toLocaleDateString()}</span>
+                  <span className="text-[rgb(var(--muted))]">Last Updated:</span>
+                  <span className="text-[rgb(var(--fg))]">{new Date(portfolio.updatedAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Template:</span>
-                  <span className="text-white capitalize">{portfolio.templateId.replace('-', ' ')}</span>
+                  <span className="text-[rgb(var(--muted))]">Template:</span>
+                  <span className="text-[rgb(var(--fg))] capitalize">{portfolio.templateId.replace('-', ' ')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Views:</span>
-                  <span className="text-white">{portfolio.views}</span>
+                  <span className="text-[rgb(var(--muted))]">Views:</span>
+                  <span className="text-[rgb(var(--fg))]">{portfolio.views}</span>
                 </div>
               </div>
             </div>

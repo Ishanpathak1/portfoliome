@@ -5,19 +5,14 @@ import Link from 'next/link';
 import { useAuth } from './FirebaseAuthWrapper';
 import { useState, useEffect } from 'react';
 import { 
-  Home,
-  Layout,
-  Info,
-  HelpCircle,
-  Mail,
   LogIn,
   User,
   LogOut,
-  BookOpen,
   Menu,
   X,
   ExternalLink,
 } from 'lucide-react';
+import { navItems as navigation } from '@/components/nav-config';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface NavigationProps {
@@ -77,15 +72,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
   // Auto-detect dashboard mode if not explicitly set
   const isDashboard = showDashboardMode || pathname === '/dashboard';
 
-  const navigation = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Features', href: '/features', icon: Layout },
-    { name: 'Templates', href: '/templates', icon: Layout },
-    { name: 'Blog', href: '/blog', icon: BookOpen },
-    { name: 'How It Works', href: '/how-it-works', icon: Info },
-    { name: 'FAQ', href: '/faq', icon: HelpCircle },
-    { name: 'Contact', href: '/contact', icon: Mail },
-  ];
+  // navigation imported from shared config
 
   const isActive = (path: string) => pathname === path;
 
@@ -94,47 +81,47 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[rgb(var(--card))]/80 backdrop-blur-xl border-b border-[rgb(var(--border))]/60">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-3">
           {/* Logo / Dashboard Title */}
           {isDashboard && user ? (
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+            <div className="flex items-center gap-3 flex-shrink-0 min-w-[220px] ml-[-12px] sm:ml-[-24px] lg:ml-[-32px]">
+              <div className="w-10 h-10 bg-[rgb(var(--accent-600))] rounded-full flex items-center justify-center">
                 <User className="w-5 h-5 text-white" />
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-white">
+                <h1 className="text-xl font-bold text-[rgb(var(--fg))] dark:text-white">
                   Welcome back, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0]}
                 </h1>
-                <p className="text-gray-300 text-sm">Dashboard</p>
+                <p className="text-gray-500 dark:text-gray-300 text-sm">Dashboard</p>
               </div>
               <div className="sm:hidden">
-                <h1 className="text-lg font-bold text-white">Dashboard</h1>
+                <h1 className="text-lg font-bold text-[rgb(var(--fg))] dark:text-white">Dashboard</h1>
               </div>
             </div>
           ) : (
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-[rgb(var(--accent-600))] rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">P</span>
               </div>
-              <span className="text-white font-bold text-xl">PortfolioHub</span>
+              <span className="font-bold text-xl text-[rgb(var(--fg))] dark:text-white">PortfolioHub</span>
             </Link>
           )}
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-1 overflow-x-auto">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
                   isActive(item.href)
-                    ? 'bg-white/20 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                    ? 'bg-[rgb(var(--accent-600))]/15 text-[rgb(var(--fg))] dark:text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white hover:bg-[rgb(var(--border))]/40'
                 }`}
               >
-                <span className="flex items-center space-x-1">
+                <span className="flex items-center gap-1.5">
                   <item.icon className="w-4 h-4" />
                   <span>{item.name}</span>
                 </span>
@@ -143,7 +130,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
           </div>
 
           {/* Auth Buttons, Notification Bell & Mobile Menu */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {user ? (
               <div className="flex items-center space-x-3">
                 {isDashboard ? (
@@ -154,8 +141,8 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                       href={userPortfolio ? `/${userPortfolio.slug}` : '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center space-x-2 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 ${
-                        userPortfolio ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-500/50 cursor-not-allowed'
+                      className={`flex items-center gap-2 border border-[rgb(var(--border))] text-[rgb(var(--fg))] dark:text-white px-3 py-2 rounded-md transition-colors whitespace-nowrap ${
+                        userPortfolio ? 'hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10' : 'opacity-60 cursor-not-allowed'
                       }`}
                       onClick={(e) => {
                         if (!userPortfolio) {
@@ -170,7 +157,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                     </a>
                     <button
                       onClick={() => signOut()}
-                      className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                      className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white transition-colors px-3 py-2 rounded-md hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10"
                       title="Sign Out"
                     >
                       <LogOut className="w-4 h-4" />
@@ -183,14 +170,14 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                     <NotificationBell />
                     <Link
                       href="/dashboard"
-                      className="flex items-center space-x-2 px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-[rgb(var(--accent-600))]/10 rounded-md text-[rgb(var(--fg))] dark:text-white hover:bg-[rgb(var(--accent-600))]/20 transition-colors whitespace-nowrap"
                     >
                       <User className="w-4 h-4" />
                       <span className="hidden sm:inline">Dashboard</span>
                     </Link>
                     <button
                       onClick={() => signOut()}
-                      className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                      className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white transition-colors px-3 py-2 rounded-md hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10"
                       title="Sign Out"
                     >
                       <LogOut className="w-4 h-4" />
@@ -202,7 +189,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
             ) : (
               <button
                 onClick={() => signInWithGoogle()}
-                className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                className="flex items-center gap-2 bg-[rgb(var(--accent-600))] text-white px-4 py-2 rounded-md hover:bg-[rgb(var(--accent))] transition-colors"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Sign In</span>
@@ -212,7 +199,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+              className="lg:hidden p-2 rounded-md text-black dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-[rgb(var(--border))]/40 transition-colors"
             >
               {isMobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -226,7 +213,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
 
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-white/10 bg-white/5 backdrop-blur-xl">
+        <div className="lg:hidden border-t border-[rgb(var(--border))]/60 bg-[rgb(var(--card))]/70 dark:bg-black/30 backdrop-blur-xl">
           <div className="px-4 py-3 space-y-1">
             {navigation.map((item) => (
               <Link
@@ -235,8 +222,8 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'bg-white/20 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                    ? 'bg-[rgb(var(--accent-600))]/10 text-[rgb(var(--fg))] dark:text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10'
                 }`}
               >
                 <item.icon className="w-5 h-5" />

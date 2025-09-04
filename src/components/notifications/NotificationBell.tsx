@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Bell, Check, ChevronRight, Circle, X, AlertTriangle, Megaphone } from 'lucide-react';
 import { useNotifications } from './NotificationStore';
 import { AppNotification } from './NotificationTypes';
@@ -33,15 +33,41 @@ function buildDashboardLink(n: AppNotification): string {
 export function NotificationBell({ isDashboard = false }: NotificationBellProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotifications();
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const unreadNotifications = useMemo(() => notifications.filter(n => !n.read), [notifications]);
   const topNotifications = useMemo(() => unreadNotifications.slice(0, 8), [unreadNotifications]);
 
+  // Close on outside click (desktop) and on Escape
+  useEffect(() => {
+    if (!open) return;
+
+    function handleDocumentMouseDown(event: MouseEvent) {
+      const container = containerRef.current;
+      if (!container) return;
+      const target = event.target as Node | null;
+      if (target && !container.contains(target)) {
+        setOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+
+    document.addEventListener('mousedown', handleDocumentMouseDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentMouseDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+        className="relative p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white hover:bg-[rgb(var(--border))]/40 transition-colors"
         title="Notifications"
       >
         <Bell className="w-5 h-5" />

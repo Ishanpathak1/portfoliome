@@ -5,6 +5,7 @@ import ConditionalAuthWrapper from '@/components/ConditionalAuthWrapper';
 import { NotificationProvider } from '@/components/notifications/NotificationStore';
 import { GoogleAnalyticsWrapper } from '@/components/GoogleAnalytics';
 import ConditionalNavigation from '@/components/ConditionalNavigation';
+import ThemeProvider from '../components/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -104,15 +105,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <GoogleAnalyticsWrapper />
         <ConditionalAuthWrapper>
           <NotificationProvider>
-            <ConditionalNavigation />
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-              {children}
-            </div>
+            <ThemeProvider>
+              <ConditionalNavigation />
+              <div className="min-h-screen bg-[rgb(var(--bg))]">
+                {children}
+              </div>
+            </ThemeProvider>
           </NotificationProvider>
         </ConditionalAuthWrapper>
       </body>

@@ -16,5 +16,6 @@ export default function ConditionalNavigation() {
     return null;
   }
 
+  // Always show top navigation; dashboard will also have a sidebar on desktop
   return <Navigation showDashboardMode={isDashboardPage} />;
 } 
