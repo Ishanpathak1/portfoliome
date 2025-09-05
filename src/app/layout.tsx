@@ -6,6 +6,7 @@ import { NotificationProvider } from '@/components/notifications/NotificationSto
 import { GoogleAnalyticsWrapper } from '@/components/GoogleAnalytics';
 import ConditionalNavigation from '@/components/ConditionalNavigation';
 import ThemeProvider from '../components/ThemeProvider';
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -118,6 +119,7 @@ export default function RootLayout({
             </ThemeProvider>
           </NotificationProvider>
         </ConditionalAuthWrapper>
+        <Analytics />
       </body>
     </html>
   );
