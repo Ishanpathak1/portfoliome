@@ -572,9 +572,11 @@ function DashboardContent() {
 
     setSaving(true);
     try {
-      // If merge mode and there's a parsed resume waiting, apply merge just-in-time before save
+      // If merge mode and there's a parsed resume waiting, compute merged data locally
+      let effectiveResumeData = editedResumeData;
       if (resumeUpdateMode === 'merge' && resumeParsedPending && editedResumeData) {
         const mergedNow = mergeResumeData(editedResumeData, resumeParsedPending);
+        effectiveResumeData = mergedNow;
         setEditedResumeData(mergedNow);
       }
 
@@ -584,13 +586,13 @@ function DashboardContent() {
       });
 
       // Sanitize resume data before saving (e.g., remove empty technologies from projects)
-      const sanitizedResumeData = editedResumeData ? {
-        ...editedResumeData,
-        projects: (editedResumeData.projects || []).map((p) => ({
+      const sanitizedResumeData = effectiveResumeData ? {
+        ...effectiveResumeData,
+        projects: (effectiveResumeData.projects || []).map((p) => ({
           ...p,
           technologies: (p.technologies || []).map(t => t.trim()).filter(t => t),
         })),
-      } : editedResumeData;
+      } : effectiveResumeData;
 
       const fetchPromise = fetch('/api/update-portfolio', {
         method: 'PUT',
@@ -620,6 +622,10 @@ function DashboardContent() {
         showSuccess('Portfolio updated successfully!');
         setEditingSection(null);
         setEditingIndex(null);
+        // Clear any pending merge/preview state after successful save
+        setResumeParsedPending(null);
+        setResumeMergePreview(null);
+        setShowMergePreview(false);
       } else {
         const error = await response.json();
         if (error.field === 'slug') {
