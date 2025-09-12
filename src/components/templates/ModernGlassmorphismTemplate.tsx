@@ -21,50 +21,50 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
   const { sectionHeadings, templateText } = personalization;
   const [activeSection, setActiveSection] = useState('about');
 
-  // Simple theme colors
+  // Subtle purple theme colors
   const getThemeColors = (scheme: string) => {
     const themes = {
       blue: {
-        primary: 'from-blue-600 to-indigo-600',
-        secondary: 'from-indigo-600 to-purple-600',
-        accent: 'text-blue-600',
-        bg: 'bg-gradient-to-br from-slate-50 to-blue-50',
-        card: 'bg-white/80 backdrop-blur-sm border border-gray-200/50',
+        primary: 'from-purple-500 to-violet-600',
+        secondary: 'from-violet-500 to-purple-600',
+        accent: 'text-purple-600',
+        bg: 'bg-gradient-to-br from-purple-50/30 to-violet-50/50',
+        card: 'bg-white/90 backdrop-blur-sm border border-purple-100/60 shadow-purple-100/20',
         text: 'text-gray-900',
-        textSecondary: 'text-gray-600'
+        textSecondary: 'text-gray-700'
       },
       green: {
-        primary: 'from-emerald-600 to-teal-600',
-        secondary: 'from-teal-600 to-cyan-600',
-        accent: 'text-emerald-600',
-        bg: 'bg-gradient-to-br from-slate-50 to-emerald-50',
-        card: 'bg-white/80 backdrop-blur-sm border border-gray-200/50',
+        primary: 'from-purple-500 to-violet-600',
+        secondary: 'from-violet-500 to-purple-600',
+        accent: 'text-purple-600',
+        bg: 'bg-gradient-to-br from-purple-50/30 to-violet-50/50',
+        card: 'bg-white/90 backdrop-blur-sm border border-purple-100/60 shadow-purple-100/20',
         text: 'text-gray-900',
-        textSecondary: 'text-gray-600'
+        textSecondary: 'text-gray-700'
       },
       purple: {
-        primary: 'from-purple-600 to-pink-600',
-        secondary: 'from-pink-600 to-rose-600',
+        primary: 'from-purple-500 to-violet-600',
+        secondary: 'from-violet-500 to-purple-600',
         accent: 'text-purple-600',
-        bg: 'bg-gradient-to-br from-slate-50 to-purple-50',
-        card: 'bg-white/80 backdrop-blur-sm border border-gray-200/50',
+        bg: 'bg-gradient-to-br from-purple-50/30 to-violet-50/50',
+        card: 'bg-white/90 backdrop-blur-sm border border-purple-100/60 shadow-purple-100/20',
         text: 'text-gray-900',
-        textSecondary: 'text-gray-600'
+        textSecondary: 'text-gray-700'
       },
       orange: {
-        primary: 'from-orange-600 to-amber-600',
-        secondary: 'from-amber-600 to-yellow-600',
-        accent: 'text-orange-600',
-        bg: 'bg-gradient-to-br from-slate-50 to-orange-50',
-        card: 'bg-white/80 backdrop-blur-sm border border-gray-200/50',
+        primary: 'from-purple-500 to-violet-600',
+        secondary: 'from-violet-500 to-purple-600',
+        accent: 'text-purple-600',
+        bg: 'bg-gradient-to-br from-purple-50/30 to-violet-50/50',
+        card: 'bg-white/90 backdrop-blur-sm border border-purple-100/60 shadow-purple-100/20',
         text: 'text-gray-900',
-        textSecondary: 'text-gray-600'
+        textSecondary: 'text-gray-700'
       }
     };
-    return themes[scheme as keyof typeof themes] || themes.blue;
+    return themes[scheme as keyof typeof themes] || themes.purple;
   };
 
-  const theme = getThemeColors(personalization?.colorScheme || 'blue');
+  const theme = getThemeColors(personalization?.colorScheme || 'purple');
   const sectionOrder = personalization?.sectionOrder || [
     'experience', 'skills', 'projects', 'education', 'certifications'
   ];
@@ -189,9 +189,9 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <div className={`w-80 h-80 rounded-3xl bg-gradient-to-br ${theme.primary} flex items-center justify-center shadow-2xl`}>
+            <div className={`w-80 h-80 rounded-3xl bg-gradient-to-br ${theme.primary} flex items-center justify-center shadow-2xl shadow-purple-200/50`}>
               <div className="text-center text-white">
-                <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-4 mx-auto backdrop-blur-sm">
                   <Code className="w-12 h-12" />
                 </div>
                 <h3 className="text-2xl font-bold mb-2">Portfolio</h3>
