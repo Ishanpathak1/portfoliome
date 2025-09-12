@@ -1,15 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mail, Phone, Github, Linkedin, Calendar, Award, Code, Briefcase, 
   Star, Zap, Heart, Target, Sparkles, ExternalLink, ArrowRight, 
-  FileText, MapPin, GraduationCap, Building, Users, Trophy, Globe
+  FileText, MapPin, GraduationCap, Building, Users, Trophy, Globe,
+  ChevronDown, Download, ExternalLink as ExternalLinkIcon
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, safeUrl } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import CircularText from '../CircularText';
+import { CreativePortfolioHero } from '../CreativePortfolioHero';
 
 interface ModernGlassmorphismTemplateProps {
   portfolio: DatabasePortfolio;
@@ -33,6 +37,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [currentSection, setCurrentSection] = useState(0);
 
   // Mouse tracking for interactive effects
   useEffect(() => {
@@ -111,164 +116,302 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
   const customSections = resumeData?.customSections || [];
   const sectionRenderStyle = personalization?.sectionRenderStyle || {};
 
-  // Enhanced Header Section
+  // Enhanced Header Section with Circular Text
   const renderHeader = () => (
     <header className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Enhanced Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20" />
+      {/* Premium Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
       </div>
       
-      {/* Enhanced Animated Background Elements */}
+      {/* Animated Background Elements */}
       <div className="absolute inset-0">
-        <div className={`absolute top-20 left-20 w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-20 animate-pulse`} />
-        <div className={`absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r ${themeColors.secondary} rounded-full blur-3xl opacity-15 animate-pulse`} style={{ animationDelay: '1s' }} />
-        <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-10 animate-pulse`} style={{ animationDelay: '2s' }} />
-        <div className={`absolute top-10 right-1/3 w-48 h-48 bg-gradient-to-r ${themeColors.secondary} rounded-full blur-3xl opacity-10 animate-pulse`} style={{ animationDelay: '3s' }} />
+        <motion.div 
+          className={`absolute top-20 left-20 w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-20`}
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.3, 0.2]
+          }}
+          transition={{ 
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className={`absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r ${themeColors.secondary} rounded-full blur-3xl opacity-15`}
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.15, 0.25, 0.15]
+          }}
+          transition={{ 
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+        <motion.div 
+          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-10`}
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1]
+          }}
+          transition={{ 
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
       </div>
 
       {/* Interactive Mouse Follower */}
-      <div 
-        className={`fixed w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-5 pointer-events-none transition-all duration-700 ease-out z-0`}
+      <motion.div 
+        className={`fixed w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-5 pointer-events-none z-0`}
         style={{
           left: mousePosition.x - 192,
           top: mousePosition.y - 192,
-          transform: isHovering ? 'scale(1.5)' : 'scale(1)',
+        }}
+        animate={{
+          scale: isHovering ? 1.5 : 1,
           opacity: isHovering ? 0.15 : 0.05
         }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
       />
 
-      {/* Floating Orbs */}
+      {/* Floating Particles */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <div
+        {[...Array(12)].map((_, i) => (
+          <motion.div
             key={i}
-            className={`absolute w-2 h-2 bg-gradient-to-r ${themeColors.primary} rounded-full animate-pulse`}
+            className={`absolute w-1 h-1 bg-gradient-to-r ${themeColors.primary} rounded-full`}
             style={{
-              left: `${20 + i * 15}%`,
-              top: `${30 + i * 10}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: '3s'
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0, 1, 0],
+              scale: [0, 1, 0]
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut"
             }}
           />
         ))}
       </div>
 
-      <div className="relative z-10 text-center max-w-6xl mx-auto px-8">
-        {/* Enhanced Hero Content */}
-        <div className={`${themeColors.glassDark} rounded-3xl p-12 border backdrop-blur-3xl`}>
-          <div className="mb-8">
-            <div className="flex justify-center mb-6">
-              <div className={`w-32 h-32 rounded-full bg-gradient-to-r ${themeColors.primary} p-1 animate-pulse`}>
+      <div className="relative z-10 max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center">
+        {/* Left Side - Content */}
+        <motion.div 
+          className="text-center lg:text-left"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          {/* Profile Image */}
+          <motion.div 
+            className="flex justify-center lg:justify-start mb-8"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          >
+            <div className="relative">
+              <div className={`w-40 h-40 rounded-full bg-gradient-to-r ${themeColors.primary} p-1 animate-pulse`}>
                 <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center">
-                                  <span className="text-4xl font-bold text-white">
-                  {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 
-                   getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName').split(' ').map(n => n[0]).join('')}
-                </span>
+                  <span className="text-5xl font-black text-white">
+                    {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 
+                     getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName').split(' ').map(n => n[0]).join('')}
+                  </span>
                 </div>
               </div>
+              <motion.div 
+                className={`absolute -inset-4 rounded-full bg-gradient-to-r ${themeColors.primary} opacity-20 blur-xl`}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              />
             </div>
+          </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight">
-              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
-                {resumeData.contact?.name || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName')}
-              </span>
-            </h1>
+          {/* Name and Title */}
+          <motion.h1 
+            className="text-6xl md:text-8xl font-black text-white mb-6 tracking-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+              {resumeData.contact?.name || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName')}
+            </span>
+          </motion.h1>
 
-            {/* Tagline */}
-            <div className="mb-4">
-              <p className="text-xl md:text-2xl text-gray-400 font-light italic">
-                {getTemplateText(templateText, 'modern-glassmorphism', 'tagline')}
-              </p>
-            </div>
-
-            <p className="text-2xl md:text-3xl text-gray-300 mb-8 font-light">
+          <motion.div 
+            className="mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <p className="text-2xl md:text-3xl text-gray-300 font-light mb-2">
               {resumeData.experience?.[0]?.position || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackPosition')}
             </p>
+            <p className="text-lg md:text-xl text-gray-400 font-light italic">
+              {getTemplateText(templateText, 'modern-glassmorphism', 'tagline')}
+            </p>
+          </motion.div>
 
-            {/* Enhanced Summary */}
-            {resumeData.summary && (
-              <div className={`${themeColors.glass} rounded-2xl p-8 border backdrop-blur-2xl mb-8`}>
-                <p className="text-lg text-gray-200 leading-relaxed">
-                  {resumeData.summary}
-                </p>
-              </div>
-            )}
-          </div>
+          {/* Summary */}
+          {resumeData.summary && (
+            <motion.div 
+              className={`${themeColors.glass} rounded-3xl p-8 border backdrop-blur-2xl mb-8`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <p className="text-lg text-gray-200 leading-relaxed">
+                {resumeData.summary}
+              </p>
+            </motion.div>
+          )}
 
-          {/* Enhanced Contact Info */}
-          <div className="flex flex-wrap justify-center gap-6 mb-12">
+          {/* Contact Info */}
+          <motion.div 
+            className="flex flex-wrap justify-center lg:justify-start gap-4 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
             {resumeData.contact?.email && (
-              <a 
+              <motion.a 
                 href={`mailto:${resumeData.contact.email}`}
-                className={`group flex items-center gap-3 ${themeColors.glass} px-8 py-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-2xl text-white`}
+                className={`group flex items-center gap-3 ${themeColors.glass} px-6 py-3 rounded-2xl border transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-2xl text-white`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
                 <Mail className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
                 <span className="font-medium">{resumeData.contact.email}</span>
-              </a>
+              </motion.a>
             )}
             {resumeData.contact?.phone && (
-              <a 
+              <motion.a 
                 href={`tel:${resumeData.contact.phone}`}
-                className={`group flex items-center gap-3 ${themeColors.glass} px-8 py-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-2xl text-white`}
+                className={`group flex items-center gap-3 ${themeColors.glass} px-6 py-3 rounded-2xl border transition-all duration-300 hover:scale-105 ${themeColors.glow} hover:shadow-2xl text-white`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
                 <Phone className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
                 <span className="font-medium">{resumeData.contact.phone}</span>
-              </a>
+              </motion.a>
             )}
             {resumeData.contact?.location && (
-              <div className={`flex items-center gap-3 ${themeColors.glass} px-8 py-4 rounded-2xl border text-white`}>
+              <div className={`flex items-center gap-3 ${themeColors.glass} px-6 py-3 rounded-2xl border text-white`}>
                 <MapPin className="w-5 h-5" />
                 <span className="font-medium">{resumeData.contact.location}</span>
               </div>
             )}
-          </div>
+          </motion.div>
 
-          {/* Enhanced Social Links */}
-          <div className="flex justify-center gap-6">
+          {/* Social Links */}
+          <motion.div 
+            className="flex justify-center lg:justify-start gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+          >
             {resumeData.contact?.linkedin && (
-              <a 
+              <motion.a 
                 href={safeUrl(resumeData.contact.linkedin)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group p-6 ${themeColors.glass} rounded-2xl border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-2xl text-white`}
+                className={`group p-4 ${themeColors.glass} rounded-2xl border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-2xl text-white`}
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
-                <Linkedin className="w-8 h-8 group-hover:rotate-12 transition-transform duration-300" />
-              </a>
+                <Linkedin className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
+              </motion.a>
             )}
             {resumeData.contact?.github && (
-              <a 
+              <motion.a 
                 href={safeUrl(resumeData.contact.github)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group p-6 ${themeColors.glass} rounded-2xl border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-2xl text-white`}
+                className={`group p-4 ${themeColors.glass} rounded-2xl border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-2xl text-white`}
+                whileHover={{ scale: 1.1, rotate: -5 }}
+                whileTap={{ scale: 0.95 }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
-                <Github className="w-8 h-8 group-hover:rotate-12 transition-transform duration-300" />
-              </a>
+                <Github className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
+              </motion.a>
             )}
             {resumeData.contact?.website && (
-              <a 
+              <motion.a 
                 href={safeUrl(resumeData.contact.website)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group p-6 ${themeColors.glass} rounded-2xl border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-2xl text-white`}
+                className={`group p-4 ${themeColors.glass} rounded-2xl border transition-all duration-300 hover:scale-110 ${themeColors.glow} hover:shadow-2xl text-white`}
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
-                <Globe className="w-8 h-8 group-hover:rotate-12 transition-transform duration-300" />
-              </a>
+                <Globe className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
+              </motion.a>
             )}
+          </motion.div>
+        </motion.div>
+
+        {/* Right Side - Circular Text Animation */}
+        <motion.div 
+          className="flex justify-center lg:justify-end"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+        >
+          <div className="relative">
+            <CircularText
+              text={`${resumeData.contact?.name || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName')}*DEVELOPER*CREATIVE*INNOVATIVE*`}
+              onHover="speedUp"
+              spinDuration={25}
+              size={300}
+              fontSize={20}
+              className="text-white"
+            />
+            <motion.div 
+              className={`absolute inset-0 rounded-full bg-gradient-to-r ${themeColors.primary} opacity-10 blur-xl`}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
           </div>
-        </div>
+        </motion.div>
       </div>
+
+      {/* Scroll Indicator */}
+      <motion.div 
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 1 }}
+      >
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="flex flex-col items-center gap-2 text-white/60"
+        >
+          <span className="text-sm font-medium">Scroll to explore</span>
+          <ChevronDown className="w-6 h-6" />
+        </motion.div>
+      </motion.div>
     </header>
   );
 
@@ -823,66 +966,126 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
-      {/* Enhanced Parallax Background */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 text-white overflow-hidden">
+      {/* Creative Portfolio Hero with Gradient Blinds */}
+      <CreativePortfolioHero portfolio={portfolio} />
+      
+      {/* Enhanced Parallax Background for other sections */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div 
-          className={`absolute -top-40 -left-40 w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-20 animate-pulse`}
-          style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+        <motion.div 
+          className={`absolute -top-40 -left-40 w-96 h-96 bg-gradient-to-r ${themeColors.primary} rounded-full blur-3xl opacity-20`}
+          style={{ 
+            transform: `translateY(${scrollY * 0.5}px)`,
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02
+          }}
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.2, 0.3, 0.2]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
         />
-        <div 
-          className={`absolute -bottom-40 -right-40 w-96 h-96 bg-gradient-to-r ${themeColors.secondary} rounded-full blur-3xl opacity-20 animate-pulse`}
+        <motion.div 
+          className={`absolute -bottom-40 -right-40 w-96 h-96 bg-gradient-to-r ${themeColors.secondary} rounded-full blur-3xl opacity-20`}
           style={{ 
             transform: `translateY(${scrollY * -0.3}px)`,
-            animationDelay: '1s'
+            x: mousePosition.x * -0.01,
+            y: mousePosition.y * -0.01
+          }}
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.3, 0.2]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
           }}
         />
       </div>
-
-      {/* Render Header */}
-      {renderHeader()}
       
       {/* Render Sections in Order */}
-      {sectionOrder.map((sectionId) => (
-        <div key={sectionId}>
-          {renderSection(sectionId)}
-        </div>
-      ))}
+      <AnimatePresence>
+        {sectionOrder.map((sectionId, index) => (
+          <motion.div 
+            key={sectionId}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: index * 0.1 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            {renderSection(sectionId)}
+          </motion.div>
+        ))}
+      </AnimatePresence>
       
       {/* Enhanced Footer */}
-      <footer className="py-20 relative overflow-hidden">
+      <motion.footer 
+        className="py-20 relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+      >
         {/* Footer Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900">
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
         </div>
         
         <div className="container mx-auto px-8 text-center relative z-10">
-          <div className={`${themeColors.glass} rounded-3xl p-12 border backdrop-blur-2xl max-w-3xl mx-auto`}>
-            <div className="flex justify-center mb-8">
+          <motion.div 
+            className={`${themeColors.glass} rounded-3xl p-12 border backdrop-blur-2xl max-w-4xl mx-auto`}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="flex justify-center mb-8"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ duration: 0.3 }}
+            >
               <div className={`p-6 rounded-full bg-gradient-to-r ${themeColors.primary} shadow-lg`}>
                 <Heart className="w-8 h-8 text-white" />
               </div>
-            </div>
-            <h3 className="text-4xl font-bold text-white mb-4">
-              Thank you for viewing my portfolio!
+            </motion.div>
+            <h3 className="text-5xl font-bold text-white mb-6">
+              <span className={`bg-gradient-to-r ${themeColors.primary} bg-clip-text text-transparent`}>
+                Thank you for viewing my portfolio!
+              </span>
             </h3>
-            <p className="text-gray-300 text-xl mb-8">
+            <p className="text-gray-300 text-xl mb-8 leading-relaxed">
               Built with passion and modern web technologies
             </p>
             <div className="flex justify-center gap-6">
-              <div className={`px-6 py-3 ${themeColors.glassDark} rounded-2xl border`}>
+              <motion.div 
+                className={`px-6 py-3 ${themeColors.glassDark} rounded-2xl border`}
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Sparkles className={`w-6 h-6 ${themeColors.accent} animate-pulse`} />
-              </div>
-              <div className={`px-6 py-3 ${themeColors.glassDark} rounded-2xl border`}>
+              </motion.div>
+              <motion.div 
+                className={`px-6 py-3 ${themeColors.glassDark} rounded-2xl border`}
+                whileHover={{ scale: 1.05, rotate: -5 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Zap className={`w-6 h-6 ${themeColors.accent} animate-pulse`} />
-              </div>
-              <div className={`px-6 py-3 ${themeColors.glassDark} rounded-2xl border`}>
+              </motion.div>
+              <motion.div 
+                className={`px-6 py-3 ${themeColors.glassDark} rounded-2xl border`}
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Trophy className={`w-6 h-6 ${themeColors.accent} animate-pulse`} />
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 } 
