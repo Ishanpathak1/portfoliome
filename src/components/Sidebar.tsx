@@ -89,8 +89,9 @@ export default function Sidebar() {
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActiveTab(tab.id)
                   ? 'bg-[rgb(var(--accent-600))]/15 text-[rgb(var(--fg))] dark:text-white border-l-2 border-l-[rgb(var(--accent-600))]'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10'
+                  : 'text-gray-600 hover:bg-[rgb(var(--border))]/40 hover:text-gray-800'
               }`}
+              style={!isActiveTab(tab.id) ? { color: 'var(--fg)' } : undefined}
             >
               <tab.icon className="w-4 h-4" />
               <span>{tab.title}</span>
@@ -103,7 +104,8 @@ export default function Sidebar() {
         <button
           onClick={toggleTheme}
           aria-label="Toggle theme"
-          className="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10"
+          className="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-[rgb(var(--border))]/40 hover:text-gray-800"
+          style={{ color: 'var(--fg)' }}
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
@@ -114,16 +116,18 @@ export default function Sidebar() {
               href={userPortfolio ? `/${userPortfolio.slug}` : '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center justify-center space-x-2 border border-[rgb(var(--border))] px-3 py-2 rounded-lg transition-colors ${
-                userPortfolio ? 'hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10' : 'cursor-not-allowed opacity-60'
+              className={`flex items-center justify-center space-x-2 border border-[rgb(var(--border))] px-3 py-2 rounded-lg transition-colors text-gray-600 ${
+                userPortfolio ? 'hover:bg-[rgb(var(--border))]/40 hover:text-gray-800' : 'cursor-not-allowed opacity-60'
               }`}
+              style={{ color: 'var(--fg)' }}
             >
               <ExternalLink className="w-4 h-4" />
               <span>View Live</span>
             </a>
             <button
               onClick={() => signOut()}
-              className="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10"
+              className="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-[rgb(var(--border))]/40 hover:text-gray-800"
+              style={{ color: 'var(--fg)' }}
             >
               <LogOut className="w-4 h-4" />
               <span>Sign Out</span>

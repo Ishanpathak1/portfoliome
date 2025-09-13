@@ -67,7 +67,8 @@ export function NotificationBell({ isDashboard = false }: NotificationBellProps)
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white hover:bg-[rgb(var(--border))]/40 transition-colors"
+        className="relative p-2 rounded-lg text-gray-600 hover:text-[rgb(var(--fg))] hover:bg-[rgb(var(--border))]/40 transition-colors"
+        style={{ color: 'var(--fg)' }}
         title="Notifications"
       >
         <Bell className="w-5 h-5" />

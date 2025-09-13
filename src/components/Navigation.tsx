@@ -118,8 +118,9 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
                   isActive(item.href)
                     ? 'bg-[rgb(var(--accent-600))]/15 text-[rgb(var(--fg))] dark:text-white'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white hover:bg-[rgb(var(--border))]/40'
+                    : 'text-gray-600 hover:bg-[rgb(var(--border))]/40'
                 }`}
+                style={!isActive(item.href) ? { color: 'var(--fg)' } : undefined}
               >
                 <span className="flex items-center gap-1.5">
                   <item.icon className="w-4 h-4" />
@@ -157,7 +158,8 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                     </a>
                     <button
                       onClick={() => signOut()}
-                      className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white transition-colors px-3 py-2 rounded-md hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10"
+                      className="flex items-center gap-1 text-gray-600 hover:text-[rgb(var(--fg))] transition-colors px-3 py-2 rounded-md hover:bg-[rgb(var(--border))]/40"
+                      style={{ color: 'var(--fg)' }}
                       title="Sign Out"
                     >
                       <LogOut className="w-4 h-4" />
@@ -177,7 +179,8 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                     </Link>
                     <button
                       onClick={() => signOut()}
-                      className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white transition-colors px-3 py-2 rounded-md hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10"
+                      className="flex items-center gap-1 text-gray-600 hover:text-[rgb(var(--fg))] transition-colors px-3 py-2 rounded-md hover:bg-[rgb(var(--border))]/40"
+                      style={{ color: 'var(--fg)' }}
                       title="Sign Out"
                     >
                       <LogOut className="w-4 h-4" />
@@ -223,8 +226,9 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                 className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
                   isActive(item.href)
                     ? 'bg-[rgb(var(--accent-600))]/10 text-[rgb(var(--fg))] dark:text-white'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-[rgb(var(--fg))] dark:hover:text-white hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10'
+                    : 'text-gray-600 hover:bg-[rgb(var(--border))]/40'
                 }`}
+                style={!isActive(item.href) ? { color: 'var(--fg)' } : undefined}
               >
                 <item.icon className="w-5 h-5" />
                 <span>{item.name}</span>

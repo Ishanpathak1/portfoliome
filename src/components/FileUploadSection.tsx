@@ -20,7 +20,7 @@ export function FileUploadSection({ onFileUpload, isLoading }: FileUploadSection
     setError(null);
     setUploadedFile(file);
     try {
-      trackResumeUpload(file.size, file.type);
+      trackResumeUpload(true);
       await onFileUpload(file);
     } catch (error) {
       setError('Failed to process file. Please try again.');

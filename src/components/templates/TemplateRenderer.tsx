@@ -19,7 +19,7 @@ export function TemplateRenderer({ portfolio }: TemplateRendererProps) {
   try {
     return <TemplateLoader portfolio={portfolio} templateId={templateId} />;
   } catch (error) {
-    trackPortfolioGeneration(false, error instanceof Error ? error.message : 'Unknown error');
+    trackPortfolioGeneration(false);
     throw error;
   }
 } 
