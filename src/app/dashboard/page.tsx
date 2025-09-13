@@ -1460,12 +1460,12 @@ function DashboardContent() {
             )}
 
             {activeTab === 'design' && editedPersonalization && (
-              <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-4 sm:p-6 shadow-sm">
-                <h2 className="text-xl sm:text-2xl font-bold text-[rgb(var(--fg))] mb-4 sm:mb-6">Design & Theme</h2>
+              <div className="bg-gray-800 dark:bg-gray-900 border border-gray-700 dark:border-gray-600 rounded-2xl p-4 sm:p-6 shadow-sm">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Design & Theme</h2>
                 
                 {/* Template Selection */}
                 <div className="mb-6 sm:mb-8">
-                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Choose Template</h3>
+                  <h3 className="text-lg font-medium text-white mb-4">Choose Template</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     {[
                       { id: 'modern-glassmorphism', name: 'Modern Glassmorphism', desc: 'Sleek with glass effects' },
@@ -1485,12 +1485,12 @@ function DashboardContent() {
                         onClick={() => setEditedPersonalization({ ...editedPersonalization, templateId: template.id })}
                         className={`text-left p-4 rounded-xl border-2 transition-all duration-300 ${
                           editedPersonalization.templateId === template.id
-                            ? 'border-purple-400 bg-purple-50 text-[rgb(var(--fg))] dark:bg-purple-500/10 dark:text-white dark:ring-2 dark:ring-purple-400/40 dark:ring-offset-2 dark:ring-offset-slate-900'
-                            : 'border-[rgb(var(--border))] bg-[rgb(var(--card))] hover:bg-[rgb(var(--border))]/40'
+                            ? 'border-purple-400 bg-purple-500/20 text-white ring-2 ring-purple-400/40 ring-offset-2 ring-offset-gray-800'
+                            : 'border-gray-600 bg-gray-700 hover:bg-gray-600 text-white'
                         }`}
                       >
-                        <div className="text-[rgb(var(--fg))] font-medium">{template.name}</div>
-                        <div className="text-[rgb(var(--muted))] text-sm">{template.desc}</div>
+                        <div className="font-medium text-white">{template.name}</div>
+                        <div className="text-gray-300 text-sm">{template.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -1498,14 +1498,16 @@ function DashboardContent() {
 
                 {/* Color Scheme */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Color Scheme</h3>
+                  <h3 className="text-lg font-medium text-white mb-4">Color Scheme</h3>
                   <div className="flex space-x-3">
                     {['blue', 'green', 'purple', 'orange', 'red'].map((color) => (
                       <button
                         key={color}
                         onClick={() => setEditedPersonalization({ ...editedPersonalization, colorScheme: color as any })}
                         className={`w-12 h-12 rounded-full border-4 transition-all duration-300 ${
-                          editedPersonalization.colorScheme === color ? 'border-[rgb(var(--border))] scale-110' : 'border-transparent'
+                          editedPersonalization.colorScheme === color 
+                            ? 'border-gray-300 scale-110 ring-2 ring-gray-300 ring-offset-2 ring-offset-gray-800' 
+                            : 'border-transparent hover:scale-105'
                         } bg-${color}-500`}
                       />
                     ))}
