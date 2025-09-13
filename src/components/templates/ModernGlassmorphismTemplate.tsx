@@ -77,11 +77,11 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
   const renderHeader = () => {
     return (
     <header className="min-h-screen bg-gray-900 flex items-center">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-20">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-20 items-center">
           {/* Left Side - Content */}
           <motion.div 
-            className="space-y-6 sm:space-y-8 lg:space-y-10"
+            className="space-y-4 sm:space-y-6 lg:space-y-10"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -89,9 +89,9 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
             {/* Profile Image */}
             <div className="flex justify-center lg:justify-start">
               <div className="relative">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full border-2 border-purple-500 p-1">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 rounded-full border-2 border-purple-500 p-1">
                   <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                    <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                    <span className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-900">
                       {resumeData.contact?.name?.split(' ').map(n => n[0]).join('') || 
                        getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName').split(' ').map(n => n[0]).join('')}
                     </span>
@@ -101,8 +101,8 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
             </div>
 
             {/* Name and Title */}
-            <div className="text-center lg:text-left space-y-2 sm:space-y-3">
-              <div className="mb-2 text-gray-100 overflow-hidden flex justify-center lg:justify-start">
+            <div className="text-center lg:text-left space-y-1 sm:space-y-2 lg:space-y-3">
+              <div className="mb-1 sm:mb-2 text-gray-100 overflow-hidden flex justify-center lg:justify-start">
                 <TrueFocus 
                   sentence={resumeData.contact?.name || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackName')}
                   manualMode={false}
@@ -112,65 +112,65 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                   pauseBetweenAnimations={1}
                 />
               </div>
-              <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 font-medium">
+              <p className="text-base sm:text-lg lg:text-2xl text-gray-300 font-medium">
                 {resumeData.experience?.[0]?.position || getTemplateText(templateText, 'modern-glassmorphism', 'fallbackPosition')}
               </p>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-400 italic">
+              <p className="text-xs sm:text-sm lg:text-lg text-gray-400 italic">
                 {getTemplateText(templateText, 'modern-glassmorphism', 'tagline')}
               </p>
             </div>
 
             {/* Summary with Blur Text Effect */}
             {resumeData.summary && (
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8">
+              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-8">
                 <BlurText
                   text={resumeData.summary}
                   delay={150}
                   animateBy="words"
                   direction="top"
-                  className="text-sm sm:text-base lg:text-lg text-gray-300 leading-relaxed"
+                  className="text-xs sm:text-sm lg:text-lg text-gray-300 leading-relaxed"
                 />
               </div>
             )}
 
             {/* Contact Info */}
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-2 sm:space-y-3 lg:space-y-4">
               {resumeData.contact?.email && (
                 <a 
                   href={`mailto:${resumeData.contact.email}`}
-                  className="flex items-center gap-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl hover:bg-gray-700/50 transition-all group"
+                  className="flex items-center gap-2 sm:gap-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl hover:bg-gray-700/50 transition-all group"
                 >
-                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 group-hover:text-purple-300" />
-                  <span className="text-sm sm:text-base text-gray-300 group-hover:text-gray-200 truncate">{resumeData.contact.email}</span>
+                  <Mail className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-purple-400 group-hover:text-purple-300" />
+                  <span className="text-xs sm:text-sm lg:text-base text-gray-300 group-hover:text-gray-200 truncate">{resumeData.contact.email}</span>
                 </a>
               )}
               {resumeData.contact?.phone && (
                 <a 
                   href={`tel:${resumeData.contact.phone}`}
-                  className="flex items-center gap-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl hover:bg-gray-700/50 transition-all group"
+                  className="flex items-center gap-2 sm:gap-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl hover:bg-gray-700/50 transition-all group"
                 >
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 group-hover:text-purple-300" />
-                  <span className="text-sm sm:text-base text-gray-300 group-hover:text-gray-200">{resumeData.contact.phone}</span>
+                  <Phone className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-purple-400 group-hover:text-purple-300" />
+                  <span className="text-xs sm:text-sm lg:text-base text-gray-300 group-hover:text-gray-200">{resumeData.contact.phone}</span>
                 </a>
               )}
               {resumeData.contact?.location && (
-                <div className="flex items-center gap-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl">
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
-                  <span className="text-sm sm:text-base text-gray-300">{resumeData.contact.location}</span>
+                <div className="flex items-center gap-2 sm:gap-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl">
+                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-purple-400" />
+                  <span className="text-xs sm:text-sm lg:text-base text-gray-300">{resumeData.contact.location}</span>
                 </div>
               )}
             </div>
 
             {/* Social Links */}
-            <div className="flex gap-3 sm:gap-4 justify-center lg:justify-start">
+            <div className="flex gap-2 sm:gap-3 lg:gap-4 justify-center lg:justify-start">
               {resumeData.contact?.linkedin && (
                 <a 
                   href={safeUrl(resumeData.contact.linkedin)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 sm:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl hover:bg-gray-700/50 transition-all hover:scale-105 group"
+                  className="p-2 sm:p-3 lg:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg sm:rounded-xl hover:bg-gray-700/50 transition-all hover:scale-105 group"
                 >
-                  <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 group-hover:text-purple-300" />
+                  <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-purple-400 group-hover:text-purple-300" />
                 </a>
               )}
               {resumeData.contact?.github && (
@@ -178,9 +178,9 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                   href={safeUrl(resumeData.contact.github)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 sm:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl hover:bg-gray-700/50 transition-all hover:scale-105 group"
+                  className="p-2 sm:p-3 lg:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg sm:rounded-xl hover:bg-gray-700/50 transition-all hover:scale-105 group"
                 >
-                  <Github className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 group-hover:text-purple-300" />
+                  <Github className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-purple-400 group-hover:text-purple-300" />
                 </a>
               )}
               {resumeData.contact?.website && (
@@ -188,9 +188,9 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                   href={safeUrl(resumeData.contact.website)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 sm:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl hover:bg-gray-700/50 transition-all hover:scale-105 group"
+                  className="p-2 sm:p-3 lg:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg sm:rounded-xl hover:bg-gray-700/50 transition-all hover:scale-105 group"
                 >
-                  <ExternalLink className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 group-hover:text-purple-300" />
+                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-purple-400 group-hover:text-purple-300" />
                 </a>
               )}
             </div>
