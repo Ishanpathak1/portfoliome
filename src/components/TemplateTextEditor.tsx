@@ -115,9 +115,9 @@ export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose
   if (!config) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Template Not Supported</h2>
-          <p className="text-gray-600 mb-4">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-6 border border-transparent dark:border-gray-800">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Template Not Supported</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
             Text customization is not yet available for this template.
           </p>
           <button
@@ -155,18 +155,18 @@ export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-transparent dark:border-gray-800">
+        <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Customize Template Text</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Customize Template Text</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
             Customize the text content for your <strong>{config.name}</strong> template.
           </p>
         </div>
@@ -175,17 +175,17 @@ export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose
           <div className="space-y-6">
             {config.fields.map((field) => (
               <div key={field.key} className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   {field.label}
                 </label>
-                <p className="text-xs text-gray-500 mb-2">{field.description}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{field.description}</p>
                 
                 {field.type === 'textarea' ? (
                   <textarea
                     value={editedText[templateKey]?.[field.key] || ''}
                     onChange={(e) => handleFieldChange(field.key, e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder={DEFAULT_TEMPLATE_TEXT[templateKey]?.[field.key] || ''}
                   />
                 ) : (
@@ -193,7 +193,7 @@ export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose
                     type="text"
                     value={editedText[templateKey]?.[field.key] || ''}
                     onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder={DEFAULT_TEMPLATE_TEXT[templateKey]?.[field.key] || ''}
                   />
                 )}
@@ -202,10 +202,10 @@ export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               Reset to Default
@@ -214,7 +214,7 @@ export function TemplateTextEditor({ templateId, templateText, onUpdate, onClose
             <div className="flex items-center gap-3">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
                 Cancel
               </button>
