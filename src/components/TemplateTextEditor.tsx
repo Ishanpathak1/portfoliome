@@ -47,6 +47,7 @@ const TEMPLATE_CONFIGS: Record<string, { name: string; fields: Array<{ key: stri
       { key: 'tagline', label: 'Tagline', description: 'Main tagline under your name', type: 'text' },
       { key: 'fallbackName', label: 'Fallback Name', description: 'Displayed when no name is available', type: 'text' },
       { key: 'fallbackSummary', label: 'Fallback Summary', description: 'Displayed when no summary is available', type: 'textarea' },
+      { key: 'viewWorkUrl', label: 'View Work Button URL', description: 'Link opened when the "View My Work" button is clicked', type: 'text' },
     ],
   },
   'developer-terminal': {

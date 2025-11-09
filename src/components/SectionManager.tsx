@@ -252,7 +252,7 @@ export function SectionManager({
               <select
                 value={newSectionType}
                 onChange={(e) => setNewSectionType(e.target.value as 'text' | 'list' | 'cards')}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
               >
                 <option value="text">Text Content</option>
                 <option value="list">List Items</option>
@@ -267,7 +267,7 @@ export function SectionManager({
                 value={newSectionTitle}
                 onChange={(e) => setNewSectionTitle(e.target.value)}
                 placeholder="e.g., Awards, Volunteer Work, Hobbies"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50"
+                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
               />
             </div>
 
@@ -281,7 +281,7 @@ export function SectionManager({
                     ? "Enter each item on a new line\nItem 1\nItem 2\nItem 3"
                     : "Write your content here..."}
                   rows={4}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50"
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                 />
               </div>
             ) : (
@@ -311,7 +311,7 @@ export function SectionManager({
                           setNewSectionCards(next);
                         }}
                         placeholder="Heading / Title"
-                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                       />
                       <textarea
                         rows={3}
@@ -322,7 +322,7 @@ export function SectionManager({
                           setNewSectionCards(next);
                         }}
                         placeholder="Text / Description"
-                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                       />
                       <input
                         type="date"
@@ -332,7 +332,7 @@ export function SectionManager({
                           next[i] = { ...next[i], date: e.target.value };
                           setNewSectionCards(next);
                         }}
-                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
                       />
                       <input
                         type="url"
@@ -343,7 +343,7 @@ export function SectionManager({
                           setNewSectionCards(next);
                         }}
                         placeholder="Optional: https://example.com"
-                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                       />
                       <div className="flex justify-end">
                         <button
@@ -524,7 +524,7 @@ export function SectionManager({
                             type="text"
                             value={editTitle}
                             onChange={(e) => setEditTitle(e.target.value)}
-                            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
                           />
                         </div>
                         <div>
@@ -576,7 +576,7 @@ export function SectionManager({
                               }
                               setEditType(next);
                             }}
-                            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
                           >
                             <option value="text">Text</option>
                             <option value="list">List</option>
@@ -592,7 +592,7 @@ export function SectionManager({
                             rows={5}
                             value={editTextContent}
                             onChange={(e) => setEditTextContent(e.target.value)}
-                            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                           />
                         </div>
                       )}
@@ -621,7 +621,7 @@ export function SectionManager({
                                     setEditListItems(next);
                                   }}
                                   placeholder={`Enter content for card ${i + 1}`}
-                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                                 />
                                 <div className="flex justify-end">
                                   <button
@@ -661,7 +661,7 @@ export function SectionManager({
                                     setEditCards(next);
                                   }}
                                   placeholder="Heading / Title"
-                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                                 />
                                 <textarea
                                   rows={3}
@@ -672,7 +672,7 @@ export function SectionManager({
                                     setEditCards(next);
                                   }}
                                   placeholder="Text / Description"
-                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                                 />
                                 <input
                                   type="date"
@@ -682,7 +682,7 @@ export function SectionManager({
                                     next[i] = { ...next[i], date: e.target.value };
                                     setEditCards(next);
                                   }}
-                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
                                 />
                                 <input
                                   type="url"
@@ -693,7 +693,7 @@ export function SectionManager({
                                     setEditCards(next);
                                   }}
                                   placeholder="Optional: https://example.com"
-                                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40"
+                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
                                 />
                                 <div className="flex justify-end">
                                   <button

@@ -114,6 +114,7 @@ export interface TemplateText {
     tagline?: string;
     fallbackName?: string;
     fallbackSummary?: string;
+    viewWorkUrl?: string;
   };
   // Developer Terminal template
   developerTerminal?: {

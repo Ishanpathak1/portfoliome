@@ -130,18 +130,18 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-transparent dark:border-gray-800">
+        <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Customize Section Headings</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Customize Section Headings</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
             Customize section headings to match your profession and style preferences.
           </p>
         </div>
@@ -149,13 +149,13 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
         <div className="p-6">
           {/* Profession Presets */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Presets</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Quick Presets</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {Object.entries(PROFESSION_PRESETS).map(([profession, preset]) => (
                 <button
                   key={profession}
                   onClick={() => applyPreset(preset)}
-                  className="text-xs px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors text-gray-700"
+                  className="text-xs px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md transition-colors text-gray-700 dark:text-gray-200"
                 >
                   {profession}
                 </button>
@@ -165,17 +165,17 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
 
           {/* Section Heading Inputs */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-700">Section Headings</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Section Headings</h3>
             {mainSections.map((section) => (
               <div key={section} className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 capitalize">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
                   {section}
                 </label>
                 <input
                   type="text"
                   value={editedHeadings[section] || ''}
                   onChange={(e) => handleHeadingChange(section, e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                   placeholder={DEFAULT_HEADINGS[section]}
                 />
               </div>
@@ -183,19 +183,19 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
           </div>
 
           {/* Analytics Metrics */}
-          <div className="space-y-4 mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700">Analytics Metrics Data</h3>
+          <div className="space-y-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Analytics Metrics Data</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {analyticsSections.map((section) => (
                 <div key={section} className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {String(section).replace('analytics', '').replace(/([A-Z])/g, ' $1').trim()}
                   </label>
                   <input
                     type="text"
                     value={editedHeadings[section] || ''}
                     onChange={(e) => handleHeadingChange(section, e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder={DEFAULT_HEADINGS[section]}
                   />
                 </div>
@@ -204,10 +204,10 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               Reset to Default
@@ -216,7 +216,7 @@ export function SectionHeadingEditor({ sectionHeadings, onUpdate, onClose }: Sec
             <div className="flex items-center gap-3">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
                 Cancel
               </button>

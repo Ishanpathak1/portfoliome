@@ -24,6 +24,7 @@ export const DEFAULT_TEMPLATE_TEXT: TemplateText = {
     tagline: 'Crafting Digital Art & Experiences',
     fallbackName: 'Creative Portfolio',
     fallbackSummary: 'Passionate artist and designer creating meaningful digital experiences',
+    viewWorkUrl: '',
   },
   developerTerminal: {
     // No customizable text for this template

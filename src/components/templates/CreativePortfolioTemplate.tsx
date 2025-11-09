@@ -296,30 +296,54 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
           </div>
 
           {/* Artistic CTA buttons */}
-          <div className="flex flex-col sm:flex-row gap-8 justify-center mb-16">
-            <button
-              className="group relative overflow-hidden px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:scale-105 bg-white shadow-2xl border-4 transform hover:rotate-1"
-              style={{ borderColor: colors.accent }}
-              onMouseEnter={() => setIsDrawing(true)}
-              onMouseLeave={() => setIsDrawing(false)}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-200 to-purple-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative flex items-center justify-center space-x-3">
-                <Palette className="w-8 h-8" style={{ color: colors.paint }} />
-                <span style={{ color: colors.ink }}>View My Work</span>
-                <ArrowRight className="w-8 h-8 group-hover:translate-x-2 transition-transform" style={{ color: colors.accent }} />
-              </div>
-            </button>
+          {(() => {
+            const viewWorkUrl = getTemplateText(templateText, 'creative-portfolio', 'viewWorkUrl').trim();
+            const email = resumeData.contact?.email?.trim();
+            const hasViewWorkButton = Boolean(viewWorkUrl);
+            const hasCollaborateButton = Boolean(email);
 
-            <button className="group relative overflow-hidden px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:scale-105 bg-white shadow-2xl border-4 transform hover:-rotate-1" style={{ borderColor: colors.paint }}>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-200 to-orange-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative flex items-center justify-center space-x-3">
-                <Mail className="w-8 h-8" style={{ color: colors.accent }} />
-                <span style={{ color: colors.ink }}>Let's Collaborate</span>
-                <Heart className="w-8 h-8 group-hover:scale-110 transition-transform" style={{ color: colors.paint }} />
+            if (!hasViewWorkButton && !hasCollaborateButton) {
+              return null;
+            }
+
+            return (
+              <div className="flex flex-col sm:flex-row gap-8 justify-center mb-16">
+                {hasViewWorkButton && (
+                  <a
+                    href={viewWorkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative overflow-hidden px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:scale-105 bg-white shadow-2xl border-4 transform hover:rotate-1"
+                    style={{ borderColor: colors.accent }}
+                    onMouseEnter={() => setIsDrawing(true)}
+                    onMouseLeave={() => setIsDrawing(false)}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-200 to-purple-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex items-center justify-center space-x-3">
+                      <Palette className="w-8 h-8" style={{ color: colors.paint }} />
+                      <span style={{ color: colors.ink }}>View My Work</span>
+                      <ArrowRight className="w-8 h-8 group-hover:translate-x-2 transition-transform" style={{ color: colors.accent }} />
+                    </div>
+                  </a>
+                )}
+
+                {hasCollaborateButton && (
+                  <a
+                    href={`mailto:${email}`}
+                    className="group relative overflow-hidden px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:scale-105 bg-white shadow-2xl border-4 transform hover:-rotate-1"
+                    style={{ borderColor: colors.paint }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-200 to-orange-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex items-center justify-center space-x-3">
+                      <Mail className="w-8 h-8" style={{ color: colors.accent }} />
+                      <span style={{ color: colors.ink }}>Let's Collaborate</span>
+                      <Heart className="w-8 h-8 group-hover:scale-110 transition-transform" style={{ color: colors.paint }} />
+                    </div>
+                  </a>
+                )}
               </div>
-            </button>
-          </div>
+            );
+          })()}
 
           {/* Artistic contact cards */}
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
