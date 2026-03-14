@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { BarChart3, Palette, User as UserIcon, FileText, Layers, Briefcase, Settings as SettingsIcon } from 'lucide-react';
 import { useAuth } from './FirebaseAuthWrapper';
 import { LogOut, User, Moon, Sun, ExternalLink } from 'lucide-react';
@@ -15,6 +15,7 @@ interface UserPortfolio {
 export default function Sidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { theme, toggleTheme } = useTheme();
 
   let user: any = null;
@@ -62,7 +63,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-64 shrink-0 border-r border-[rgb(var(--border))] bg-[rgb(var(--card))] h-screen sticky top-0">
+    <aside className="hidden lg:flex lg:flex-col lg:w-64 shrink-0 border-r border-[rgb(var(--border))] bg-[rgb(var(--card))] h-screen sticky top-0 z-50">
       <div className="h-16 px-4 flex items-center justify-between border-b border-[rgb(var(--border))]">
         <Link href="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-[rgb(var(--accent-600))] rounded-lg flex items-center justify-center">
@@ -82,20 +83,21 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-4">
         <div className="px-3 space-y-1">
           {dashboardTabs.map((tab) => (
-            <Link
+            <button
               key={tab.id}
-              href={`/dashboard?tab=${tab.id}`}
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('dashboard-tab', { detail: { tab: tab.id } }))}
               aria-current={isActiveTab(tab.id) ? 'page' : undefined}
-              className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left ${
                 isActiveTab(tab.id)
                   ? 'bg-[rgb(var(--accent-600))]/15 text-[rgb(var(--fg))] dark:text-white border-l-2 border-l-[rgb(var(--accent-600))]'
                   : 'text-gray-600 hover:bg-[rgb(var(--border))]/40 hover:text-gray-800'
               }`}
               style={!isActiveTab(tab.id) ? { color: 'var(--fg)' } : undefined}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="w-4 h-4 shrink-0" />
               <span>{tab.title}</span>
-            </Link>
+            </button>
           ))}
         </div>
       </nav>

@@ -9,7 +9,7 @@ import {
   Terminal, Bug, GitPullRequest, Shield, Eye
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -238,7 +238,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                     <div className="flex items-center space-x-2 px-4 py-2 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
                       <Calendar className="w-4 h-4" style={{ color: colors.primary }} />
                       <span className="font-mono text-sm" style={{ color: colors.text }}>
-                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                        {formatExperienceDateRange(exp)}
                       </span>
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                 <div className="p-4 flex items-center justify-between" style={{ backgroundColor: colors.background }}>
                   {(project.startDate || project.endDate) && (
                     <div className="text-sm" style={{ color: colors.textSecondary }}>
-                      {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
+                      {formatProjectDateRange(project)}
                     </div>
                   )}
                 </div>
@@ -410,14 +410,12 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                     )}
                   </div>
                   <div className="mt-4 lg:mt-0">
-                    {edu.graduationDate && (
-                      <div className="flex items-center space-x-2 px-4 py-2 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                    <div className="flex items-center space-x-2 px-4 py-2 rounded-lg border" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
                         <Calendar className="w-4 h-4" style={{ color: colors.primary }} />
                         <span className="font-mono text-sm" style={{ color: colors.text }}>
-                          {formatDate(edu.graduationDate)}
+                          {formatGraduationDate(edu.graduationDate)}
                         </span>
                       </div>
-                    )}
                     {edu.gpa && (
                       <p className="mt-2" style={{ color: colors.textSecondary }}>GPA: {edu.gpa}</p>
                     )}

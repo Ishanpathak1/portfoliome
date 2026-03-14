@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { AuthWrapper } from '@/components/FirebaseAuthWrapper';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
@@ -12,7 +12,7 @@ import { TemplateTextEditor } from '@/components/TemplateTextEditor';
 import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
 import { useNotifications } from '@/components/notifications/NotificationStore';
 import { AppNotification } from '@/components/notifications/NotificationTypes';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { getAllSectionHeadings } from '@/lib/section-headings';
 import { getAllTemplateText } from '@/lib/template-text';
 import { PortfolioRenderer } from '@/components/PortfolioRenderer';
@@ -51,7 +51,9 @@ import {
   QrCode,
   Smartphone,
   Type,
-  Menu
+  Menu,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import NavigationPadding from '@/components/NavigationPadding';
 
@@ -66,10 +68,13 @@ export default function DashboardPage() {
 function DashboardContent() {
   const { user, signOut } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [portfolio, setPortfolio] = useState<DatabasePortfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const tabParam = searchParams?.get('tab') ?? '';
+  const validTabIds = ['overview', 'design', 'content', 'cover-letter', 'custom', 'jobs', 'settings'];
+  const activeTab = validTabIds.includes(tabParam) ? tabParam : 'overview';
   const [showPreview, setShowPreview] = useState(false);
   const [jobs, setJobs] = useState<Array<{ id: string; company: string; status: 'APPLIED'|'ACCEPTED'|'REJECTED'; updatedAt?: string }>>([]);
 
@@ -123,6 +128,18 @@ function DashboardContent() {
   const { toasts, removeToast, showSuccess, showError } = useToast();
   // Notification center
   const { addNotifications, removeByDedupeKey } = useNotifications();
+
+  const hasUnsavedChanges = useMemo(() => {
+    if (!portfolio || !editedResumeData || !editedPersonalization) return false;
+    try {
+      const resumeSame = JSON.stringify(portfolio.resumeData) === JSON.stringify(editedResumeData);
+      const personalizationSame = JSON.stringify(portfolio.personalization) === JSON.stringify(editedPersonalization);
+      const slugSame = editedSlug === portfolio.slug;
+      return !resumeSame || !personalizationSame || !slugSame;
+    } catch {
+      return false;
+    }
+  }, [portfolio, editedResumeData, editedPersonalization, editedSlug]);
 
   // Helper function to ensure resume data has all required arrays
   const ensureResumeDataStructure = (resumeData: any): ResumeData => {
@@ -364,12 +381,24 @@ function DashboardContent() {
     const tab = searchParams?.get('tab');
     const section = searchParams?.get('section');
     const indexParam = searchParams?.get('index');
-    if (tab) setActiveTab(tab);
-    // If a section is specified but no tab, ensure we land in content tab by default
-    if (section && !tab) setActiveTab('content');
+    if (section && !tab) router.replace(`/dashboard?tab=content&section=${encodeURIComponent(section)}${indexParam != null ? `&index=${indexParam}` : ''}`);
     if (section) setEditingSection(section);
     if (indexParam) setEditingIndex(Number(indexParam));
-  }, [searchParams]);
+  }, [searchParams, router]);
+
+  const goToTab = (tabId: string) => router.replace(`/dashboard?tab=${tabId}`);
+
+  // Listen for sidebar tab clicks (works when useSearchParams is stale on same-path nav)
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ tab: string }>) => router.replace(`/dashboard?tab=${e.detail.tab}`);
+    window.addEventListener('dashboard-tab', handler as EventListener);
+    return () => window.removeEventListener('dashboard-tab', handler as EventListener);
+  }, [router]);
+
+  // Keep URL in sync when landing on /dashboard with no tab (so sidebar links work)
+  useEffect(() => {
+    if (!tabParam && portfolio) router.replace('/dashboard?tab=overview');
+  }, [tabParam, portfolio, router]);
 
   // Generate QR code when portfolio changes
   useEffect(() => {
@@ -758,6 +787,19 @@ function DashboardContent() {
     setEditedResumeData({ ...editedResumeData, experience: updated });
   };
 
+  const moveExperience = (index: number, direction: 'up' | 'down') => {
+    if (!editedResumeData) return;
+    const len = editedResumeData.experience.length;
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= len) return;
+    const updated = [...editedResumeData.experience];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    setEditedResumeData({ ...editedResumeData, experience: updated });
+    if (editingSection === 'experience' && (editingIndex === index || editingIndex === newIndex)) {
+      setEditingIndex(newIndex);
+    }
+  };
+
   const addEducation = () => {
     if (!editedResumeData) return;
     const newEducation: Education = {
@@ -1114,7 +1156,7 @@ function DashboardContent() {
                     <button
                       key={tab.id}
                       onClick={() => {
-                        setActiveTab(tab.id);
+                        goToTab(tab.id);
                         setShowMobileMenu(false);
                       }}
                       className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
@@ -1141,7 +1183,7 @@ function DashboardContent() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => goToTab(tab.id)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-300 whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'bg-[rgb(var(--card))] text-[rgb(var(--fg))] shadow-lg border border-[rgb(var(--border))]'
@@ -1157,8 +1199,8 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div className={`grid ${activeTab === 'cover-letter' ? 'grid-cols-1 xl:grid-cols-12' : 'grid-cols-1 lg:grid-cols-3'} gap-4 sm:gap-6 lg:gap-8`}>
+        {/* Tab Content - key forces re-render when tab from URL changes */}
+        <div key={activeTab} className={`grid ${activeTab === 'cover-letter' ? 'grid-cols-1 xl:grid-cols-12' : 'grid-cols-1 lg:grid-cols-3'} gap-4 sm:gap-6 lg:gap-8`}>
           {/* Main Content */}
           <div className={`${activeTab === 'cover-letter' ? 'xl:col-span-12' : 'lg:col-span-2'} order-2 lg:order-1`}>
             {activeTab === 'cover-letter' && (
@@ -1382,7 +1424,7 @@ function DashboardContent() {
                   <h3 className="text-lg font-bold text-[rgb(var(--fg))] mb-4">Quick Actions</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
-                      onClick={() => setActiveTab('design')}
+                      onClick={() => goToTab('design')}
                       className="flex items-center space-x-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--border))]/40 p-4 rounded-xl transition-all duration-300 shadow-sm"
                     >
                       <Palette className="w-6 h-6 text-purple-400" />
@@ -1392,7 +1434,7 @@ function DashboardContent() {
                       </div>
                     </button>
                     <button
-                      onClick={() => setActiveTab('content')}
+                      onClick={() => goToTab('content')}
                       className="flex items-center space-x-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--border))]/40 p-4 rounded-xl transition-all duration-300 shadow-sm"
                     >
                       <Edit className="w-6 h-6 text-green-400" />
@@ -1724,12 +1766,30 @@ function DashboardContent() {
                                 placeholder="• Developed and maintained web applications&#10;• Collaborated with cross-functional teams&#10;• Improved system performance by 40%"
                               />
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex flex-nowrap items-center gap-2">
+                              <div className="flex items-center rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-1 gap-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => moveExperience(index, 'up')}
+                                  disabled={index === 0}
+                                  className="p-2 rounded-md text-[rgb(var(--muted))] hover:bg-[rgb(var(--muted))]/20 hover:text-[rgb(var(--fg))] disabled:opacity-30 disabled:cursor-not-allowed"
+                                  title="Move up"
+                                >
+                                  <ChevronUp className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveExperience(index, 'down')}
+                                  disabled={index === editedResumeData.experience.length - 1}
+                                  className="p-2 rounded-md text-[rgb(var(--muted))] hover:bg-[rgb(var(--muted))]/20 hover:text-[rgb(var(--fg))] disabled:opacity-30 disabled:cursor-not-allowed"
+                                  title="Move down"
+                                >
+                                  <ChevronDown className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <span className="w-px h-5 bg-[rgb(var(--border))]" aria-hidden />
                               <button
-                                onClick={() => {
-                                  setEditingSection(null);
-                                  setEditingIndex(null);
-                                }}
+                                onClick={() => { setEditingSection(null); setEditingIndex(null); }}
                                 className="btn-secondary flex items-center space-x-2"
                               >
                                 <X className="w-4 h-4" />
@@ -1746,8 +1806,8 @@ function DashboardContent() {
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-start justify-between">
-                            <div>
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
                               <h4 className="text-[rgb(var(--fg))] font-medium">{exp.position || 'New Position'}</h4>
                               <p className="text-[rgb(var(--muted))]">{exp.company} {exp.location && `• ${exp.location}`}</p>
                               <p className="text-[rgb(var(--muted))] text-sm">
@@ -1764,19 +1824,39 @@ function DashboardContent() {
                                 </ul>
                               )}
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex items-center shrink-0 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-1 gap-0.5">
                               <button
-                                onClick={() => {
-                                  setEditingSection('experience');
-                                  setEditingIndex(index);
-                                }}
-                                className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                type="button"
+                                onClick={() => moveExperience(index, 'up')}
+                                disabled={index === 0}
+                                className="p-2 rounded-md text-[rgb(var(--muted))] hover:bg-[rgb(var(--muted))]/20 hover:text-[rgb(var(--fg))] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="Move up"
+                              >
+                                <ChevronUp className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveExperience(index, 'down')}
+                                disabled={index === editedResumeData.experience.length - 1}
+                                className="p-2 rounded-md text-[rgb(var(--muted))] hover:bg-[rgb(var(--muted))]/20 hover:text-[rgb(var(--fg))] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="Move down"
+                              >
+                                <ChevronDown className="w-4 h-4" />
+                              </button>
+                              <span className="w-px h-5 bg-[rgb(var(--border))]" aria-hidden />
+                              <button
+                                type="button"
+                                onClick={() => { setEditingSection('experience'); setEditingIndex(index); }}
+                                className="p-2 rounded-md text-blue-500 hover:bg-blue-500/20 transition-colors"
+                                title="Edit"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
+                                type="button"
                                 onClick={() => deleteExperience(index)}
-                                className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                                className="p-2 rounded-md text-red-500 hover:bg-red-500/20 transition-colors"
+                                title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -2356,19 +2436,13 @@ function DashboardContent() {
                     </div>
                   </div>
                   
-                  <div className="bg-[rgb(var(--card))] rounded-lg border border-[rgb(var(--border))] overflow-hidden" style={{ height: '600px' }}>
-                    <div className="w-full h-full overflow-auto relative">
-                      <div className="transform scale-75 origin-top-left w-[133.33%] h-[133.33%]">
-                        <PortfolioRenderer 
-                          portfolio={{
-                            ...portfolio,
-                            resumeData: editedResumeData || portfolio.resumeData,
-                            personalization: editedPersonalization || portfolio.personalization
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  {/* iframe contains template so fixed elements cannot cover the sidebar */}
+                  <iframe
+                    src={`/${portfolio.slug}`}
+                    title="Portfolio preview"
+                    className="w-full border-0 rounded-lg"
+                    style={{ height: '600px' }}
+                  />
                 </div>
               </div>
             )}
@@ -2647,14 +2721,16 @@ function DashboardContent() {
                   </div>
                 </div>
 
-                <button
-                  onClick={saveChanges}
-                  disabled={saving || (editedSlug !== portfolio.slug && slugAvailable !== true)}
-                  className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors"
-                >
-                  {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  <span>{saving ? 'Saving...' : 'Save Settings'}</span>
-                </button>
+                {hasUnsavedChanges && (
+                  <button
+                    onClick={saveChanges}
+                    disabled={saving || (editedSlug !== portfolio.slug && slugAvailable !== true)}
+                    className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-6 py-3 rounded-lg transition-colors"
+                  >
+                    {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    <span>{saving ? 'Saving...' : 'Save'}</span>
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -2680,14 +2756,29 @@ function DashboardContent() {
                     )}
                   </div>
                 </div>
-                <a
-                  href={`/${portfolio.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center bg-[rgb(var(--card))] hover:bg-[rgb(var(--border))]/40 border border-[rgb(var(--border))] text-[rgb(var(--fg))] py-2 rounded-lg transition-colors text-sm sm:text-base"
-                >
-                  View Live Portfolio
-                </a>
+                {hasUnsavedChanges ? (
+                  <button
+                    type="button"
+                    onClick={saveChanges}
+                    disabled={saving || (editedSlug !== portfolio.slug && slugAvailable !== true)}
+                    className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white py-2.5 rounded-lg transition-colors text-sm sm:text-base font-medium"
+                  >
+                    {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    <span>{saving ? 'Saving...' : 'Save'}</span>
+                  </button>
+                ) : (
+                  <a
+                    href={`/${portfolio.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center bg-[rgb(var(--card))] hover:bg-[rgb(var(--border))]/40 border border-[rgb(var(--border))] text-[rgb(var(--fg))] py-2.5 rounded-lg transition-colors text-sm sm:text-base"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <ExternalLink className="w-4 h-4" />
+                      View Live Portfolio
+                    </span>
+                  </a>
+                )}
               </div>
             </div>
 

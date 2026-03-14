@@ -87,7 +87,7 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
           <p className="text-white mt-4 text-center">Loading...</p>
@@ -126,10 +126,10 @@ function SignInPrompt() {
   const { signInWithGoogle } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center px-6">
       <div className="max-w-md mx-auto text-center">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12">
-          <UserIcon className="w-16 h-16 text-purple-400 mx-auto mb-6" />
+          <UserIcon className="w-16 h-16 text-gray-300 mx-auto mb-6" />
           <h1 className="text-3xl font-bold text-white mb-4">
             Sign In Required
           </h1>

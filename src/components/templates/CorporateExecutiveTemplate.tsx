@@ -9,7 +9,7 @@ import {
   Code
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -138,7 +138,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                           <div className="inline-flex items-center space-x-2 bg-gray-100 rounded-full px-3 sm:px-4 py-2">
                             <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
                             <span className="text-xs sm:text-sm font-medium text-gray-700">
-                              {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                              {formatExperienceDateRange(exp)}
                             </span>
                           </div>
                         </div>
@@ -296,7 +296,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                   </div>
                   <div className="text-right">
                     <span className="text-sm font-medium text-gray-500">
-                      {edu.graduationDate ? formatDate(edu.graduationDate) : 'In Progress'}
+                      {formatGraduationDate(edu.graduationDate)}
                     </span>
                   </div>
                 </div>

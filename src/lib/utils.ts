@@ -70,21 +70,80 @@ export function trackResumeUpload(success: boolean): void {
   }
 }
 
+const MONTH_NAMES = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+const MONTH_ABBREV = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+function parseFlexibleDate(s: string): Date | null {
+  if (!s || typeof s !== 'string') return null;
+  const trimmed = s.trim().toLowerCase();
+  if (!trimmed) return null;
+  let date = new Date(s);
+  if (!isNaN(date.getTime())) return date;
+  const match = trimmed.match(/^([a-z]+)\s*[\s\-,\/]*\s*(\d{4})$/);
+  if (match) {
+    const monthStr = match[1];
+    const year = parseInt(match[2], 10);
+    const mi = MONTH_NAMES.indexOf(monthStr);
+    const ai = MONTH_ABBREV.indexOf(monthStr.slice(0, 3));
+    const month = mi >= 0 ? mi : (ai >= 0 ? ai : -1);
+    if (month >= 0 && year >= 1900 && year <= 2100) {
+      date = new Date(year, month, 1);
+      if (!isNaN(date.getTime())) return date;
+    }
+  }
+  const ymd = trimmed.match(/^(\d{4})-(\d{1,2})-?(\d{1,2})?$/);
+  if (ymd) {
+    const y = parseInt(ymd[1], 10);
+    const m = parseInt(ymd[2], 10) - 1;
+    const d = ymd[3] ? parseInt(ymd[3], 10) : 1;
+    date = new Date(y, m, d);
+    if (!isNaN(date.getTime())) return date;
+  }
+  return null;
+}
+
 export function formatDate(dateString: string | Date): string {
   if (!dateString) return '';
   
   try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return '';
+    const date = typeof dateString === 'string' ? parseFlexibleDate(dateString) : (isNaN((dateString as Date).getTime()) ? null : dateString);
+    if (!date || isNaN(date.getTime())) return '';
     
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      month: 'long'
     });
   } catch {
     return '';
   }
+}
+
+/** Format experience date range; handles empty start/end and current role. Returns '' when no dates. */
+export function formatExperienceDateRange(exp: { startDate?: string; endDate?: string; current?: boolean }): string {
+  const start = formatDate(exp.startDate || '');
+  const end = formatDate(exp.endDate || '');
+  const isCurrent = !!exp.current;
+  if (!start && !end && !isCurrent) return '';
+  if (isCurrent) return start ? `${start} – Present` : 'Present';
+  if (start && end) return `${start} – ${end}`;
+  if (start) return start;
+  if (end) return end;
+  return '';
+}
+
+/** Format project date range; returns '' when no dates. */
+export function formatProjectDateRange(project: { startDate?: string; endDate?: string }): string {
+  const start = formatDate(project.startDate || '');
+  const end = formatDate(project.endDate || '');
+  if (!start && !end) return '';
+  if (start && end) return `${start} – ${end}`;
+  return start || end;
+}
+
+/** Format graduation date; returns 'In Progress' when empty. */
+export function formatGraduationDate(dateString?: string): string {
+  const formatted = formatDate(dateString || '');
+  return formatted || 'In Progress';
 }
 
 export function safeUrl(url: string | undefined | null): string {

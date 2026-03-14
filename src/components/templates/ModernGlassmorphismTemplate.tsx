@@ -8,7 +8,7 @@ import {
   ArrowRight, Star, Heart
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate, safeUrl } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate, safeUrl } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 import BlurText from '../BlurText';
@@ -273,7 +273,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                   <div className="flex items-center gap-2 bg-gray-600/50 px-3 sm:px-4 py-2 rounded-lg mt-3 lg:mt-0">
                     <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" />
                     <span className="text-gray-300 text-xs sm:text-sm">
-                      {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                      {formatExperienceDateRange(exp)}
                     </span>
                   </div>
                 </div>
@@ -438,7 +438,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                   <div className="flex items-center gap-2 bg-gray-600/50 px-4 py-2 rounded-lg">
                     <Calendar className="w-4 h-4 text-purple-400" />
                     <span className="text-gray-300 text-sm">
-                      {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
+                      {formatProjectDateRange(project)}
                     </span>
                   </div>
                 )}
@@ -499,14 +499,12 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                     )}
                   </div>
                   <div className="mt-4 lg:mt-0">
-                    {edu.graduationDate && (
-                      <div className="flex items-center gap-2 bg-gray-700/50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-2 bg-gray-700/50 px-4 py-2 rounded-lg">
                         <Calendar className="w-4 h-4 text-purple-400" />
                         <span className="text-gray-300 text-sm">
-                          {formatDate(edu.graduationDate)}
+                          {formatGraduationDate(edu.graduationDate)}
                         </span>
                       </div>
-                    )}
                     {edu.gpa && (
                       <p className="text-gray-400 mt-2 text-sm">GPA: {edu.gpa}</p>
                     )}

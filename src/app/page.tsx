@@ -314,7 +314,7 @@ export default function HomePage() {
 
     return (
       <NavigationPadding>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
           <div className="container mx-auto px-6 py-4">
             {/* Header */}
             <div className="text-center mb-4">

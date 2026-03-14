@@ -3,7 +3,7 @@
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink, Briefcase, GraduationCap, Code, Award, Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 
 interface DarkProfessionalTemplateProps {
@@ -57,7 +57,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                 <div className="mt-3 sm:mt-0 flex items-center text-gray-400 text-sm bg-gray-900/40 rounded-md px-2 py-1 self-start sm:self-auto">
                   <Calendar className="w-4 h-4 mr-1" />
                   <span className="whitespace-nowrap">
-                    {formatDate(job.startDate)} - {job.endDate ? formatDate(job.endDate) : 'Present'}
+                    {formatExperienceDateRange(job)}
                   </span>
                 </div>
               </div>
@@ -194,7 +194,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                 <div className="mt-3 sm:mt-0 flex items-center text-gray-400 text-sm bg-gray-900/40 rounded-md px-2 py-1 self-start sm:self-auto">
                   <Calendar className="w-4 h-4 mr-1" />
                   <span className="whitespace-nowrap">
-                    {edu.graduationDate ? formatDate(edu.graduationDate) : 'In Progress'}
+                    {formatGraduationDate(edu.graduationDate)}
                   </span>
                 </div>
               </div>

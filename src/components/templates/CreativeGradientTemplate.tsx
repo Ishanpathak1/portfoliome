@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Mail, Phone, Github, Linkedin, Calendar, Award, Code, Briefcase, Zap, Heart, Target, Sparkles, ExternalLink, Sun, Moon, Palette, GraduationCap, MapPin } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -87,7 +87,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                        {formatExperienceDateRange(exp)}
                       </p>
                       {!exp.endDate && (
                         <span className={`inline-block px-3 py-1 bg-gradient-to-r ${colors.accent} text-white text-xs rounded-full mt-2 animate-pulse`}>
@@ -295,7 +295,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                   </div>
                   <div className="text-right">
                     <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {edu.graduationDate ? formatDate(edu.graduationDate) : 'In Progress'}
+                      {formatGraduationDate(edu.graduationDate)}
                     </p>
                   </div>
                 </div>

@@ -11,7 +11,7 @@ import {
   Triangle, Circle, Square, PenTool, Eraser
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -511,7 +511,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
                           <div className="flex items-center gap-2">
                             <Calendar className="w-5 h-5" style={{ color: colors.paint }} />
                             <span className="font-bold" style={{ color: colors.ink }}>
-                              {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                              {formatExperienceDateRange(exp)}
                             </span>
                           </div>
                         </div>
@@ -733,7 +733,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
                       <div className="flex items-center gap-2 text-sm" style={{ color: colors.sketch }}>
                         <Calendar className="w-4 h-4" />
                         <span className="font-bold">
-                          {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
+                          {formatProjectDateRange(project)}
                         </span>
                       </div>
                     )}
@@ -807,16 +807,14 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
                     </div>
                     
                     <div className="mt-6 lg:mt-0">
-                      {edu.graduationDate && (
-                        <div className="inline-block bg-gradient-to-r from-blue-100 to-green-100 px-6 py-3 rounded-full border-2" style={{ borderColor: colors.accent }}>
+                      <div className="inline-block bg-gradient-to-r from-blue-100 to-green-100 px-6 py-3 rounded-full border-2" style={{ borderColor: colors.accent }}>
                           <div className="flex items-center gap-2">
                             <Calendar className="w-5 h-5" style={{ color: colors.paint }} />
                             <span className="font-bold" style={{ color: colors.ink }}>
-                              {formatDate(edu.graduationDate)}
+                              {formatGraduationDate(edu.graduationDate)}
                             </span>
                           </div>
                         </div>
-                      )}
                       {edu.gpa && (
                         <p className="text-lg font-bold mt-3" style={{ color: colors.sketch }}>
                           GPA: {edu.gpa}
@@ -1082,7 +1080,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
       ))}
 
       {/* Artistic Footer */}
-      <footer className="py-20 px-8 relative bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900 overflow-hidden">
+      <footer className="py-20 px-8 relative bg-gradient-to-br from-gray-900 to-black overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-20 w-96 h-96 rounded-full blur-3xl bg-gradient-to-r from-purple-400 to-pink-400 animate-pulse" />
           <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full blur-3xl bg-gradient-to-r from-blue-400 to-cyan-400 animate-pulse" style={{ animationDelay: '2s' }} />

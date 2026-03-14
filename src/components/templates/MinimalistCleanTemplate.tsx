@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Mail, Phone, Github, Linkedin, MapPin, ExternalLink, Sun, Moon, Code, Briefcase, User, Award, FolderOpen, GraduationCap, Menu, X, Calendar, Building, Trophy } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -253,7 +253,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                    {formatExperienceDateRange(exp)}
                   </p>
                   {!exp.endDate && (
                     <span 
@@ -445,11 +445,9 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                   )}
                 </div>
                 <div className="text-right">
-                  {edu.graduationDate && (
-                    <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                      {formatDate(edu.graduationDate)}
+                  <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {formatGraduationDate(edu.graduationDate)}
                     </p>
-                  )}
                   {edu.gpa && (
                     <p 
                       className="text-sm font-medium"

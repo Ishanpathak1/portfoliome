@@ -12,7 +12,7 @@ import {
   Star, Sparkles, Moon, Sun, Orbit, Satellite, Command
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -603,7 +603,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                         DURATION
                       </div>
                       <div className="text-cyan-400 font-mono text-xs md:text-sm">
-                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'PRESENT'}
+                        {formatExperienceDateRange(exp).replace('Present', 'PRESENT')}
                       </div>
                     </div>
                   </div>
@@ -754,7 +754,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                   {(project.startDate || project.endDate) && (
                     <div className="border-t border-cyan-500/30 pt-4">
                       <div className="text-purple-400 font-mono text-xs md:text-sm">
-                        TIMELINE: {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
+                        TIMELINE: {formatProjectDateRange(project)}
                       </div>
                     </div>
                   )}
@@ -802,11 +802,9 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                     )}
                   </div>
                   <div className="text-left md:text-right">
-                    {edu.graduationDate && (
-                      <div className="text-green-400 font-mono text-xs md:text-sm">
-                        {formatDate(edu.graduationDate)}
+                    <div className="text-green-400 font-mono text-xs md:text-sm">
+                        {formatGraduationDate(edu.graduationDate)}
                       </div>
-                    )}
                     {edu.gpa && (
                       <div className="text-cyan-400 font-mono text-xs mt-1">
                         GPA: {edu.gpa}

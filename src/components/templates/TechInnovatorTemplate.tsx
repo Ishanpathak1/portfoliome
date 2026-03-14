@@ -12,7 +12,7 @@ import {
   Gauge, Orbit, Scan, Blocks, Network, Waves, Flashlight
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -528,16 +528,18 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                         </div>
                       </div>
                       
+                      {formatExperienceDateRange(exp) && (
                       <div className="mt-6 lg:mt-0">
                         <div className="bg-gradient-to-r from-current to-transparent rounded-2xl p-4 md:p-6 border-2" style={{ color: colors.quantum + '20', borderColor: colors.quantum }}>
                           <div className="flex items-center gap-3">
                             <Calendar className="w-5 h-5 md:w-6 md:h-6" style={{ color: colors.quantum }} />
                             <span className="text-white font-bold text-sm md:text-lg">
-                              {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                              {formatExperienceDateRange(exp)}
                             </span>
                           </div>
                         </div>
                       </div>
+                      )}
                     </div>
 
                     {exp.responsibilities && (
@@ -730,7 +732,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                       <div className="flex items-center gap-3 bg-gradient-to-r from-current to-transparent rounded-2xl p-3 md:p-4 border-2" style={{ color: colors.quantum + '20', borderColor: colors.quantum }}>
                         <Calendar className="w-4 h-4 md:w-5 md:h-5" style={{ color: colors.quantum }} />
                         <span className="text-white font-bold text-sm md:text-base">
-                          {project.startDate ? formatDate(project.startDate) : ''} {project.endDate && `- ${formatDate(project.endDate)}`}
+                          {formatProjectDateRange(project)}
                         </span>
                       </div>
                     )}
@@ -798,16 +800,14 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                       </div>
                       
                       <div className="mt-6 lg:mt-0">
-                        {edu.graduationDate && (
-                          <div className="bg-gradient-to-r from-current to-transparent rounded-2xl p-4 md:p-6 border-2" style={{ color: colors.quantum + '20', borderColor: colors.quantum }}>
+                        <div className="bg-gradient-to-r from-current to-transparent rounded-2xl p-4 md:p-6 border-2" style={{ color: colors.quantum + '20', borderColor: colors.quantum }}>
                             <div className="flex items-center gap-3">
                               <Calendar className="w-5 h-5 md:w-6 md:h-6" style={{ color: colors.quantum }} />
                               <span className="text-white font-bold text-sm md:text-lg">
-                                {formatDate(edu.graduationDate)}
+                                {formatGraduationDate(edu.graduationDate)}
                               </span>
                             </div>
                           </div>
-                        )}
                         {edu.gpa && (
                           <p className="text-gray-300 mt-4 text-sm md:text-lg font-bold">
                             GPA: <span style={{ color: colors.accent }}>{edu.gpa}</span>

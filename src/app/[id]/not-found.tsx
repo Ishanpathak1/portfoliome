@@ -5,7 +5,7 @@ import { Home, Search, AlertTriangle } from 'lucide-react';
 
 export default function PortfolioNotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center px-6">
       <div className="max-w-2xl mx-auto text-center">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12">
           <div className="w-24 h-24 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
@@ -34,7 +34,7 @@ export default function PortfolioNotFound() {
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <Link 
               href="/"
-              className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:scale-105 transition-all duration-300 shadow-2xl"
+              className="flex items-center space-x-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-8 py-4 rounded-full font-semibold hover:scale-105 transition-all duration-300 shadow-2xl"
             >
               <Home className="w-5 h-5" />
               <span>Create New Portfolio</span>

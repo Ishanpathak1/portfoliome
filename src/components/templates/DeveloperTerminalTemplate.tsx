@@ -7,7 +7,7 @@ import {
   ChevronRight, Cpu, Zap, Database, Globe, Coffee, Star
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 
 interface DeveloperTerminalTemplateProps {
   portfolio: DatabasePortfolio;
@@ -218,7 +218,7 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
             <div className="ml-1 sm:ml-2">
               <div className="text-xs sm:text-sm" style={{ color: colors.secondary }}>{exp.position}</div>
               <div className="text-xs sm:text-sm" style={{ color: colors.textSecondary }}>
-                {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
+                {formatExperienceDateRange(exp)}
               </div>
               <div className="mt-1 sm:mt-2" style={{ color: colors.text }}>
                 {exp.responsibilities?.map((responsibility: string, i: number) => (
@@ -283,7 +283,7 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
             <div className="ml-1 sm:ml-2">
               <div className="text-xs sm:text-sm" style={{ color: colors.secondary }}>{edu.degree} in {edu.field}</div>
               <div className="text-xs sm:text-sm" style={{ color: colors.textSecondary }}>
-                Graduated: {formatDate(edu.graduationDate)}
+                Graduated: {formatGraduationDate(edu.graduationDate)}
               </div>
               {edu.gpa && (
                 <div className="text-xs sm:text-sm" style={{ color: colors.text }}>GPA: {edu.gpa}</div>

@@ -14,7 +14,7 @@ import {
   Download, Upload, RefreshCw, Play, Pause, Square, Circle
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
 
@@ -287,7 +287,7 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2 lg:mt-0">
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-4 h-4" />
-                      <span>{formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}</span>
+                      <span>{formatExperienceDateRange(exp)}</span>
                     </div>
                     {exp.location && (
                       <div className="flex items-center space-x-1">
@@ -483,7 +483,7 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
                 <div className="flex items-center space-x-4 text-sm text-gray-500">
                   <div className="flex items-center space-x-1">
                     <Calendar className="w-4 h-4" />
-                    <span>Graduated {formatDate(edu.graduationDate)}</span>
+                    <span>Graduated {formatGraduationDate(edu.graduationDate)}</span>
                   </div>
                   {edu.gpa && (
                     <div className="flex items-center space-x-1">

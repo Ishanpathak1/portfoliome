@@ -164,7 +164,7 @@ export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: Mobil
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
       <div className="container mx-auto px-4 py-4">
         {/* Mobile Header */}
         <div className="text-center mb-6">
@@ -179,7 +179,7 @@ export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: Mobil
           </div>
           <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
             <div 
-              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-gray-600 to-gray-700 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(mobileStep / 3) * 100}%` }}
             ></div>
           </div>
@@ -199,7 +199,7 @@ export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: Mobil
                      onClick={() => handleTemplateSelect(template.id)}
                      className={`w-full p-4 rounded-lg border-2 transition-all ${
                        personalization.templateId === template.id
-                         ? 'border-purple-500 bg-white/10'
+                         ? 'border-gray-500 bg-white/10'
                          : 'border-white/20 bg-white/5 hover:bg-white/10'
                      }`}
                    >
@@ -229,7 +229,7 @@ export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: Mobil
                     onClick={() => handleColorSelect(scheme.id as 'blue' | 'green' | 'purple' | 'orange' | 'red')}
                     className={`p-4 rounded-lg border-2 transition-all ${
                       personalization.colorScheme === scheme.id
-                        ? 'border-purple-500 bg-white/10'
+                        ? 'border-gray-500 bg-white/10'
                         : 'border-white/20 bg-white/5 hover:bg-white/10'
                     }`}
                   >
@@ -272,7 +272,7 @@ export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: Mobil
                 <button
                   onClick={handleFinish}
                   disabled={isGenerating}
-                  className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {isGenerating ? (
                     <>
