@@ -64,20 +64,13 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-64 shrink-0 border-r border-[rgb(var(--border))] bg-[rgb(var(--card))] h-screen sticky top-0 z-50">
-      <div className="h-16 px-4 flex items-center justify-between border-b border-[rgb(var(--border))]">
+      <div className="h-16 px-4 flex items-center border-b border-[rgb(var(--border))]">
         <Link href="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-[rgb(var(--accent-600))] rounded-lg flex items-center justify-center">
             <span className="text-white font-bold">P</span>
           </div>
           <span className="font-bold text-[rgb(var(--fg))] dark:text-white">PortfolioHub</span>
         </Link>
-        <button
-          aria-label="Toggle theme"
-          onClick={toggleTheme}
-          className="p-2 rounded-lg hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10"
-        >
-          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </button>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4">

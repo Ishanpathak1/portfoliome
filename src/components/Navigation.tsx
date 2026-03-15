@@ -38,9 +38,8 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
     user = auth.user;
     signInWithGoogle = auth.signInWithGoogle;
     signOut = auth.signOut;
-  } catch (error) {
-    // Auth context not available (during SSR)
-    console.log('Auth context not available, using defaults');
+  } catch {
+    // Auth context not available yet (during hydration or before FirebaseAuthWrapper loads)
   }
 
   // Fetch user's portfolio data when user is available
@@ -81,7 +80,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[rgb(var(--card))]/80 backdrop-blur-xl border-b border-[rgb(var(--border))]/60">
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-[rgb(var(--card))]/80 backdrop-blur-xl border-b border-[rgb(var(--border))]/60 ${isDashboard && user ? 'lg:left-64' : ''}`}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Logo / Dashboard Title */}
@@ -135,36 +134,9 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
             {user ? (
               <div className="flex items-center space-x-3">
                 {isDashboard ? (
-                  // Dashboard mode - show portfolio link
+                  // Dashboard mode - View Live, Sign Out, and theme toggle are in the left sidebar; only show NotificationBell on desktop, mobile menu always
                   <>
                     <NotificationBell isDashboard />
-                    <a
-                      href={userPortfolio ? `/${userPortfolio.slug}` : '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex items-center gap-2 border border-[rgb(var(--border))] text-[rgb(var(--fg))] dark:text-white px-3 py-2 rounded-md transition-colors whitespace-nowrap ${
-                        userPortfolio ? 'hover:bg-[rgb(var(--border))]/40 dark:hover:bg-white/10' : 'opacity-60 cursor-not-allowed'
-                      }`}
-                      onClick={(e) => {
-                        if (!userPortfolio) {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span className="hidden sm:inline">
-                        {userPortfolio ? 'View Live' : 'Loading...'}
-                      </span>
-                    </a>
-                    <button
-                      onClick={() => signOut()}
-                      className="flex items-center gap-1 text-gray-600 hover:text-[rgb(var(--fg))] transition-colors px-3 py-2 rounded-md hover:bg-[rgb(var(--border))]/40"
-                      style={{ color: 'var(--fg)' }}
-                      title="Sign Out"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span className="hidden sm:inline">Sign Out</span>
-                    </button>
                   </>
                 ) : (
                   // Regular mode - show dashboard link
@@ -234,6 +206,37 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
                 <span>{item.name}</span>
               </Link>
             ))}
+            {isDashboard && user && (
+              <>
+                <a
+                  href={userPortfolio ? `/${userPortfolio.slug}` : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    if (!userPortfolio) e.preventDefault();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    userPortfolio ? 'text-gray-600 hover:bg-[rgb(var(--border))]/40' : 'opacity-60 cursor-not-allowed'
+                  }`}
+                  style={userPortfolio ? { color: 'var(--fg)' } : undefined}
+                >
+                  <ExternalLink className="w-5 h-5" />
+                  <span>{userPortfolio ? 'View Live' : 'Loading...'}</span>
+                </a>
+                <button
+                  onClick={() => {
+                    signOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium w-full text-left text-gray-600 hover:bg-[rgb(var(--border))]/40"
+                  style={{ color: 'var(--fg)' }}
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Sign Out</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

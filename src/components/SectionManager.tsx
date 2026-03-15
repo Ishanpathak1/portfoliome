@@ -229,12 +229,12 @@ export function SectionManager({
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+    <div className="rounded-xl">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-white">Manage Sections</h3>
+        <h3 className="text-xl font-semibold text-[rgb(var(--fg))]">Manage Sections</h3>
         <button
           onClick={() => setIsAddingSection(true)}
-          className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:scale-105 transition-all duration-300"
+          className="flex items-center space-x-2 bg-[rgb(var(--accent-600))] hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
         >
           <Plus className="w-4 h-4" />
           <span>Add Section</span>
@@ -243,16 +243,16 @@ export function SectionManager({
 
       {/* Add New Section Form */}
       {isAddingSection && (
-        <div className="bg-white/10 border border-white/20 rounded-lg p-4 mb-6">
-          <h4 className="text-lg font-medium text-white mb-4">Add Custom Section</h4>
+        <div className="bg-[rgb(var(--border))]/10 border border-[rgb(var(--border))] rounded-lg p-4 mb-6">
+          <h4 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Add Custom Section</h4>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-white mb-2">Section Type</label>
+              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Section Type</label>
               <select
                 value={newSectionType}
                 onChange={(e) => setNewSectionType(e.target.value as 'text' | 'list' | 'cards')}
-                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                className="w-full input-field"
               >
                 <option value="text">Text Content</option>
                 <option value="list">List Items</option>
@@ -261,19 +261,19 @@ export function SectionManager({
             </div>
 
             <div>
-              <label className="block text-white mb-2">Section Title</label>
+              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Section Title</label>
               <input
                 type="text"
                 value={newSectionTitle}
                 onChange={(e) => setNewSectionTitle(e.target.value)}
                 placeholder="e.g., Awards, Volunteer Work, Hobbies"
-                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                className="w-full input-field"
               />
             </div>
 
             {newSectionType !== 'cards' ? (
               <div>
-                <label className="block text-white mb-2">Content</label>
+                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Content</label>
                 <textarea
                   value={newSectionContent}
                   onChange={(e) => setNewSectionContent(e.target.value)}
@@ -281,27 +281,27 @@ export function SectionManager({
                     ? "Enter each item on a new line\nItem 1\nItem 2\nItem 3"
                     : "Write your content here..."}
                   rows={4}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full input-field"
                 />
               </div>
             ) : (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-white">Cards</label>
+                  <label className="block text-[rgb(var(--fg))] text-sm">Cards</label>
                   <button
                     onClick={() => setNewSectionCards([...
                       newSectionCards,
                       { title: '', description: '', date: '', link: '' }
                     ])}
-                    className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
+                    className="px-2 py-1 text-xs bg-[rgb(var(--border))]/30 border border-[rgb(var(--border))] rounded-md text-[rgb(var(--fg))] hover:bg-[rgb(var(--border))]/50 transition-colors"
                   >
                     Add Card
                   </button>
                 </div>
                 <div className="grid md:grid-cols-2 gap-3">
                   {newSectionCards.map((card, i) => (
-                    <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
-                      <div className="text-white/70 text-xs">Card {i + 1}</div>
+                    <div key={i} className="bg-[rgb(var(--border))]/10 border border-[rgb(var(--border))] rounded-lg p-3 space-y-2">
+                      <div className="text-[rgb(var(--muted))] text-xs">Card {i + 1}</div>
                       <input
                         type="text"
                         value={card.title}
@@ -311,7 +311,7 @@ export function SectionManager({
                           setNewSectionCards(next);
                         }}
                         placeholder="Heading / Title"
-                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full input-field"
                       />
                       <textarea
                         rows={3}
@@ -322,7 +322,7 @@ export function SectionManager({
                           setNewSectionCards(next);
                         }}
                         placeholder="Text / Description"
-                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full input-field"
                       />
                       <input
                         type="date"
@@ -332,7 +332,7 @@ export function SectionManager({
                           next[i] = { ...next[i], date: e.target.value };
                           setNewSectionCards(next);
                         }}
-                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full input-field"
                       />
                       <input
                         type="url"
@@ -343,12 +343,12 @@ export function SectionManager({
                           setNewSectionCards(next);
                         }}
                         placeholder="Optional: https://example.com"
-                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full input-field"
                       />
                       <div className="flex justify-end">
                         <button
                           onClick={() => setNewSectionCards(newSectionCards.filter((_, idx) => idx !== i))}
-                          className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30"
+                          className="px-2 py-1 text-xs text-red-600 hover:bg-red-500/20 rounded-md transition-colors"
                         >
                           Remove
                         </button>
@@ -374,7 +374,7 @@ export function SectionManager({
                   setNewSectionTitle('');
                   setNewSectionContent('');
                 }}
-                className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-medium"
+                className="btn-secondary flex items-center space-x-2"
               >
                 <X className="w-4 h-4" />
                 <span>Cancel</span>
@@ -387,7 +387,7 @@ export function SectionManager({
       {/* Quick Add Templates */}
       {!isAddingSection && (
         <div className="mb-6">
-          <h4 className="text-white mb-3">Quick Add:</h4>
+          <h4 className="text-[rgb(var(--fg))] text-sm font-medium mb-3">Quick Add:</h4>
           <div className="flex flex-wrap gap-2">
             {CUSTOM_SECTION_TEMPLATES.map((template, index) => (
               <button
@@ -398,7 +398,7 @@ export function SectionManager({
                   setNewSectionContent(template.placeholder);
                   setIsAddingSection(true);
                 }}
-                className="px-3 py-1 bg-white/10 text-white text-sm rounded-full hover:bg-white/20 transition-colors"
+                className="px-3 py-1 bg-[rgb(var(--border))]/30 text-[rgb(var(--fg))] text-sm rounded-full hover:bg-[rgb(var(--border))]/50 transition-colors"
               >
                 {template.title}
               </button>
@@ -419,13 +419,13 @@ export function SectionManager({
           return (
             <div
               key={section.id}
-              className={`bg-white/10 border border-white/20 rounded-lg p-4 ${
+              className={`bg-[rgb(var(--border))]/10 border border-[rgb(var(--border))] rounded-lg p-4 ${
                 isHidden ? 'opacity-50' : ''
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <span className="text-white font-medium">{section.title}</span>
+                  <span className="text-[rgb(var(--fg))] font-medium">{section.title}</span>
                   {section.required && (
                     <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded-full">
                       Required
@@ -444,20 +444,20 @@ export function SectionManager({
                     <div className="flex items-center space-x-1 mr-2">
                       <button
                         onClick={() => setRenderStyle(section.id, 'grouped')}
-                        className={`px-2 py-1 text-xs rounded-md ${
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
                           (sectionRenderStyle[section.id] || 'grouped') === 'grouped'
-                            ? 'bg-white/20 text-white'
-                            : 'bg-white/10 text-white/70 hover:bg-white/15'
+                            ? 'bg-[rgb(var(--accent-600))]/20 text-[rgb(var(--fg))]'
+                            : 'bg-[rgb(var(--border))]/30 text-[rgb(var(--muted))] hover:bg-[rgb(var(--border))]/50'
                         }`}
                       >
                         Grouped
                       </button>
                       <button
                         onClick={() => setRenderStyle(section.id, 'cards')}
-                        className={`px-2 py-1 text-xs rounded-md ${
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
                           sectionRenderStyle[section.id] === 'cards'
-                            ? 'bg-white/20 text-white'
-                            : 'bg-white/10 text-white/70 hover:bg-white/15'
+                            ? 'bg-[rgb(var(--accent-600))]/20 text-[rgb(var(--fg))]'
+                            : 'bg-[rgb(var(--border))]/30 text-[rgb(var(--muted))] hover:bg-[rgb(var(--border))]/50'
                         }`}
                       >
                         Cards
@@ -468,14 +468,14 @@ export function SectionManager({
                   <button
                     onClick={() => moveSection(section.id, 'up')}
                     disabled={index === 0}
-                    className="p-1 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronUp className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => moveSection(section.id, 'down')}
                     disabled={index === orderedSections.length - 1}
-                    className="p-1 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronDown className="w-4 h-4" />
                   </button>
@@ -484,7 +484,7 @@ export function SectionManager({
                   {!section.required ? (
                     <button
                       onClick={() => toggleSectionVisibility(section.id)}
-                      className="p-1 text-white/70 hover:text-white"
+                      className="p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] transition-colors"
                     >
                       {isHidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -494,7 +494,7 @@ export function SectionManager({
                   {isCustom ? (
                     <button
                       onClick={() => beginEditSection(section.id)}
-                      className="p-1 text-white/70 hover:text-white"
+                      className="p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -504,7 +504,7 @@ export function SectionManager({
                   {isCustom ? (
                     <button
                       onClick={() => deleteCustomSection(section.id)}
-                      className="p-1 text-red-400 hover:text-red-300"
+                      className="p-1 text-red-500 hover:bg-red-500/20 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -514,21 +514,21 @@ export function SectionManager({
 
               {/* Custom Section Content Preview */}
               {isCustom && customSection ? (
-                <div className="mt-3 pt-3 border-t border-white/20">
+                <div className="mt-3 pt-3 border-t border-[rgb(var(--border))]">
                   {editingSection === section.id ? (
                     <div className="space-y-3">
                       <div className="grid md:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-white mb-1 text-sm">Title</label>
+                          <label className="block text-[rgb(var(--muted))] mb-1 text-sm">Title</label>
                           <input
                             type="text"
                             value={editTitle}
                             onChange={(e) => setEditTitle(e.target.value)}
-                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            className="w-full input-field"
                           />
                         </div>
                         <div>
-                          <label className="block text-white mb-1 text-sm">Content Type</label>
+                          <label className="block text-[rgb(var(--muted))] mb-1 text-sm">Content Type</label>
                           <select
                             value={editType}
                             onChange={(e) => {
@@ -576,7 +576,7 @@ export function SectionManager({
                               }
                               setEditType(next);
                             }}
-                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            className="w-full input-field"
                           >
                             <option value="text">Text</option>
                             <option value="list">List</option>
@@ -587,12 +587,12 @@ export function SectionManager({
 
                       {editType === 'text' && (
                         <div>
-                          <label className="block text-white mb-1 text-sm">Text Content</label>
+                          <label className="block text-[rgb(var(--muted))] mb-1 text-sm">Text Content</label>
                           <textarea
                             rows={5}
                             value={editTextContent}
                             onChange={(e) => setEditTextContent(e.target.value)}
-                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            className="w-full input-field"
                           />
                         </div>
                       )}
@@ -600,18 +600,18 @@ export function SectionManager({
                       {editType === 'list' && (
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <label className="block text-white text-sm">Cards</label>
+                            <label className="block text-[rgb(var(--fg))] text-sm">List Items</label>
                             <button
                               onClick={() => setEditListItems([...editListItems, ''])}
-                              className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
+                              className="px-2 py-1 text-xs bg-[rgb(var(--border))]/30 border border-[rgb(var(--border))] rounded-md text-[rgb(var(--fg))] hover:bg-[rgb(var(--border))]/50 transition-colors"
                             >
                               Add Card
                             </button>
                           </div>
                           <div className="grid md:grid-cols-2 gap-3">
                             {editListItems.map((item, i) => (
-                              <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
-                                <div className="text-white/70 text-xs">Card {i + 1}</div>
+                              <div key={i} className="bg-[rgb(var(--border))]/10 border border-[rgb(var(--border))] rounded-lg p-3 space-y-2">
+                                <div className="text-[rgb(var(--muted))] text-xs">Item {i + 1}</div>
                                 <input
                                   type="text"
                                   value={item}
@@ -620,13 +620,13 @@ export function SectionManager({
                                     next[i] = e.target.value;
                                     setEditListItems(next);
                                   }}
-                                  placeholder={`Enter content for card ${i + 1}`}
-                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                  placeholder={`Enter content for item ${i + 1}`}
+                                  className="w-full input-field"
                                 />
                                 <div className="flex justify-end">
                                   <button
                                     onClick={() => setEditListItems(editListItems.filter((_, idx) => idx !== i))}
-                                    className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30"
+                                    className="px-2 py-1 text-xs text-red-600 hover:bg-red-500/20 rounded-md transition-colors"
                                   >
                                     Remove
                                   </button>
@@ -640,18 +640,18 @@ export function SectionManager({
                       {editType === 'cards' && (
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <label className="block text-white text-sm">Cards</label>
+                            <label className="block text-[rgb(var(--fg))] text-sm">Cards</label>
                             <button
                               onClick={() => setEditCards([...editCards, { title: '', description: '', date: '', link: '' }])}
-                              className="px-2 py-1 text-xs bg-white/10 border border-white/20 rounded-md text-white hover:bg-white/15"
+                              className="px-2 py-1 text-xs bg-[rgb(var(--border))]/30 border border-[rgb(var(--border))] rounded-md text-[rgb(var(--fg))] hover:bg-[rgb(var(--border))]/50 transition-colors"
                             >
                               Add Card
                             </button>
                           </div>
                           <div className="grid md:grid-cols-2 gap-3">
                             {editCards.map((card, i) => (
-                              <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
-                                <div className="text-white/70 text-xs">Card {i + 1}</div>
+                              <div key={i} className="bg-[rgb(var(--border))]/10 border border-[rgb(var(--border))] rounded-lg p-3 space-y-2">
+                                <div className="text-[rgb(var(--muted))] text-xs">Card {i + 1}</div>
                                 <input
                                   type="text"
                                   value={card.title}
@@ -661,7 +661,7 @@ export function SectionManager({
                                     setEditCards(next);
                                   }}
                                   placeholder="Heading / Title"
-                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                  className="w-full input-field"
                                 />
                                 <textarea
                                   rows={3}
@@ -672,7 +672,7 @@ export function SectionManager({
                                     setEditCards(next);
                                   }}
                                   placeholder="Text / Description"
-                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                  className="w-full input-field"
                                 />
                                 <input
                                   type="date"
@@ -682,7 +682,7 @@ export function SectionManager({
                                     next[i] = { ...next[i], date: e.target.value };
                                     setEditCards(next);
                                   }}
-                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                  className="w-full input-field"
                                 />
                                 <input
                                   type="url"
@@ -693,12 +693,12 @@ export function SectionManager({
                                     setEditCards(next);
                                   }}
                                   placeholder="Optional: https://example.com"
-                                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                  className="w-full input-field"
                                 />
                                 <div className="flex justify-end">
                                   <button
                                     onClick={() => setEditCards(editCards.filter((_, idx) => idx !== i))}
-                                    className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30"
+                                    className="px-2 py-1 text-xs text-red-600 hover:bg-red-500/20 rounded-md transition-colors"
                                   >
                                     Remove
                                   </button>
@@ -718,14 +718,14 @@ export function SectionManager({
                         </button>
                         <button
                           onClick={() => setEditingSection(null)}
-                          className="px-4 py-2 bg-gray-600 text-white rounded-lg"
+                          className="btn-secondary px-4 py-2 rounded-lg"
                         >
                           Cancel
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-gray-300 text-sm">
+                    <div className="text-[rgb(var(--muted))] text-sm">
                       {Array.isArray(customSection.content)
                         ? (typeof customSection.content[0] === 'string'
                             ? (customSection.content as string[]).slice(0, 3).join(', ') + ((customSection.content as any[]).length > 3 ? '...' : '')

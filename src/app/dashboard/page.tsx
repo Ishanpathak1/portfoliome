@@ -1869,15 +1869,15 @@ function DashboardContent() {
                 </div>
 
                 {/* Projects */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                    <h2 className="text-2xl font-bold text-[rgb(var(--fg))] flex items-center space-x-2">
                       <FolderOpen className="w-6 h-6" />
                       <span>Projects</span>
                     </h2>
                     <button
                       onClick={addProject}
-                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Project</span>
@@ -1886,58 +1886,58 @@ function DashboardContent() {
 
                   <div className="space-y-4">
                     {editedResumeData.projects.map((project, index) => (
-                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                      <div key={index} className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg p-4">
                         {editingSection === 'projects' && editingIndex === index ? (
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Project Name</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Project Name</label>
                                 <input
                                   type="text"
                                   value={project.name}
                                   onChange={(e) => updateProject(index, 'name', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="Project name"
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Technologies (comma separated)</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Technologies (comma separated)</label>
                                 <input
                                   type="text"
                                   value={(project.technologies || []).join(', ')}
                                   onChange={(e) => updateProject(index, 'technologies', e.target.value.split(',').map(t => t.trim()))}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="React, Node.js, MongoDB"
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Live Demo URL</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Live Demo URL</label>
                                 <input
                                   type="url"
                                   value={project.link || ''}
                                   onChange={(e) => updateProject(index, 'link', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="https://project-demo.com"
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">GitHub URL</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">GitHub URL</label>
                                 <input
                                   type="url"
                                   value={project.github || ''}
                                   onChange={(e) => updateProject(index, 'github', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="https://github.com/username/repo"
                                 />
                               </div>
                             </div>
                             <div>
-                              <label className="block text-gray-300 text-sm mb-2">Description</label>
+                              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Description</label>
                               <textarea
                                 value={project.description}
                                 onChange={(e) => updateProject(index, 'description', e.target.value)}
                                 rows={3}
-                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full input-field"
                                 placeholder="Describe your project..."
                               />
                             </div>
@@ -1947,7 +1947,7 @@ function DashboardContent() {
                                   setEditingSection(null);
                                   setEditingIndex(null);
                                 }}
-                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="btn-secondary flex items-center space-x-2"
                               >
                                 <X className="w-4 h-4" />
                                 <span>Cancel</span>
@@ -1955,7 +1955,7 @@ function DashboardContent() {
                               <button
                                 onClick={saveChanges}
                                 disabled={saving}
-                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
                               >
                                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                 <span>{saving ? 'Saving...' : 'Save'}</span>
@@ -1965,12 +1965,12 @@ function DashboardContent() {
                         ) : (
                           <div className="flex items-start justify-between">
                             <div>
-                              <h4 className="text-white font-medium">{project.name || 'New Project'}</h4>
-                              <p className="text-gray-300 text-sm mt-1">{project.description}</p>
+                              <h4 className="text-[rgb(var(--fg))] font-medium">{project.name || 'New Project'}</h4>
+                              <p className="text-[rgb(var(--muted))] text-sm mt-1">{project.description}</p>
                               {project.technologies && project.technologies.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
                                   {project.technologies.map((tech, i) => (
-                                    <span key={i} className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">
+                                    <span key={i} className="bg-[rgb(var(--accent-600))]/20 text-[rgb(var(--accent-600))] px-2 py-1 rounded text-xs">
                                       {tech}
                                     </span>
                                   ))}
@@ -1978,32 +1978,36 @@ function DashboardContent() {
                               )}
                               <div className="flex space-x-4 mt-2">
                                 {project.link && (
-                                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm flex items-center space-x-1">
+                                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-[rgb(var(--accent-600))] hover:underline text-sm flex items-center space-x-1">
                                     <Globe className="w-3 h-3" />
                                     <span>Demo</span>
                                   </a>
                                 )}
                                 {project.github && (
-                                  <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 text-sm flex items-center space-x-1">
+                                  <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] text-sm flex items-center space-x-1">
                                     <Github className="w-3 h-3" />
                                     <span>Code</span>
                                   </a>
                                 )}
                               </div>
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex shrink-0 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-1 gap-0.5">
                               <button
+                                type="button"
                                 onClick={() => {
                                   setEditingSection('projects');
                                   setEditingIndex(index);
                                 }}
-                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                                className="p-2 rounded-md text-blue-500 hover:bg-blue-500/20 transition-colors"
+                                title="Edit"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
+                                type="button"
                                 onClick={() => deleteProject(index)}
-                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                                className="p-2 rounded-md text-red-500 hover:bg-red-500/20 transition-colors"
+                                title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -2016,15 +2020,15 @@ function DashboardContent() {
                 </div>
 
                 {/* Education */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                    <h2 className="text-2xl font-bold text-[rgb(var(--fg))] flex items-center space-x-2">
                       <GraduationCap className="w-6 h-6" />
                       <span>Education</span>
                     </h2>
                     <button
                       onClick={addEducation}
-                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Education</span>
@@ -2033,57 +2037,57 @@ function DashboardContent() {
 
                   <div className="space-y-4">
                     {editedResumeData.education.map((edu, index) => (
-                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                      <div key={index} className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg p-4">
                         {editingSection === 'education' && editingIndex === index ? (
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Institution</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Institution</label>
                                 <input
                                   type="text"
                                   value={edu.institution}
                                   onChange={(e) => updateEducation(index, 'institution', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="University/School name"
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Degree</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Degree</label>
                                 <input
                                   type="text"
                                   value={edu.degree}
                                   onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="Bachelor's, Master's, etc."
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Field of Study</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Field of Study</label>
                                 <input
                                   type="text"
                                   value={edu.field}
                                   onChange={(e) => updateEducation(index, 'field', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="Computer Science, Business, etc."
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">Graduation Date</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">Graduation Date</label>
                                 <input
                                   type="text"
                                   value={edu.graduationDate}
                                   onChange={(e) => updateEducation(index, 'graduationDate', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="May 2023"
                                 />
                               </div>
                               <div>
-                                <label className="block text-gray-300 text-sm mb-2">GPA (optional)</label>
+                                <label className="block text-[rgb(var(--muted))] text-sm mb-2">GPA (optional)</label>
                                 <input
                                   type="text"
                                   value={edu.gpa || ''}
                                   onChange={(e) => updateEducation(index, 'gpa', e.target.value)}
-                                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full input-field"
                                   placeholder="3.8/4.0"
                                 />
                               </div>
@@ -2094,7 +2098,7 @@ function DashboardContent() {
                                   setEditingSection(null);
                                   setEditingIndex(null);
                                 }}
-                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="btn-secondary flex items-center space-x-2"
                               >
                                 <X className="w-4 h-4" />
                                 <span>Cancel</span>
@@ -2102,7 +2106,7 @@ function DashboardContent() {
                               <button
                                 onClick={saveChanges}
                                 disabled={saving}
-                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
                               >
                                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                 <span>{saving ? 'Saving...' : 'Save'}</span>
@@ -2112,23 +2116,27 @@ function DashboardContent() {
                         ) : (
                           <div className="flex items-start justify-between">
                             <div>
-                              <h4 className="text-white font-medium">{edu.degree || 'New Degree'} {edu.field && `in ${edu.field}`}</h4>
-                              <p className="text-gray-300">{edu.institution}</p>
-                              <p className="text-gray-400 text-sm">{edu.graduationDate} {edu.gpa && `• GPA: ${edu.gpa}`}</p>
+                              <h4 className="text-[rgb(var(--fg))] font-medium">{edu.degree || 'New Degree'} {edu.field && `in ${edu.field}`}</h4>
+                              <p className="text-[rgb(var(--muted))]">{edu.institution}</p>
+                              <p className="text-[rgb(var(--muted))] text-sm">{edu.graduationDate} {edu.gpa && `• GPA: ${edu.gpa}`}</p>
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex shrink-0 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-1 gap-0.5">
                               <button
+                                type="button"
                                 onClick={() => {
                                   setEditingSection('education');
                                   setEditingIndex(index);
                                 }}
-                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                                className="p-2 rounded-md text-blue-500 hover:bg-blue-500/20 transition-colors"
+                                title="Edit"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
+                                type="button"
                                 onClick={() => deleteEducation(index)}
-                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                                className="p-2 rounded-md text-red-500 hover:bg-red-500/20 transition-colors"
+                                title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -2141,15 +2149,15 @@ function DashboardContent() {
                 </div>
 
                 {/* Skills */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                    <h2 className="text-2xl font-bold text-[rgb(var(--fg))] flex items-center space-x-2">
                       <Code className="w-6 h-6" />
                       <span>Skills</span>
                     </h2>
                     <button
                       onClick={addSkillCategory}
-                      className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Category</span>
@@ -2158,26 +2166,26 @@ function DashboardContent() {
 
                   <div className="space-y-4">
                     {editedResumeData.skills.map((skillGroup, index) => (
-                      <div key={index} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                      <div key={index} className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg p-4">
                         {editingSection === 'skills' && editingIndex === index ? (
                           <div className="space-y-4">
                             <div>
-                              <label className="block text-gray-300 text-sm mb-2">Category Name</label>
+                              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Category Name</label>
                               <input
                                 type="text"
                                 value={skillGroup.category}
                                 onChange={(e) => updateSkillCategory(index, 'category', e.target.value)}
-                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full input-field"
                                 placeholder="Programming Languages, Frameworks, etc."
                               />
                             </div>
                             <div>
-                              <label className="block text-gray-300 text-sm mb-2">Skills (comma separated)</label>
+                              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Skills (comma separated)</label>
                               <textarea
                                 value={(skillGroup.items || []).join(', ')}
                                 onChange={(e) => updateSkillCategory(index, 'items', e.target.value.split(',').map(s => s.trim()).filter(s => s))}
                                 rows={3}
-                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full input-field"
                                 placeholder="JavaScript, React, Node.js, Python, etc."
                               />
                             </div>
@@ -2187,7 +2195,7 @@ function DashboardContent() {
                                   setEditingSection(null);
                                   setEditingIndex(null);
                                 }}
-                                className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="btn-secondary flex items-center space-x-2"
                               >
                                 <X className="w-4 h-4" />
                                 <span>Cancel</span>
@@ -2195,7 +2203,7 @@ function DashboardContent() {
                               <button
                                 onClick={saveChanges}
                                 disabled={saving}
-                                className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
                               >
                                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                 <span>{saving ? 'Saving...' : 'Save'}</span>
@@ -2205,28 +2213,32 @@ function DashboardContent() {
                         ) : (
                           <div className="flex items-start justify-between">
                             <div>
-                              <h4 className="text-white font-medium">{skillGroup.category || 'New Skill Category'}</h4>
+                              <h4 className="text-[rgb(var(--fg))] font-medium">{skillGroup.category || 'New Skill Category'}</h4>
                               <div className="flex flex-wrap gap-2 mt-2">
                                 {(skillGroup.items || []).map((skill, i) => (
-                                  <span key={i} className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-sm">
+                                  <span key={i} className="bg-[rgb(var(--accent-600))]/20 text-[rgb(var(--accent-600))] px-2 py-1 rounded text-sm">
                                     {skill}
                                   </span>
                                 ))}
                               </div>
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex shrink-0 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-1 gap-0.5">
                               <button
+                                type="button"
                                 onClick={() => {
                                   setEditingSection('skills');
                                   setEditingIndex(index);
                                 }}
-                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                                className="p-2 rounded-md text-blue-500 hover:bg-blue-500/20 transition-colors"
+                                title="Edit"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
+                                type="button"
                                 onClick={() => deleteSkillCategory(index)}
-                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                                className="p-2 rounded-md text-red-500 hover:bg-red-500/20 transition-colors"
+                                title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>

@@ -19,10 +19,13 @@ export default function ConditionalAuthWrapper({ children }: ConditionalAuthWrap
   // Pages that need Firebase authentication
   const authRequiredPaths = ['/dashboard', '/features', '/templates', '/faq', '/contact', '/how-it-works', '/blog', '/admin'];
   
-  // Check if current path needs authentication
-  const needsAuth = authRequiredPaths.some(path => 
-    pathname === path || pathname.startsWith(path + '/')
-  ) || pathname === '/'; // Only exact match for home page
+  // Check if current path needs authentication.
+  // When pathname is null/undefined (initial load/hydration), assume we need auth so Navigation has context.
+  const needsAuth = pathname == null ? true : (
+    authRequiredPaths.some(path => 
+      pathname === path || pathname.startsWith(path + '/')
+    ) || pathname === '/'
+  );
   
   // For portfolio pages (like /[id]), don't load Firebase
   if (!needsAuth) {
