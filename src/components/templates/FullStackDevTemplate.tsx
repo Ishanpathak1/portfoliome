@@ -15,6 +15,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface FullStackDevTemplateProps {
   portfolio: DatabasePortfolio;
@@ -588,9 +589,7 @@ export function FullStackDevTemplate({ portfolio }: FullStackDevTemplateProps) {
                         {exp.responsibilities.map((item, i) => (
                           <div key={i} className="flex items-start space-x-3">
                             <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-cyan-400 font-mono text-xs md:text-sm leading-relaxed">
-                              {item}
-                            </span>
+                            <ResponsibilityText text={item} className="text-cyan-400 font-mono text-xs md:text-sm leading-relaxed" as="span" />
                           </div>
                         ))}
                       </div>

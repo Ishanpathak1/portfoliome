@@ -6,6 +6,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface CreativeGradientTemplateProps {
   portfolio: DatabasePortfolio;
@@ -115,7 +116,7 @@ export function CreativeGradientTemplate({ portfolio }: CreativeGradientTemplate
                     {(exp.responsibilities || []).map((desc: string, i: number) => (
                       <div key={i} className="flex items-start space-x-3">
                         <div className={`w-2 h-2 bg-gradient-to-r ${colors.accent} rounded-full mt-2 flex-shrink-0`}></div>
-                        <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} leading-relaxed text-sm md:text-base`}>{desc}</p>
+                        <ResponsibilityText text={desc} className={`${isDark ? 'text-gray-300' : 'text-gray-700'} leading-relaxed text-sm md:text-base`} as="p" />
                       </div>
                     ))}
                   </div>

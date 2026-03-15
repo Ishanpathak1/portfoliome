@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface DeveloperTerminalTemplateProps {
   portfolio: DatabasePortfolio;
@@ -224,7 +225,7 @@ export function DeveloperTerminalTemplate({ portfolio }: DeveloperTerminalTempla
                 {exp.responsibilities?.map((responsibility: string, i: number) => (
                   <div key={i} className="flex items-start text-xs sm:text-sm">
                     <span className="mr-1 sm:mr-2">•</span>
-                    <span className="break-words">{responsibility}</span>
+                    <ResponsibilityText text={responsibility} className="break-words" as="span" />
                   </div>
                 ))}
               </div>

@@ -5,6 +5,7 @@ import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink, B
 import { useState } from 'react';
 import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface DarkProfessionalTemplateProps {
   portfolio: DatabasePortfolio;
@@ -65,7 +66,7 @@ export function DarkProfessionalTemplate({ portfolio }: DarkProfessionalTemplate
                 {(job.responsibilities || []).map((item, descIndex) => (
                   <li key={descIndex} className="text-gray-300 flex items-start">
                     <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0" style={{ backgroundColor: currentColors.accent }}></span>
-                    {item}
+                    <ResponsibilityText text={item} as="span" />
                   </li>
                 ))}
               </ul>

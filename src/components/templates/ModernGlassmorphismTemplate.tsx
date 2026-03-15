@@ -11,6 +11,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate, safeUrl } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 import BlurText from '../BlurText';
 import TrueFocus from '../TrueFocus';
 
@@ -283,7 +284,7 @@ export function ModernGlassmorphismTemplate({ portfolio }: ModernGlassmorphismTe
                     {exp.responsibilities.map((item, i) => (
                       <div key={i} className="flex items-start gap-2 sm:gap-3">
                         <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gradient-to-r from-purple-500 to-violet-600 mt-2 flex-shrink-0" />
-                        <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{item}</p>
+                        <ResponsibilityText text={item} className="text-sm sm:text-base text-gray-300 leading-relaxed" as="p" />
                       </div>
                     ))}
                   </div>

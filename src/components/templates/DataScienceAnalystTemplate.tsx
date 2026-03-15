@@ -17,6 +17,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface DataScienceAnalystTemplateProps {
   portfolio: DatabasePortfolio;
@@ -302,7 +303,7 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
                   {(exp.responsibilities || []).map((responsibility, idx) => (
                     <div key={idx} className="flex items-start space-x-3">
                       <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: colors.primary }}></div>
-                      <p className="text-gray-700 leading-relaxed">{responsibility}</p>
+                      <ResponsibilityText text={responsibility} className="text-gray-700 leading-relaxed" as="p" />
                     </div>
                   ))}
                 </div>

@@ -12,6 +12,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface CorporateExecutiveTemplateProps {
   portfolio: DatabasePortfolio;
@@ -148,7 +149,7 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
                         {(exp.responsibilities || []).map((desc: string, descIndex: number) => (
                           <div key={descIndex} className="flex items-start space-x-2 sm:space-x-3">
                             <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0" style={{ color: colors.accent }} />
-                            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{desc}</p>
+                            <ResponsibilityText text={desc} className="text-sm sm:text-base text-gray-700 leading-relaxed" as="p" />
                           </div>
                         ))}
                       </div>

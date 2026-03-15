@@ -9,6 +9,8 @@ import { ToastContainer, useToast } from '@/components/Toast';
 import { SectionManager } from '@/components/SectionManager';
 import { SectionHeadingEditor } from '@/components/SectionHeadingEditor';
 import { TemplateTextEditor } from '@/components/TemplateTextEditor';
+import { ResponsibilitiesEditor } from '@/components/ResponsibilitiesEditor';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
 import { useNotifications } from '@/components/notifications/NotificationStore';
 import { AppNotification } from '@/components/notifications/NotificationTypes';
@@ -1757,13 +1759,11 @@ function DashboardContent() {
                               )}
                             </div>
                             <div>
-                              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Responsibilities (one per line)</label>
-                              <textarea
-                                value={(exp.responsibilities || []).join('\\n')}
-                                onChange={(e) => updateExperience(index, 'responsibilities', e.target.value.split('\\n').filter(r => r.trim()))}
-                                rows={4}
-                                className="w-full input-field"
-                                placeholder="• Developed and maintained web applications&#10;• Collaborated with cross-functional teams&#10;• Improved system performance by 40%"
+                              <label className="block text-[rgb(var(--muted))] text-sm mb-2">Responsibilities</label>
+                              <ResponsibilitiesEditor
+                                value={exp.responsibilities || []}
+                                onChange={(items) => updateExperience(index, 'responsibilities', items)}
+                                placeholder="Type - or * then space for bullets, or use the toolbar"
                               />
                             </div>
                             <div className="flex flex-nowrap items-center gap-2">
@@ -1816,7 +1816,7 @@ function DashboardContent() {
                               {exp.responsibilities && exp.responsibilities.length > 0 && (
                                 <ul className="text-[rgb(var(--muted))] text-sm mt-2 space-y-1">
                                   {exp.responsibilities.slice(0, 2).map((resp, i) => (
-                                    <li key={i}>• {resp}</li>
+                                    <li key={i}>• <ResponsibilityText text={resp} as="span" /></li>
                                   ))}
                                   {exp.responsibilities.length > 2 && (
                                     <li className="text-[rgb(var(--muted))]">... and {exp.responsibilities.length - 2} more</li>

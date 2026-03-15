@@ -12,6 +12,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface OpenSourceContributorTemplateProps {
   portfolio: DatabasePortfolio;
@@ -249,7 +250,7 @@ export function OpenSourceContributorTemplate({ portfolio }: OpenSourceContribut
                     {exp.responsibilities.map((item, i) => (
                       <div key={i} className="flex items-start space-x-3">
                         <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: colors.primary }} />
-                        <p className="leading-relaxed" style={{ color: colors.textSecondary }}>{item}</p>
+                        <ResponsibilityText text={item} className="leading-relaxed" style={{ color: colors.textSecondary }} as="p" />
                       </div>
                     ))}
                   </div>

@@ -6,6 +6,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface MinimalistCleanTemplateProps {
   portfolio: DatabasePortfolio;
@@ -276,7 +277,7 @@ export function MinimalistCleanTemplate({ portfolio }: MinimalistCleanTemplatePr
                         className="w-1.5 h-1.5 rounded-full mt-2 mr-3 flex-shrink-0"
                         style={{ backgroundColor: colors.primary }}
                       ></span>
-                      {desc}
+                      <ResponsibilityText text={desc} as="span" />
                     </li>
                   ))}
                 </ul>

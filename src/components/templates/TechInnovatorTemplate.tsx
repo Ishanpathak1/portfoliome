@@ -15,6 +15,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface TechInnovatorTemplateProps {
   portfolio: DatabasePortfolio;
@@ -547,7 +548,7 @@ export function TechInnovatorTemplate({ portfolio }: TechInnovatorTemplateProps)
                         {exp.responsibilities.map((item, i) => (
                           <div key={i} className="flex items-start gap-4">
                             <div className="w-3 h-3 rounded-full mt-3 animate-pulse flex-shrink-0" style={{ backgroundColor: colors.neon }} />
-                            <p className="text-gray-300 text-sm md:text-lg leading-relaxed">{item}</p>
+                            <ResponsibilityText text={item} className="text-gray-300 text-sm md:text-lg leading-relaxed" as="p" />
                           </div>
                         ))}
                       </div>

@@ -14,6 +14,7 @@ import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { formatDate, formatExperienceDateRange, formatProjectDateRange, formatGraduationDate } from '@/lib/utils';
 import { getSectionHeading } from '@/lib/section-headings';
 import { getTemplateText } from '@/lib/template-text';
+import { ResponsibilityText } from '@/components/ResponsibilityText';
 
 interface CreativePortfolioTemplateProps {
   portfolio: DatabasePortfolio;
@@ -524,9 +525,7 @@ export function CreativePortfolioTemplate({ portfolio }: CreativePortfolioTempla
                               <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center mt-1">
                                 <Star className="w-3 h-3 text-white" />
                               </div>
-                              <p className="text-lg leading-relaxed" style={{ color: colors.sketch }}>
-                                {item}
-                              </p>
+                              <ResponsibilityText text={item} className="text-lg leading-relaxed" style={{ color: colors.sketch }} as="p" />
                             </div>
                           ))}
                         </div>
