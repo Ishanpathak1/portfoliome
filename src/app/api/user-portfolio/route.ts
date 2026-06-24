@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const testNewUser = user.isAdmin && searchParams.has('test-new-user');
 
-    const portfolio = await getUserPortfolio(user.uid, user.email, testNewUser);
+    const portfolio = await getUserPortfolio(user.uid, user.emailVerified ? user.email : undefined, testNewUser);
 
     if (!portfolio) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });

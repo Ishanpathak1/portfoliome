@@ -171,10 +171,45 @@ export async function getUserPortfolio(userId: string, userEmail?: string, testN
       return null;
     }
 
-    // Add timeout protection to the database query
-    const portfolioPromise = prisma.portfolio.findUnique({
-      where: { userId },
-    });
+    const portfolioPromise = (async () => {
+      const portfolio = await prisma.portfolio.findUnique({
+        where: { userId },
+      });
+      if (portfolio) return portfolio;
+
+      if (!userEmail) return null;
+
+      const userByEmail = await prisma.user.findUnique({
+        where: { email: userEmail },
+        include: { portfolio: true },
+      });
+
+      if (!userByEmail?.portfolio) return null;
+
+      if (userByEmail.id !== userId) {
+        const targetUser = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { id: true },
+        });
+
+        if (!targetUser) {
+          try {
+            await prisma.user.update({
+              where: { id: userByEmail.id },
+              data: { id: userId },
+            });
+
+            return prisma.portfolio.findUnique({
+              where: { userId },
+            });
+          } catch (error) {
+            console.warn('Unable to relink portfolio user id during email recovery');
+          }
+        }
+      }
+
+      return userByEmail.portfolio;
+    })();
 
     // Create a timeout promise
     const timeoutPromise = new Promise((_, reject) => {

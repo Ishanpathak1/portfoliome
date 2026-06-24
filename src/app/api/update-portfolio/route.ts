@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest) {
 
     const { slug, personalization, resumeData } = parsed.data;
     
-    const currentPortfolio = await getUserPortfolio(user.uid, user.email);
+    const currentPortfolio = await getUserPortfolio(user.uid, user.emailVerified ? user.email : undefined);
     if (!currentPortfolio) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
     }
@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest) {
         // Add a timeout to the database operation
         const prisma = requirePrisma();
         const dbUpdatePromise = prisma.portfolio.update({
-          where: { userId: user.uid },
+          where: { id: currentPortfolio.id },
           data: updateData
         });
 
