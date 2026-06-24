@@ -1,5 +1,4 @@
-import { cert, getApps, initializeApp, applicationDefault, type App } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
+import type { App } from 'firebase-admin/app';
 import type { NextRequest } from 'next/server';
 import { decodeProtectedHeader, importX509, jwtVerify, type JWTPayload } from 'jose';
 
@@ -50,7 +49,9 @@ function hasFirebaseAdminCredentials(): boolean {
   );
 }
 
-function getFirebaseAdminApp(): App {
+async function getFirebaseAdminApp(): Promise<App> {
+  const { cert, getApps, initializeApp, applicationDefault } = await import('firebase-admin/app');
+
   const existing = getApps()[0];
   if (existing) return existing;
 
@@ -142,7 +143,9 @@ async function verifyFirebaseTokenWithPublicCerts(token: string): Promise<Fireba
 async function verifyFirebaseToken(token: string): Promise<FirebaseJwtPayload> {
   if (hasFirebaseAdminCredentials()) {
     try {
-      const decoded = await getAuth(getFirebaseAdminApp()).verifyIdToken(token, true);
+      const { getAuth } = await import('firebase-admin/auth');
+      const app = await getFirebaseAdminApp();
+      const decoded = await getAuth(app).verifyIdToken(token, true);
       return decoded as FirebaseJwtPayload;
     } catch (error) {
       console.warn('Firebase Admin token verification failed; falling back to public cert verification');
