@@ -141,8 +141,12 @@ async function verifyFirebaseTokenWithPublicCerts(token: string): Promise<Fireba
 
 async function verifyFirebaseToken(token: string): Promise<FirebaseJwtPayload> {
   if (hasFirebaseAdminCredentials()) {
-    const decoded = await getAuth(getFirebaseAdminApp()).verifyIdToken(token, true);
-    return decoded as FirebaseJwtPayload;
+    try {
+      const decoded = await getAuth(getFirebaseAdminApp()).verifyIdToken(token, true);
+      return decoded as FirebaseJwtPayload;
+    } catch (error) {
+      console.warn('Firebase Admin token verification failed; falling back to public cert verification');
+    }
   }
 
   return verifyFirebaseTokenWithPublicCerts(token);

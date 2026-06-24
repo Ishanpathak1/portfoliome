@@ -184,31 +184,45 @@ export async function getUserPortfolio(userId: string, userEmail?: string, testN
         include: { portfolio: true },
       });
 
-      if (!userByEmail?.portfolio) return null;
+      const portfolioByEmail = userByEmail?.portfolio || await prisma.portfolio.findFirst({
+        where: {
+          resumeData: {
+            path: ['contact', 'email'],
+            equals: userEmail,
+          },
+        },
+      });
 
-      if (userByEmail.id !== userId) {
+      if (!portfolioByEmail) return null;
+
+      if (portfolioByEmail.userId !== userId) {
         const targetUser = await prisma.user.findUnique({
           where: { id: userId },
           select: { id: true },
         });
 
-        if (!targetUser) {
-          try {
+        try {
+          if (!targetUser) {
             await prisma.user.update({
-              where: { id: userByEmail.id },
-              data: { id: userId },
+              where: { id: portfolioByEmail.userId },
+              data: { id: userId, email: userEmail },
             });
-
-            return prisma.portfolio.findUnique({
-              where: { userId },
+          } else {
+            await prisma.portfolio.update({
+              where: { id: portfolioByEmail.id },
+              data: { userId },
             });
-          } catch (error) {
-            console.warn('Unable to relink portfolio user id during email recovery');
           }
+
+          return prisma.portfolio.findUnique({
+            where: { userId },
+          });
+        } catch (error) {
+          console.warn('Unable to relink portfolio user id during email recovery');
         }
       }
 
-      return userByEmail.portfolio;
+      return portfolioByEmail;
     })();
 
     // Create a timeout promise
