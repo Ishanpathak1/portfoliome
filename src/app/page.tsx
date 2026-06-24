@@ -117,20 +117,16 @@ export default function HomePage() {
   // Check if user has existing portfolio and redirect to dashboard
   useEffect(() => {
     if (user) {
-      // Developer bypass for testing new user experience
-      const isDeveloper = user.email === 'ishan.pathak2711@gmail.com';
-      const bypassPortfolioCheck = isDeveloper && new URLSearchParams(window.location.search).has('test-new-user');
-      
-      if (!bypassPortfolioCheck) {
-        setCheckingExistingPortfolio(true);
-        checkExistingPortfolio();
-      }
+      setCheckingExistingPortfolio(true);
+      checkExistingPortfolio();
     }
   }, [user]);
 
   const checkExistingPortfolio = async () => {
     try {
-      const response = await fetch('/api/user-portfolio', {
+      const params = new URLSearchParams(window.location.search);
+      const testNewUser = params.has('test-new-user') ? '?test-new-user=1' : '';
+      const response = await fetch(`/api/user-portfolio${testNewUser}`, {
         headers: {
           'Authorization': `Bearer ${await user?.getIdToken()}`
         }
@@ -139,15 +135,8 @@ export default function HomePage() {
       if (response.ok) {
         const data = await response.json();
         if (data.portfolio) {
-          // Developer bypass for testing new user experience
-          const isDeveloper = user?.email === 'ishan.pathak2711@gmail.com';
-          const bypassPortfolioCheck = isDeveloper && new URLSearchParams(window.location.search).has('test-new-user');
-          
-          if (!bypassPortfolioCheck) {
-            // User has existing portfolio, redirect to dashboard
-            router.push('/dashboard');
-            return;
-          }
+          router.push('/dashboard');
+          return;
         }
       }
       // If no portfolio or error, continue with normal flow

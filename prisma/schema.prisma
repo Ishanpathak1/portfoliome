@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // NextAuth.js required models
@@ -96,17 +97,6 @@ model Portfolio {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("portfolios")
-}
-
-// Analytics model for tracking
-model PortfolioView {
-  id          String   @id @default(cuid())
-  portfolioId String
-  viewerIp    String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
-
-  @@map("portfolio_views")
 }
 
 // Broadcast announcements for notifications

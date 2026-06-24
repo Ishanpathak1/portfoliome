@@ -5,7 +5,10 @@ import { useAuth } from '@/components/FirebaseAuthWrapper';
 import { LogOut, Megaphone, Send, Link as LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 
-const ADMIN_EMAIL = 'ishan.pathak2711@gmail.com';
+const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '')
+  .split(',')
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean);
 
 export default function AdminPage() {
   const { user, signInWithGoogle, signOut } = useAuth();
@@ -18,17 +21,24 @@ export default function AdminPage() {
   const [actionSection, setActionSection] = useState('');
   const [actionIndex, setActionIndex] = useState<string>('');
 
-  const isAdmin = useMemo(() => !!user && user.email === ADMIN_EMAIL, [user]);
+  const isAdmin = useMemo(() => {
+    if (!user?.email) return false;
+    return ADMIN_EMAILS.includes(user.email.toLowerCase());
+  }, [user]);
 
   const load = async () => {
-    const res = await fetch('/api/admin/announcements');
+    const res = await fetch('/api/admin/announcements', {
+      headers: user ? { 'Authorization': `Bearer ${await user.getIdToken()}` } : {},
+    });
     if (res.ok) {
       const data = await res.json();
       setAnnouncements(data.announcements || []);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (user) void load();
+  }, [user]);
 
   const send = async () => {
     if (!message.trim()) return;

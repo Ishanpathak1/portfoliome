@@ -1,16 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
+const pdfSchema = z.object({
+  html: z.string().min(1).max(200_000),
+});
+
+function rejectUnsafeHtml(html: string): boolean {
+  return /<\s*(script|iframe|object|embed|base|link|meta)\b/i.test(html);
+}
+
 export async function POST(request: NextRequest) {
   let browser: any = null;
   try {
-    const { html } = await request.json();
-    if (!html || typeof html !== 'string') {
-      return NextResponse.json({ error: 'Missing html' }, { status: 400 });
+    const limited = rateLimit(request, { key: 'cover-letter-export-pdf', ...RATE_LIMITS.expensive });
+    if (limited) return limited;
+
+    const parsed = pdfSchema.safeParse(await request.json());
+    if (!parsed.success || rejectUnsafeHtml(parsed.data.html)) {
+      return NextResponse.json({ error: 'Invalid PDF content' }, { status: 400 });
     }
+    const { html } = parsed.data;
     const { default: puppeteer } = await import('puppeteer-core');
     const { default: chromium } = await import('@sparticuz/chromium');
     (chromium as any).setHeadlessMode = true;
@@ -113,6 +127,20 @@ export async function POST(request: NextRequest) {
     }
     const page = await browser.newPage();
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
+    await page.setRequestInterception(true);
+    page.on('request', (interceptedRequest: any) => {
+      const url = interceptedRequest.url();
+      const allowed =
+        url.startsWith('data:') ||
+        url.startsWith('about:') ||
+        url.startsWith('https://fonts.googleapis.com/') ||
+        url.startsWith('https://fonts.gstatic.com/');
+      if (allowed) {
+        interceptedRequest.continue();
+      } else {
+        interceptedRequest.abort();
+      }
+    });
     await page.setContent(`<!doctype html><html><head><meta charset="utf-8" />
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -1,4 +1,4 @@
-import insane from 'insane';
+import sanitizeHtml from 'sanitize-html';
 
 const SANITIZE_OPTIONS = {
   allowedTags: ['strong', 'b', 'em', 'i'],
@@ -10,7 +10,7 @@ const SANITIZE_OPTIONS = {
  */
 export function sanitizeResponsibilityHtml(html: string): string {
   if (!html || typeof html !== 'string') return '';
-  return insane(html, SANITIZE_OPTIONS);
+  return sanitizeHtml(html, SANITIZE_OPTIONS);
 }
 
 /**

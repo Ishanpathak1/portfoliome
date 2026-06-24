@@ -3,7 +3,7 @@ import { ResumeData } from '@/types/resume';
 import { validateAndFixUrl, normalizeDateInput } from './utils';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPEN_KEY,
+  apiKey: process.env.OPENAI_API_KEY || process.env.OPEN_KEY,
 });
 
 const RESUME_PARSING_PROMPT = `

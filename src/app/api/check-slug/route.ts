@@ -1,27 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requirePrisma } from '@/lib/prisma';
+import { verifyRequestUser } from '@/lib/auth';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
-// Simple token verification for development
-async function getUserIdFromToken(authHeader: string | null): Promise<string | null> {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.substring(7);
-  
-  try {
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-    return payload.user_id || payload.sub || payload.uid;
-  } catch (error) {
-    console.error('Token parsing failed:', error);
-    return null;
-  }
-}
+const slugSchema = z.string().trim().min(3).max(50).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
 export async function GET(request: NextRequest) {
   try {
+    const limited = rateLimit(request, { key: 'check-slug', ...RATE_LIMITS.publicRead });
+    if (limited) return limited;
+
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
 
@@ -29,31 +20,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Slug parameter is required' }, { status: 400 });
     }
 
-    // Validate slug format
-    const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-    if (!slugRegex.test(slug)) {
+    const parsedSlug = slugSchema.safeParse(slug);
+    if (!parsedSlug.success) {
       return NextResponse.json({ 
         available: false,
-        error: 'Slug must contain only lowercase letters, numbers, and hyphens'
-      }, { status: 200 });
-    }
-
-    // Check if slug is too short or too long
-    if (slug.length < 3 || slug.length > 50) {
-      return NextResponse.json({ 
-        available: false,
-        error: 'Slug must be between 3 and 50 characters'
+        error: 'Slug must be 3-50 characters and contain only lowercase letters, numbers, and hyphens'
       }, { status: 200 });
     }
 
     // Get user ID from token for authenticated requests
-    const authHeader = request.headers.get('Authorization');
-    const userId = await getUserIdFromToken(authHeader);
+    const user = await verifyRequestUser(request);
 
     // Check if slug exists in database
     const prisma = requirePrisma();
     const existingPortfolio = await prisma.portfolio.findUnique({
-      where: { slug },
+      where: { slug: parsedSlug.data },
       select: { id: true, userId: true }
     });
 
@@ -62,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     if (existingPortfolio) {
       // If the existing portfolio belongs to the current user, it's available for them
-      if (userId && existingPortfolio.userId === userId) {
+      if (user?.uid && existingPortfolio.userId === user.uid) {
         available = true;
         message = 'This is your current slug';
       } else {
@@ -73,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ 
       available,
-      slug,
+      slug: parsedSlug.data,
       message
     });
 

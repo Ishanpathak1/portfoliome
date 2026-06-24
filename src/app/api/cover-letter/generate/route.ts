@@ -1,31 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { upsertApplicationStatus, type ApplicationStatus } from '@/lib/portfolio-db';
+import { verifyRequestUser } from '@/lib/auth';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { z } from 'zod';
 
 import type { ResumeData } from '@/types/resume';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+const coverLetterSchema = z.object({
+  jobDescription: z.string().trim().min(30).max(20_000),
+  resumeData: z.record(z.any()).optional(),
+  prompt: z.string().max(2_000).optional(),
+  company: z.string().trim().min(1).max(160).optional(),
+  status: z.enum(['APPLIED', 'ACCEPTED', 'REJECTED']).optional(),
+});
+
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('Authorization');
-    const parseUserId = (header: string | null): string | null => {
-      if (!header || !header.startsWith('Bearer ')) return null;
-      try {
-        const token = header.substring(7);
-        const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-        return payload.user_id || payload.sub || payload.uid || null;
-      } catch {
-        return null;
-      }
-    };
+    const limited = rateLimit(req, { key: 'cover-letter-generate', ...RATE_LIMITS.expensive });
+    if (limited) return limited;
 
-    const { jobDescription, resumeData, prompt, company, status }: { jobDescription: string; resumeData?: ResumeData; prompt?: string; company?: string; status?: ApplicationStatus } = await req.json();
-    if (!jobDescription || jobDescription.trim().length < 30) {
-      return NextResponse.json({ error: 'Job description is too short.' }, { status: 400 });
+    const parsedBody = coverLetterSchema.safeParse(await req.json());
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: 'Invalid cover letter request.' }, { status: 400 });
     }
 
-    const openaiApiKey = process.env.OPEN_KEY;
+    const { jobDescription, resumeData, prompt, company, status } = parsedBody.data as {
+      jobDescription: string;
+      resumeData?: ResumeData;
+      prompt?: string;
+      company?: string;
+      status?: ApplicationStatus;
+    };
+    const openaiApiKey = process.env.OPENAI_API_KEY || process.env.OPEN_KEY;
 
     const fallbackCompose = () => {
       const greeting = 'Dear Hiring Manager,';
@@ -142,20 +151,19 @@ Return only JSON.`;
     } catch {}
 
     // Best-effort save of application status if provided
-    const userId = parseUserId(authHeader);
-    const allowed: ApplicationStatus[] = ['APPLIED', 'ACCEPTED', 'REJECTED'];
-    if (userId && company && status && allowed.includes(status)) {
+    const user = await verifyRequestUser(req);
+    if (user?.uid && company && status) {
       try {
-        await upsertApplicationStatus(userId, company, status);
+        await upsertApplicationStatus(user.uid, company, status);
       } catch {
         // Swallow errors to avoid polluting PDF/download responses or UI with Next error overlay
       }
     }
 
     return NextResponse.json({ contentBlocks: parsed, modelUsed: 'gpt-4o-mini' });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Cover letter generate error:', error);
-    return NextResponse.json({ error: error?.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
 

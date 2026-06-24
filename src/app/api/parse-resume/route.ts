@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mammoth from 'mammoth';
 import { parseResumeWithAI } from '@/lib/ai-resume-parser';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
+
+const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
 // Import pdf-parse at the top level to avoid dynamic import issues during build
 let pdfParse: any = null;
@@ -14,6 +17,9 @@ try {
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = rateLimit(request, { key: 'parse-resume', ...RATE_LIMITS.expensive });
+    if (limited) return limited;
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
@@ -25,7 +31,9 @@ export async function POST(request: NextRequest) {
     const fileType = file.type;
     const fileName = file.name.toLowerCase();
 
-    console.log('Processing file:', fileName, 'Type:', fileType);
+    if (file.size > MAX_RESUME_BYTES) {
+      return NextResponse.json({ error: 'File is too large. Please upload a file under 5 MB.' }, { status: 400 });
+    }
 
     try {
       if (fileType === 'application/pdf' || fileName.endsWith('.pdf')) {
@@ -40,18 +48,15 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(arrayBuffer);
         const pdfData = await pdfParse(buffer);
         text = pdfData.text;
-        console.log('PDF parsed successfully, text length:', text.length);
       } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fileName.endsWith('.docx')) {
         // Handle DOCX files
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const result = await mammoth.extractRawText({ buffer });
         text = result.value;
-        console.log('DOCX parsed successfully, text length:', text.length);
       } else if (fileType === 'text/plain' || fileName.endsWith('.txt')) {
         // Handle TXT files
         text = await file.text();
-        console.log('TXT file processed, text length:', text.length);
       } else {
         return NextResponse.json({ 
           error: 'Unsupported file type. Please upload a PDF, DOCX, or TXT file.' 
@@ -66,15 +71,11 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
       }
 
-      console.log('Text extraction successful. Sample:', text.substring(0, 200) + '...');
-
       // Use AI-powered parsing
       const resumeData = await parseResumeWithAI(text);
       
       // Validate that we extracted meaningful data
       if (!resumeData.contact.name || resumeData.contact.name === 'Professional') {
-        console.log('Name detection failed, trying alternative methods...');
-        
         // Try to extract name from filename if parsing failed
         const nameFromFile = fileName
           .replace(/\.(pdf|docx|txt)$/, '')
@@ -94,12 +95,10 @@ export async function POST(request: NextRequest) {
 
       // Ensure we have at least some basic info
       if (!resumeData.contact.email && !resumeData.contact.phone) {
-        console.log('No contact info found, this might not be a resume');
+        console.log('Resume parsing completed without contact details');
       }
 
-      console.log('Parsed resume data:', {
-        name: resumeData.contact.name,
-        email: resumeData.contact.email,
+      console.log('Parsed resume data', {
         experienceCount: resumeData.experience.length,
         skillsCount: resumeData.skills.length,
         projectsCount: resumeData.projects.length
@@ -135,16 +134,14 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({ 
-        error: 'Failed to parse the file. Please ensure it\'s a valid resume file with readable text.',
-        details: parseError instanceof Error ? parseError.message : 'Unknown parsing error'
+        error: 'Failed to parse the file. Please ensure it is a valid resume file with readable text.'
       }, { status: 500 });
     }
 
   } catch (error) {
     console.error('API route error:', error);
     return NextResponse.json({ 
-      error: 'Internal server error occurred while processing the file.',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Internal server error occurred while processing the file.'
     }, { status: 500 });
   }
 } 

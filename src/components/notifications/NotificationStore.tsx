@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AppNotification } from './NotificationTypes';
+import { auth } from '@/lib/firebase';
 
 declare global {
   interface Window {
@@ -53,6 +54,12 @@ function saveToStorage(notifications: AppNotification[]): void {
   }
 }
 
+async function getAuthHeader(): Promise<Record<string, string>> {
+  if (!auth) return {};
+  const token = await auth.currentUser?.getIdToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
@@ -82,10 +89,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     let cancelled = false;
     (async () => {
       try {
-        const authHeader = (window as any)?.firebaseAuthToken
-          ? { Authorization: `Bearer ${(window as any).firebaseAuthToken}` }
-          : undefined;
-        const res = await fetch('/api/notifications', { headers: { ...(authHeader || {}) } });
+        const res = await fetch('/api/notifications', { headers: await getAuthHeader() });
         if (!res.ok) return;
         const data = await res.json();
         const announcements = (data?.announcements || []) as any[];
@@ -150,12 +154,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     setNotifications(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n)));
     setReadIds(prev => new Set(prev).add(id));
     try {
-      const authHeader = (window as any)?.firebaseAuthToken
-        ? { Authorization: `Bearer ${(window as any).firebaseAuthToken}` }
-        : undefined;
       await fetch('/api/notifications/read', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(authHeader || {}) },
+        headers: { 'Content-Type': 'application/json', ...(await getAuthHeader()) },
         body: JSON.stringify({ ids: [id] }),
       });
     } catch {}
@@ -170,12 +171,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     });
     try {
       const ids = notifications.map(n => n.id);
-      const authHeader = (window as any)?.firebaseAuthToken
-        ? { Authorization: `Bearer ${(window as any).firebaseAuthToken}` }
-        : undefined;
       await fetch('/api/notifications/read', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(authHeader || {}) },
+        headers: { 'Content-Type': 'application/json', ...(await getAuthHeader()) },
         body: JSON.stringify({ ids }),
       });
     } catch {}

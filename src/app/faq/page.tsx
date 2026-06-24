@@ -46,15 +46,15 @@ const faqs = [
     questions: [
       {
         q: 'Is my resume data secure?',
-        a: 'Yes, we take security seriously. Your data is encrypted both in transit and at rest. We never share your personal information with third parties without your explicit consent.',
+        a: 'We use HTTPS in production, server-side authorization checks, and managed database storage. You should review the privacy policy for details about subprocessors, retention, and legal basis.',
       },
       {
         q: 'Can I control what information is public?',
-        a: 'Absolutely! You have full control over what information is displayed on your portfolio. You can easily hide or show specific sections and details.',
+        a: 'Your published portfolio shows the resume content you save. Review your portfolio before sharing it and remove information you do not want public.',
       },
       {
-        q: 'How do I delete my portfolio?',
-        a: 'You can delete your portfolio at any time from your dashboard settings. This will remove all your data from our servers permanently.',
+        q: 'How do I export or delete my data?',
+        a: 'Use Dashboard Settings to download a JSON export or permanently delete your account data from this app.',
       },
     ],
   },

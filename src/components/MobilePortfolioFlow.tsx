@@ -93,13 +93,11 @@ export function MobilePortfolioFlow({ resumeData, onComplete, onSignOut }: Mobil
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await user.getIdToken()}`,
         },
         body: JSON.stringify({
           resumeData,
           personalization,
-          userId: user.uid,
-          userEmail: user.email,
-          userName: user.displayName,
         }),
       });
 

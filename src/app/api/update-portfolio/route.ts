@@ -2,66 +2,39 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserPortfolio } from '@/lib/portfolio-db';
 import { requirePrisma } from '@/lib/prisma';
 import { PersonalizationData, ResumeData } from '@/types/resume';
+import { AuthError, requireUser } from '@/lib/auth';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
-// Simple token verification for development
-async function getUserIdFromToken(authHeader: string | null): Promise<string | null> {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.substring(7);
-  
-  try {
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-    return payload.user_id || payload.sub || payload.uid;
-  } catch (error) {
-    console.error('Token parsing failed:', error);
-    return null;
-  }
-}
+const updatePortfolioSchema = z.object({
+  slug: z.string().trim().min(3).max(50).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+  personalization: z.record(z.any()).optional(),
+  resumeData: z.record(z.any()).optional(),
+}).refine((value) => value.slug || value.personalization || value.resumeData, {
+  message: 'No update data provided',
+});
 
 export async function PUT(request: NextRequest) {
   const startTime = Date.now();
-  console.log('🔄 Portfolio update request started');
   
   try {
-    const authHeader = request.headers.get('Authorization');
-    const userId = await getUserIdFromToken(authHeader);
+    const limited = rateLimit(request, { key: 'update-portfolio', ...RATE_LIMITS.mutation });
+    if (limited) return limited;
 
-    if (!userId) {
-      console.log('❌ Unauthorized request');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await requireUser(request);
+    const parsed = updatePortfolioSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid update data' }, { status: 400 });
     }
 
-    console.log(`👤 User ID: ${userId}`);
-    const { slug, personalization, resumeData } = await request.json();
-    console.log(`📝 Update data:`, { 
-      hasSlug: !!slug, 
-      hasPersonalization: !!personalization, 
-      hasResumeData: !!resumeData 
-    });
-
-    // Get current portfolio with timeout
-    console.log('🔍 Fetching current portfolio...');
+    const { slug, personalization, resumeData } = parsed.data;
     
-    // Get user email from token for developer multi-portfolio support
-    const token = authHeader?.substring(7);
-    let userEmail: string | undefined;
-    try {
-      const payload = JSON.parse(Buffer.from(token!.split('.')[1], 'base64').toString());
-      userEmail = payload.email;
-    } catch (error) {
-      console.error('Failed to extract email from token:', error);
-    }
-    
-    const currentPortfolio = await getUserPortfolio(userId, userEmail);
+    const currentPortfolio = await getUserPortfolio(user.uid, user.email);
     if (!currentPortfolio) {
-      console.log('❌ Portfolio not found');
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
     }
-    console.log(`✅ Current portfolio found: ${currentPortfolio.slug}`);
 
     // Prepare update data
     const updateData: any = {};
@@ -70,48 +43,23 @@ export async function PUT(request: NextRequest) {
     if (personalization) {
       updateData.personalization = personalization as PersonalizationData;
       updateData.templateId = personalization.templateId || currentPortfolio.templateId;
-      console.log('🎨 Personalization data prepared');
     }
 
     // Update resume data if provided
     if (resumeData) {
       updateData.resumeData = resumeData as ResumeData;
-      console.log('📄 Resume data prepared');
     }
 
     // Update slug if provided and different
     if (slug && slug !== currentPortfolio.slug) {
-      console.log(`🔄 Slug change requested: ${currentPortfolio.slug} → ${slug}`);
-      
-      // Validate slug format
-      const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-      if (!slugRegex.test(slug)) {
-        console.log('❌ Invalid slug format');
-        return NextResponse.json({ 
-          error: 'Slug must contain only lowercase letters, numbers, and hyphens',
-          field: 'slug'
-        }, { status: 400 });
-      }
-
-      // Check if slug is too short or too long
-      if (slug.length < 3 || slug.length > 50) {
-        console.log('❌ Slug length invalid');
-        return NextResponse.json({ 
-          error: 'Slug must be between 3 and 50 characters',
-          field: 'slug'
-        }, { status: 400 });
-      }
-
       // Double-check if new slug is available (race condition protection)
-      console.log('🔍 Checking slug availability...');
       const prisma = requirePrisma();
       const existingPortfolio = await prisma.portfolio.findUnique({
         where: { slug },
         select: { id: true, userId: true }
       });
 
-      if (existingPortfolio && existingPortfolio.userId !== userId) {
-        console.log('❌ Slug already taken by another user');
+      if (existingPortfolio && existingPortfolio.userId !== user.uid) {
         return NextResponse.json({ 
           error: 'Slug is already taken',
           field: 'slug'
@@ -119,11 +67,9 @@ export async function PUT(request: NextRequest) {
       }
 
       updateData.slug = slug;
-      console.log('✅ Slug change validated');
     }
 
     // Update portfolio with proper error handling and timeout
-    console.log('💾 Starting database update...');
     let updatedPortfolio;
     
     // Retry mechanism for database operations
@@ -132,12 +78,10 @@ export async function PUT(request: NextRequest) {
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`🔄 Database update attempt ${attempt}/${maxRetries}`);
-        
         // Add a timeout to the database operation
         const prisma = requirePrisma();
         const dbUpdatePromise = prisma.portfolio.update({
-          where: { userId },
+          where: { userId: user.uid },
           data: updateData
         });
 
@@ -149,16 +93,14 @@ export async function PUT(request: NextRequest) {
         // Race between the database operation and timeout
         updatedPortfolio = await Promise.race([dbUpdatePromise, timeoutPromise]) as any;
         
-        console.log('✅ Database update completed successfully');
         break; // Success, exit retry loop
         
       } catch (dbError: any) {
         lastError = dbError;
-        console.error(`❌ Database error (attempt ${attempt}/${maxRetries}):`, dbError);
+        console.error('Portfolio update database error', { attempt, code: dbError?.code });
         
         // Handle database constraint violations
         if (dbError.code === 'P2002') {
-          console.log('❌ Unique constraint violation');
           return NextResponse.json({ 
             error: 'Slug is already taken. Please try a different one.',
             field: 'slug'
@@ -166,9 +108,7 @@ export async function PUT(request: NextRequest) {
         }
         
         if (dbError.message === 'Database operation timed out') {
-          console.log(`❌ Database operation timed out (attempt ${attempt})`);
           if (attempt < maxRetries) {
-            console.log(`⏳ Retrying in 1 second...`);
             await new Promise(resolve => setTimeout(resolve, 1000));
             continue;
           } else {
@@ -181,7 +121,6 @@ export async function PUT(request: NextRequest) {
         
         // For connection pool errors, retry
         if (dbError.code === 'P2024' || dbError.message?.includes('connection pool')) {
-          console.log(`🔄 Connection pool error (attempt ${attempt}), retrying...`);
           if (attempt < maxRetries) {
             await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
             continue;
@@ -195,15 +134,13 @@ export async function PUT(request: NextRequest) {
     
     // If all retries failed
     if (!updatedPortfolio) {
-      console.error('❌ All database update attempts failed');
+      console.error('Portfolio update failed after retries', { code: lastError?.code });
       return NextResponse.json({ 
-        error: 'Database error occurred while updating portfolio',
-        details: process.env.NODE_ENV === 'development' ? lastError?.message : undefined
+        error: 'Failed to update portfolio'
       }, { status: 500 });
     }
 
     // Transform and return updated portfolio
-    console.log('🔄 Transforming response data...');
     const transformedPortfolio = {
       id: updatedPortfolio.id,
       userId: updatedPortfolio.userId,
@@ -234,7 +171,7 @@ export async function PUT(request: NextRequest) {
     } catch {}
 
     const totalTime = Date.now() - startTime;
-    console.log(`✅ Portfolio update completed in ${totalTime}ms`);
+    console.log('Portfolio update completed', { durationMs: totalTime });
 
     return NextResponse.json({ 
       success: true,
@@ -244,10 +181,12 @@ export async function PUT(request: NextRequest) {
 
   } catch (error) {
     const totalTime = Date.now() - startTime;
-    console.error(`❌ Portfolio update failed after ${totalTime}ms:`, error);
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    console.error('Portfolio update failed', { durationMs: totalTime, error });
     return NextResponse.json({ 
-      error: 'Failed to update portfolio',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Failed to update portfolio'
     }, { status: 500 });
   }
 } 

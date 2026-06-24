@@ -3,38 +3,31 @@ import fs from 'fs';
 import path from 'path';
 import { requirePrisma } from '@/lib/prisma';
 import { NextRequest } from 'next/server';
+import { verifyRequestUser } from '@/lib/auth';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 // Force dynamic execution so build doesn't try to prerender this route
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// Read announcements from data/announcements.json
-function parseTokenUserId(authHeader: string | null): { userId: string | null } {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) return { userId: null };
-  try {
-    const token = authHeader.substring(7);
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-    return { userId: payload.user_id || payload.sub || payload.uid || null };
-  } catch {
-    return { userId: null };
-  }
-}
-
 export async function GET(req: NextRequest) {
   try {
+    const limited = rateLimit(req, { key: 'notifications', ...RATE_LIMITS.publicRead });
+    if (limited) return limited;
+
     // Prefer DB announcements
     const prisma = requirePrisma();
     const db = await prisma.announcement.findMany({ orderBy: { createdAt: 'desc' }, take: 50 });
-    const auth = parseTokenUserId(req.headers.get('Authorization'));
+    const auth = await verifyRequestUser(req);
     let readMap: Record<string, boolean> = {};
-    if (auth.userId) {
+    if (auth?.uid) {
       const receipts = await prisma.announcementReceipt.findMany({
-        where: { userId: auth.userId },
+        where: { userId: auth.uid },
         select: { announcementId: true },
       });
       receipts.forEach(r => { readMap[r.announcementId] = true; });
     }
-    console.log('[GET /api/notifications] userId=', auth.userId, 'dbCount=', db.length, 'readIds=', Object.keys(readMap).length);
+    console.log('Notifications fetched', { dbCount: db.length, readIds: Object.keys(readMap).length });
     if (db && db.length > 0) {
       const normalized = db.map(a => ({
         id: a.id,
@@ -55,7 +48,7 @@ export async function GET(req: NextRequest) {
       const json = JSON.parse(raw || '{"announcements": []}');
       announcements = Array.isArray(json.announcements) ? json.announcements : [];
     }
-    console.log('[GET /api/notifications] fallback file announcements=', announcements.length);
+    console.log('Fallback notifications fetched', { count: announcements.length });
     return NextResponse.json({ announcements });
   } catch (e) {
     console.error('[GET /api/notifications] ERROR', e);

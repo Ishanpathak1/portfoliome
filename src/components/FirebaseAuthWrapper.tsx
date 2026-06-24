@@ -32,6 +32,11 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -40,30 +45,11 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
     return () => unsubscribe();
   }, []);
 
-  // Expose current ID token globally for API calls that need Authorization
-  useEffect(() => {
-    let cancelled = false;
-    const updateToken = async () => {
-      try {
-        const token = await auth.currentUser?.getIdToken();
-        if (!cancelled) (window as any).firebaseAuthToken = token;
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('firebase-token-changed', { detail: { hasToken: !!token } }));
-        }
-      } catch {
-        if (!cancelled) (window as any).firebaseAuthToken = undefined;
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('firebase-token-changed', { detail: { hasToken: false } }));
-        }
-      }
-    };
-    updateToken();
-    const unsub = auth.onIdTokenChanged(() => updateToken());
-    return () => { cancelled = true; unsub(); };
-  }, []);
-
   const signInWithGoogle = async () => {
     try {
+      if (!auth || !googleProvider) {
+        throw new Error('Firebase client configuration is missing.');
+      }
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error('Error signing in with Google:', error);
@@ -72,6 +58,7 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
 
   const signOut = async () => {
     try {
+      if (!auth) return;
       await firebaseSignOut(auth);
     } catch (error) {
       console.error('Error signing out:', error);

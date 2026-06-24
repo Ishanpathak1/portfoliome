@@ -3,21 +3,24 @@
 import { Mail, MessageCircle, Clock, Phone } from 'lucide-react';
 import { useState } from 'react';
 
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com';
+const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
+
 const contactMethods = [
   {
     icon: Mail,
     title: 'Email',
     description: 'Send me an email and I\'ll get back to you as soon as possible.',
-    action: 'ishan.pathak2711@gmail.com',
-    link: 'mailto:ishan.pathak2711@gmail.com',
+    action: contactEmail,
+    link: `mailto:${contactEmail}`,
   },
-  {
+  ...(contactPhone ? [{
     icon: Phone,
     title: 'Phone',
     description: 'Feel free to call or text me during business hours.',
-    action: '(518) 699-2475',
-    link: 'tel:+15186992475',
-  },
+    action: contactPhone,
+    link: `tel:${contactPhone.replace(/[^\d+]/g, '')}`,
+  }] : []),
   {
     icon: Clock,
     title: 'Response Time',

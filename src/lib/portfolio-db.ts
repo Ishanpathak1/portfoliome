@@ -71,13 +71,10 @@ export async function saveUserPortfolio(
     },
   });
   
-  // Developer bypass: Allow multiple portfolios for developer emails
-  const isDeveloper = userEmail === 'ishan.pathak2711@gmail.com';
-  
-  // Check if user already has a portfolio (skip for developers)
-  const existingPortfolio = !isDeveloper ? await prisma.portfolio.findUnique({
+  // Check if user already has a portfolio
+  const existingPortfolio = await prisma.portfolio.findUnique({
     where: { userId }
-  }) : null;
+  });
 
   const portfolioData = {
     slug: existingPortfolio?.slug || slug,
@@ -92,7 +89,7 @@ export async function saveUserPortfolio(
     isPublic: true,
   };
 
-  if (existingPortfolio && !isDeveloper) {
+  if (existingPortfolio) {
     // Update existing portfolio (don't include userId in update)
     const updatedPortfolio = await prisma.portfolio.update({
       where: { id: existingPortfolio.id },
@@ -101,7 +98,6 @@ export async function saveUserPortfolio(
     return transformPortfolio(updatedPortfolio);
   } else {
     // Create new portfolio (include userId for creation)
-    // For developers: Always create new, for others: create if no existing portfolio
     const newPortfolio = await prisma.portfolio.create({
       data: {
         ...portfolioData,
@@ -171,23 +167,14 @@ export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfoli
 export async function getUserPortfolio(userId: string, userEmail?: string, testNewUser?: boolean): Promise<DatabasePortfolio | null> {
   try {
     const prisma = requirePrisma();
-    // Developer bypass: If developer is in test mode, return null to enable new user flow
-    const isDeveloper = userEmail === 'ishan.pathak2711@gmail.com';
-    if (isDeveloper && testNewUser) {
+    if (testNewUser) {
       return null;
     }
 
     // Add timeout protection to the database query
-    const portfolioPromise = isDeveloper 
-      ? // For developers: Get the most recent portfolio (since they can have multiple)
-        prisma.portfolio.findFirst({
-          where: { userId },
-          orderBy: { updatedAt: 'desc' }
-        })
-      : // For regular users: Get the unique portfolio
-        prisma.portfolio.findUnique({
-          where: { userId },
-        });
+    const portfolioPromise = prisma.portfolio.findUnique({
+      where: { userId },
+    });
 
     // Create a timeout promise
     const timeoutPromise = new Promise((_, reject) => {

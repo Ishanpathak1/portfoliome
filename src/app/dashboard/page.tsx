@@ -106,6 +106,7 @@ function DashboardContent() {
   const [showHeadingEditor, setShowHeadingEditor] = useState(false);
   const [showTemplateTextEditor, setShowTemplateTextEditor] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [privacyActionLoading, setPrivacyActionLoading] = useState<'export' | 'delete' | null>(null);
 
   // Settings: Update from Resume
   const [resumeUpdateMode, setResumeUpdateMode] = useState<'merge' | 'replace'>('merge');
@@ -688,6 +689,71 @@ function DashboardContent() {
       setTimeout(() => setCopiedUrl(false), 2000);
     } catch (error) {
       console.error('Failed to copy URL:', error);
+    }
+  };
+
+  const exportAccountData = async () => {
+    if (!user) return;
+
+    setPrivacyActionLoading('export');
+    try {
+      const response = await fetch('/api/privacy/export', {
+        headers: {
+          'Authorization': `Bearer ${await user.getIdToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        showError('Unable to export your data right now.');
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `portfolio-data-export-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showSuccess('Your data export has been downloaded.');
+    } catch (error) {
+      console.error('Data export failed:', error);
+      showError('Unable to export your data right now.');
+    } finally {
+      setPrivacyActionLoading(null);
+    }
+  };
+
+  const deleteAccountData = async () => {
+    if (!user) return;
+
+    const confirmation = window.prompt('Type DELETE to permanently delete your account data. This cannot be undone.');
+    if (confirmation !== 'DELETE') return;
+
+    setPrivacyActionLoading('delete');
+    try {
+      const response = await fetch('/api/privacy/delete', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${await user.getIdToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        showError('Unable to delete your account data right now.');
+        return;
+      }
+
+      showSuccess('Your account data has been deleted.');
+      await signOut();
+      router.push('/');
+    } catch (error) {
+      console.error('Account deletion failed:', error);
+      showError('Unable to delete your account data right now.');
+    } finally {
+      setPrivacyActionLoading(null);
     }
   };
 
@@ -2505,13 +2571,43 @@ function DashboardContent() {
                 {/* Privacy Settings */}
                 <div className="mb-8">
                   <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Privacy</h3>
-                  <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4">
+                  <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4 space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-[rgb(var(--fg))] font-medium">Portfolio Visibility</div>
                         <div className="text-[rgb(var(--muted))] text-sm">Your portfolio is currently public and searchable</div>
                       </div>
                       <div className="text-green-600 font-medium">Public</div>
+                    </div>
+                    <div className="border-t border-[rgb(var(--border))] pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <div className="text-[rgb(var(--fg))] font-medium">Download Your Data</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">Export your account, portfolio, resume, jobs, and notification data as JSON.</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={exportAccountData}
+                        disabled={privacyActionLoading !== null}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white rounded-lg transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                        {privacyActionLoading === 'export' ? 'Exporting...' : 'Export Data'}
+                      </button>
+                    </div>
+                    <div className="border-t border-[rgb(var(--border))] pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <div className="text-[rgb(var(--fg))] font-medium">Delete Account Data</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">Permanently delete your account data from this app. This cannot be undone.</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={deleteAccountData}
+                        disabled={privacyActionLoading !== null}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        {privacyActionLoading === 'delete' ? 'Deleting...' : 'Delete Data'}
+                      </button>
                     </div>
                   </div>
                 </div>
