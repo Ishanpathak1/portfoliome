@@ -119,7 +119,7 @@ export default function RootLayout({
             </ThemeProvider>
           </NotificationProvider>
         </ConditionalAuthWrapper>
-        <Analytics />
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   );

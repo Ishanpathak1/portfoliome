@@ -12,6 +12,7 @@ import { TemplateTextEditor } from '@/components/TemplateTextEditor';
 import { ResponsibilitiesEditor } from '@/components/ResponsibilitiesEditor';
 import { ResponsibilityText } from '@/components/ResponsibilityText';
 import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
+import { fetchWithUser } from '@/lib/auth-fetch';
 import { useNotifications } from '@/components/notifications/NotificationStore';
 import { AppNotification } from '@/components/notifications/NotificationTypes';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -460,11 +461,8 @@ function DashboardContent() {
 
   const loadUserPortfolio = async () => {
     try {
-      const response = await fetch('/api/user-portfolio', {
-        headers: {
-          'Authorization': `Bearer ${await user?.getIdToken()}`
-        }
-      });
+      if (!user) return;
+      const response = await fetchWithUser(user, '/api/user-portfolio');
 
       if (response.ok) {
         const data = await response.json();

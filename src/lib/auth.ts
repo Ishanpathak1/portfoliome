@@ -27,6 +27,11 @@ type FirebaseJwtPayload = JWTPayload & {
   user_id?: string;
 };
 
+const FIREBASE_CERT_URLS = [
+  'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com',
+  'https://www.googleapis.com/identitytoolkit/v3/relyingparty/publicKeys',
+];
+
 let publicCertCache: {
   certs: Record<string, string>;
   expiresAt: number;
@@ -79,27 +84,33 @@ async function getFirebaseAdminApp(): Promise<App> {
 }
 
 function getFirebaseProjectId(): string | undefined {
-  return process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  return projectId?.trim() || undefined;
 }
 
-async function getFirebasePublicCerts(): Promise<Record<string, string>> {
-  if (publicCertCache && publicCertCache.expiresAt > Date.now()) {
+async function fetchCertMap(url: string): Promise<Record<string, string>> {
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Unable to fetch Firebase public certificates (${response.status})`);
+  }
+
+  const certs = await response.json() as Record<string, unknown>;
+  return Object.fromEntries(
+    Object.entries(certs).filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+  );
+}
+
+async function getFirebasePublicCerts(forceRefresh = false): Promise<Record<string, string>> {
+  if (!forceRefresh && publicCertCache && publicCertCache.expiresAt > Date.now()) {
     return publicCertCache.certs;
   }
 
-  const response = await fetch('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com');
-  if (!response.ok) {
-    throw new Error('Unable to fetch Firebase public certificates');
-  }
-
-  const cacheControl = response.headers.get('cache-control') || '';
-  const maxAgeMatch = cacheControl.match(/max-age=(\d+)/);
-  const maxAgeSeconds = maxAgeMatch ? Number(maxAgeMatch[1]) : 3600;
-  const certs = await response.json() as Record<string, string>;
+  const maps = await Promise.all(FIREBASE_CERT_URLS.map((url) => fetchCertMap(url)));
+  const certs = Object.assign({}, ...maps);
 
   publicCertCache = {
     certs,
-    expiresAt: Date.now() + maxAgeSeconds * 1000,
+    expiresAt: Date.now() + 60 * 60 * 1000,
   };
 
   return certs;
@@ -116,10 +127,14 @@ async function verifyFirebaseTokenWithPublicCerts(token: string): Promise<Fireba
     throw new Error('Missing Firebase token key id');
   }
 
-  const certs = await getFirebasePublicCerts();
-  const cert = certs[header.kid];
+  let certs = await getFirebasePublicCerts();
+  let cert = certs[header.kid];
   if (!cert) {
-    throw new Error('Unknown Firebase token key id');
+    certs = await getFirebasePublicCerts(true);
+    cert = certs[header.kid];
+  }
+  if (!cert) {
+    throw new Error(`Unknown Firebase token key id: ${header.kid}`);
   }
 
   const key = await importX509(cert, 'RS256');
@@ -127,6 +142,7 @@ async function verifyFirebaseTokenWithPublicCerts(token: string): Promise<Fireba
     issuer: `https://securetoken.google.com/${projectId}`,
     audience: projectId,
     algorithms: ['RS256'],
+    clockTolerance: 120,
   });
 
   const firebasePayload = payload as FirebaseJwtPayload;
@@ -179,7 +195,18 @@ export async function verifyRequestUser(request: NextRequest): Promise<Authentic
       isAdmin: decoded.admin === true || (!!email && adminEmails.has(email)),
     };
   } catch (error) {
-    console.warn('Firebase token verification failed');
+    const message = error instanceof Error ? error.message : String(error);
+    let debug = '';
+    try {
+      const payloadPart = token.split('.')[1];
+      if (payloadPart) {
+        const payload = JSON.parse(Buffer.from(payloadPart, 'base64url').toString());
+        debug = `iss=${payload.iss} aud=${payload.aud} exp=${payload.exp} now=${Math.floor(Date.now() / 1000)} expected=${getFirebaseProjectId()}`;
+      }
+    } catch {
+      debug = 'token-payload-unreadable';
+    }
+    console.warn('Firebase token verification failed:', message, debug);
     return null;
   }
 }

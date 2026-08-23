@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { navItems as navigation } from '@/components/nav-config';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { fetchWithUser } from '@/lib/auth-fetch';
 
 interface NavigationProps {
   showDashboardMode?: boolean;
@@ -47,11 +48,7 @@ export function Navigation({ showDashboardMode = false }: NavigationProps) {
     const fetchUserPortfolio = async () => {
       if (user) {
         try {
-          const response = await fetch('/api/user-portfolio', {
-            headers: {
-              'Authorization': `Bearer ${await user.getIdToken()}`
-            }
-          });
+          const response = await fetchWithUser(user, '/api/user-portfolio');
           
           if (response.ok) {
             const data = await response.json();

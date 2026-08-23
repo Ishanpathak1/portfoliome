@@ -13,6 +13,7 @@ import { Upload, Palette, Eye, Sparkles, Settings, FileText, Users, Star, ArrowR
 import { HomepageStructuredData } from '@/components/StructuredData';
 import NavigationPadding from '@/components/NavigationPadding';
 import { MobilePortfolioFlow } from '@/components/MobilePortfolioFlow';
+import { fetchWithUser } from '@/lib/auth-fetch';
 
 export default function HomePage() {
   const { user, signInWithGoogle, signOut } = useAuth();
@@ -126,11 +127,8 @@ export default function HomePage() {
     try {
       const params = new URLSearchParams(window.location.search);
       const testNewUser = params.has('test-new-user') ? '?test-new-user=1' : '';
-      const response = await fetch(`/api/user-portfolio${testNewUser}`, {
-        headers: {
-          'Authorization': `Bearer ${await user?.getIdToken()}`
-        }
-      });
+      if (!user) return;
+      const response = await fetchWithUser(user, `/api/user-portfolio${testNewUser}`);
 
       if (response.ok) {
         const data = await response.json();

@@ -7,6 +7,7 @@ import { useAuth } from './FirebaseAuthWrapper';
 import { LogOut, User, Moon, Sun, ExternalLink } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
 import { useEffect, useState } from 'react';
+import { fetchWithUser } from '@/lib/auth-fetch';
 
 interface UserPortfolio {
   slug: string;
@@ -33,9 +34,7 @@ export default function Sidebar() {
     const run = async () => {
       if (!user) return;
       try {
-        const response = await fetch('/api/user-portfolio', {
-          headers: { 'Authorization': `Bearer ${await user.getIdToken()}` }
-        });
+        const response = await fetchWithUser(user, '/api/user-portfolio');
         if (response.ok) {
           const data = await response.json();
           if (data.portfolio) setUserPortfolio(data.portfolio);

@@ -36,7 +36,7 @@ export const auth: Auth | undefined = appInstance ? getAuth(appInstance) : undef
 export const googleProvider = appInstance ? new GoogleAuthProvider() : undefined;
 
 let analytics: ReturnType<typeof getAnalytics> | undefined;
-if (appInstance) {
+if (appInstance && process.env.NODE_ENV === 'production') {
   try {
     analytics = getAnalytics(appInstance);
   } catch {
