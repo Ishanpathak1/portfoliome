@@ -1,9 +1,6 @@
-'use client';
-
 import { DatabasePortfolio } from '@/lib/portfolio-db';
 import { TemplateLoader } from './TemplateLoader';
-import { useEffect } from 'react';
-import { trackPortfolioGeneration } from '@/lib/utils';
+import { PortfolioViewTracker } from './PortfolioViewTracker';
 
 interface TemplateRendererProps {
   portfolio: DatabasePortfolio;
@@ -12,14 +9,10 @@ interface TemplateRendererProps {
 export function TemplateRenderer({ portfolio }: TemplateRendererProps) {
   const templateId = portfolio.templateId || 'modern-glassmorphism';
 
-  useEffect(() => {
-    trackPortfolioGeneration(true);
-  }, [portfolio.id]);
-
-  try {
-    return <TemplateLoader portfolio={portfolio} templateId={templateId} />;
-  } catch (error) {
-    trackPortfolioGeneration(false);
-    throw error;
-  }
-} 
+  return (
+    <>
+      <TemplateLoader portfolio={portfolio} templateId={templateId} />
+      <PortfolioViewTracker portfolioId={portfolio.id} />
+    </>
+  );
+}

@@ -46,6 +46,16 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['pdf-parse', '@sparticuz/chromium', 'puppeteer-core', 'firebase-admin']
   },
+  webpack: (config, { dev, isServer }) => {
+    // Next 14 dev workers often 500 with missing ./vendor-chunks/* after a prod build.
+    if (dev && isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: false,
+      };
+    }
+    return config;
+  },
   async headers() {
     return [
       {

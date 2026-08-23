@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { Fragment, useState, useEffect, useRef } from 'react';
 import { 
   BarChart3, LineChart, PieChart, TrendingUp, Database, 
   Brain, Cpu, Zap, Target, Award, CheckCircle, Star,
@@ -716,7 +716,9 @@ export function DataScienceAnalystTemplate({ portfolio }: DataScienceAnalystTemp
       {/* Dynamic Sections */}
       {sectionOrder
         .filter(sectionId => !hiddenSections.includes(sectionId))
-        .map(sectionId => renderSection(sectionId))}
+        .map(sectionId => (
+          <Fragment key={sectionId}>{renderSection(sectionId)}</Fragment>
+        ))}
     </div>
   );
 } 

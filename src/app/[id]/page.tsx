@@ -4,6 +4,7 @@ import { NfcTapGuard } from '@/components/NfcTapGuard';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { buildPortfolioJsonLd } from '@/lib/portfolio-structured-data';
+import { unstable_noStore as noStore } from 'next/cache';
 import React from 'react';
 
 function getBaseUrl(): string {
@@ -25,8 +26,10 @@ interface PortfolioPageProps {
 
 // ⚡ Enable ISR for better performance while allowing dynamic content
 export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic';
 
 export default async function PortfolioPage({ params, searchParams }: PortfolioPageProps) {
+  noStore();
   const { id: slug } = params;
   
   // ⚡ Load portfolio data - now with non-blocking analytics
@@ -65,6 +68,7 @@ export default async function PortfolioPage({ params, searchParams }: PortfolioP
 
 // ⚡ Generate metadata with error handling and caching
 export async function generateMetadata({ params, searchParams }: PortfolioPageProps): Promise<Metadata> {
+  noStore();
   const { id: slug } = params;
   
   try {

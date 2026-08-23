@@ -160,7 +160,7 @@ export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfoli
     return transformPortfolio(portfolio);
   } catch (error) {
     console.error('Error fetching portfolio by slug:', error);
-    return null;
+    throw error;
   }
 }
 

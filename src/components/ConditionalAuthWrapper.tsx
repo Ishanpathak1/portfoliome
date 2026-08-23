@@ -1,13 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import dynamic from 'next/dynamic';
-
-// Load Firebase wrapper only on the client and only when rendered
-const FirebaseAuthWrapper = dynamic(
-  () => import('./FirebaseAuthWrapper').then(m => m.FirebaseAuthWrapper),
-  { ssr: false }
-);
+import { FirebaseAuthWrapper } from './FirebaseAuthWrapper';
 
 interface ConditionalAuthWrapperProps {
   children: React.ReactNode;
@@ -27,15 +21,14 @@ export default function ConditionalAuthWrapper({ children }: ConditionalAuthWrap
     ) || pathname === '/'
   );
   
-  // For portfolio pages (like /[id]), don't load Firebase
+  // For portfolio pages (like /[id]), don't wrap in Firebase
   if (!needsAuth) {
     return <>{children}</>;
   }
   
-  // For dashboard and home page, load Firebase
   return (
     <FirebaseAuthWrapper>
       {children}
     </FirebaseAuthWrapper>
   );
-} 
+}
