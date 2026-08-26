@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { ResumeData } from '@/types/resume';
-import { validateAndFixUrl, normalizeDateInput } from './utils';
+import { overlayEducationDatesFromText, overlayExperienceDatesFromText, validateAndFixUrl, normalizeDateInput } from './utils';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || process.env.OPEN_KEY,
@@ -32,19 +32,27 @@ OUTPUT FORMAT (JSON only, no markdown):
   "summary": "Professional summary paragraph",
   "experience": [
     {
-      "position": "Job Title",
-      "company": "Company Name",
-      "startDate": "January 2026",
-      "endDate": "December 2026",
+      "position": "Software Developer",
+      "company": "Example Labs",
+      "startDate": "October 2025",
+      "endDate": "",
+      "current": true,
+      "responsibilities": ["Achievement 1", "Achievement 2"]
+    },
+    {
+      "position": "Frontend Developer Intern",
+      "company": "Example Security",
+      "startDate": "August 2023",
+      "endDate": "July 2024",
       "current": false,
-      "responsibilities": ["Achievement 1", "Achievement 2", "Achievement 3"]
+      "responsibilities": ["Achievement 1"]
     }
   ],
   "education": [
     {
       "degree": "Bachelor of Science in Computer Science",
       "institution": "University Name",
-      "graduationDate": "May 2026",
+      "graduationDate": "May 2024",
       "gpa": "3.8"
     }
   ],
@@ -72,7 +80,8 @@ OUTPUT FORMAT (JSON only, no markdown):
 
 RULES:
 - Extract the COMPLETE name, don't abbreviate
-- Preserve month and year whenever the resume includes them (e.g. "January 2026", "Oct 2025", "2023-07", "01/2026"). Use a year only (e.g. "2026") if no month is present.
+- Preserve month and year whenever the resume includes them (e.g. "October 2025", "August 2023", "May 2026"). Always copy the month name from the resume when it is present. Do not output year-only dates like "2026" if the resume says "January 2026".
+- Copy dates from the resume. Never default a missing month to January. Never convert a year into YYYY-01-01 or "January YEAR".
 - Accept any common date format from the resume and keep start/end dates as separate fields
 - For current roles, set current to true and use an empty endDate instead of "Present"
 - Group skills logically by category
@@ -116,7 +125,7 @@ export class AIResumeParser {
           }
         ],
         temperature: 0.1,
-        max_tokens: 2000,
+        max_tokens: 4000,
       });
 
       const aiResponse = completion.choices[0]?.message?.content;
@@ -229,6 +238,9 @@ export class AIResumeParser {
       })) : [],
       certifications: Array.isArray(data.certifications) ? data.certifications : []
     };
+
+    validated.experience = overlayExperienceDatesFromText(this.text, validated.experience);
+    validated.education = overlayEducationDatesFromText(this.text, validated.education);
 
     return validated;
   }

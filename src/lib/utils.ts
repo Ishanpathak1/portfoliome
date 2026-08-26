@@ -147,8 +147,15 @@ function tryParseDateString(raw: string): ParsedDate | null {
   const value = text.toLowerCase().replace(/([a-z]+)\./g, '$1');
 
   // Calendar dates, including ISO timestamps. Never use `new Date("YYYY-MM-DD")`.
+  // Dates on the first of the month are month-precision (common LLM/ISO form).
   let match = value.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[t ].+)?$/);
-  if (match) return parsedDate(Number(match[1]), Number(match[2]), Number(match[3]), 'day');
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    if (day === 1) return parsedDate(year, month, undefined, 'month');
+    return parsedDate(year, month, day, 'day');
+  }
 
   match = value.match(/^(\d{4})-(\d{1,2})$/);
   if (match) return parsedDate(Number(match[1]), Number(match[2]), undefined, 'month');
@@ -298,16 +305,28 @@ export function extractDateRange(text: string): { startDate: string; endDate: st
 
   const tokens: string[] = [];
   const seen = new Set<string>();
-  const finder = /(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s+(?:\d{1,2}(?:st|nd|rd|th)?,?\s+)?\d{4}|\d{4}[/.]\d{1,2}(?:[/.]\d{1,2})?|\d{4}-\d{1,2}(?:-\d{1,2})?|\d{1,2}[/.]\d{1,2}[/.]\d{4}|\d{1,2}[/.]\d{4}|\b(?:19|20)\d{2}\b/gi;
+  const monthYearFinder = /(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s+\d{4}/gi;
 
   let match: RegExpExecArray | null;
-  while ((match = finder.exec(text)) !== null) {
+  while ((match = monthYearFinder.exec(text)) !== null) {
     const parsed = parseDateParts(match[0]);
-    if (!parsed) continue;
-    const key = `${parsed.year}-${parsed.month || 0}-${parsed.day || 0}`;
+    if (!parsed?.month) continue;
+    const key = `${parsed.year}-${parsed.month}`;
     if (seen.has(key)) continue;
     seen.add(key);
     tokens.push(formatParsedDate(parsed));
+  }
+
+  if (tokens.length === 0) {
+    const numericFinder = /\d{4}-\d{1,2}(?:-\d{1,2})?|\d{1,2}[/.]\d{4}|\d{1,2}[/.]\d{1,2}[/.]\d{4}/g;
+    while ((match = numericFinder.exec(text)) !== null) {
+      const parsed = parseDateParts(match[0]);
+      if (!parsed?.month) continue;
+      const key = `${parsed.year}-${parsed.month}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      tokens.push(formatParsedDate(parsed));
+    }
   }
 
   return {
@@ -315,4 +334,128 @@ export function extractDateRange(text: string): { startDate: string; endDate: st
     endDate: current ? '' : (tokens[1] || ''),
     current,
   };
+}
+
+const MONTH_YEAR_TOKEN = '(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\\.?\\s+\\d{4}';
+
+type LocatedDateRange = {
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  index: number;
+};
+
+function extractAllMonthYearRanges(text: string): LocatedDateRange[] {
+  if (!text) return [];
+  const ranges: LocatedDateRange[] = [];
+  const rangeRe = new RegExp(`(${MONTH_YEAR_TOKEN})\\s*(?:[-–—−]|to)\\s*(${MONTH_YEAR_TOKEN}|present|current|now|ongoing)`, 'gi');
+  let match: RegExpExecArray | null;
+  while ((match = rangeRe.exec(text)) !== null) {
+    const start = parseDateParts(match[1]);
+    if (!start?.month) continue;
+    const current = isPresentLike(match[2]);
+    const end = current ? null : parseDateParts(match[2]);
+    ranges.push({
+      startDate: formatParsedDate(start),
+      endDate: current ? '' : (end ? formatParsedDate(end) : ''),
+      current,
+      index: match.index,
+    });
+  }
+  return ranges;
+}
+
+function dateHasMonth(value?: string): boolean {
+  return !!parseDateParts(value)?.month;
+}
+
+function indexOfFrom(haystack: string, needle: string, fromIndex: number): number {
+  const n = needle.trim();
+  if (n.length < 3) return -1;
+  const lower = haystack.toLowerCase();
+  const from = Math.min(Math.max(fromIndex, 0), haystack.length);
+  const slice = lower.slice(from);
+  const exact = slice.indexOf(n.toLowerCase());
+  if (exact >= 0) return from + exact;
+  const shortened = n.split(/[,(|]/)[0].trim();
+  if (shortened.length >= 8 && shortened.toLowerCase() !== n.toLowerCase()) {
+    const shortIdx = slice.indexOf(shortened.toLowerCase());
+    if (shortIdx >= 0) return from + shortIdx;
+  }
+  return -1;
+}
+
+function applyLocatedRange<T extends { startDate?: string; endDate?: string; current?: boolean }>(item: T, range: LocatedDateRange): T {
+  return {
+    ...item,
+    startDate: range.startDate,
+    endDate: range.current ? '' : range.endDate,
+    current: range.current,
+  };
+}
+
+export function overlayExperienceDatesFromText<T extends {
+  company?: string;
+  position?: string;
+  title?: string;
+  startDate?: string;
+  endDate?: string;
+  current?: boolean;
+}>(sourceText: string, experience: T[]): T[] {
+  if (!sourceText?.trim() || !experience?.length) return experience;
+
+  const ranges = extractAllMonthYearRanges(sourceText);
+  const used = new Set<number>();
+  let searchFrom = 0;
+
+  return experience.map((exp) => {
+    const company = exp.company || '';
+    const position = exp.position || exp.title || '';
+    let at = indexOfFrom(sourceText, position, searchFrom);
+    if (at < 0) at = indexOfFrom(sourceText, company, searchFrom);
+    if (at < 0) at = indexOfFrom(sourceText, position, 0);
+    if (at < 0) at = indexOfFrom(sourceText, company, 0);
+
+    let rangeIndex = -1;
+    if (at >= 0) {
+      rangeIndex = ranges.findIndex((range, index) => !used.has(index) && range.index >= at - 40 && range.index <= at + 420);
+      searchFrom = at + 40;
+    }
+    if (rangeIndex < 0) {
+      rangeIndex = ranges.findIndex((_, index) => !used.has(index));
+    }
+    if (rangeIndex < 0) {
+      if (dateHasMonth(exp.startDate) || dateHasMonth(exp.endDate)) return exp;
+      return exp;
+    }
+
+    used.add(rangeIndex);
+    return applyLocatedRange(exp, ranges[rangeIndex]);
+  });
+}
+
+export function overlayEducationDatesFromText<T extends {
+  institution?: string;
+  degree?: string;
+  graduationDate?: string;
+}>(sourceText: string, education: T[]): T[] {
+  if (!sourceText?.trim() || !education?.length) return education;
+
+  const ranges = extractAllMonthYearRanges(sourceText);
+  let searchFrom = 0;
+
+  return education.map((edu) => {
+    let at = indexOfFrom(sourceText, edu.institution || '', searchFrom);
+    if (at < 0) at = indexOfFrom(sourceText, edu.degree || '', searchFrom);
+    if (at < 0) at = indexOfFrom(sourceText, edu.institution || '', 0);
+    if (at < 0) return edu;
+
+    searchFrom = at + 80;
+    const nearby = ranges.find((range) => range.index >= at - 20 && range.index <= at + 320);
+    const window = sourceText.slice(at, Math.min(sourceText.length, at + 280));
+    const fromWindow = extractDateRange(window);
+    const graduationDate = nearby?.endDate || nearby?.startDate || fromWindow.endDate || fromWindow.startDate;
+    if (!graduationDate) return edu;
+    return { ...edu, graduationDate };
+  });
 }
