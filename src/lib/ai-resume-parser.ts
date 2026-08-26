@@ -34,8 +34,8 @@ OUTPUT FORMAT (JSON only, no markdown):
     {
       "position": "Job Title",
       "company": "Company Name",
-      "startDate": "2020",
-      "endDate": "2024",
+      "startDate": "January 2026",
+      "endDate": "December 2026",
       "current": false,
       "responsibilities": ["Achievement 1", "Achievement 2", "Achievement 3"]
     }
@@ -44,7 +44,7 @@ OUTPUT FORMAT (JSON only, no markdown):
     {
       "degree": "Bachelor of Science in Computer Science",
       "institution": "University Name",
-      "graduationDate": "2020",
+      "graduationDate": "May 2026",
       "gpa": "3.8"
     }
   ],
@@ -72,7 +72,9 @@ OUTPUT FORMAT (JSON only, no markdown):
 
 RULES:
 - Extract the COMPLETE name, don't abbreviate
-- Use proper date formats (YYYY for years)
+- Preserve month and year whenever the resume includes them (e.g. "January 2026", "Oct 2025", "2023-07", "01/2026"). Use a year only (e.g. "2026") if no month is present.
+- Accept any common date format from the resume and keep start/end dates as separate fields
+- For current roles, set current to true and use an empty endDate instead of "Present"
 - Group skills logically by category
 - Extract ALL bullet points from experience as separate array items
 - Include URLs when found

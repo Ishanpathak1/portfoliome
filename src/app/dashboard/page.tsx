@@ -11,7 +11,7 @@ import { SectionHeadingEditor } from '@/components/SectionHeadingEditor';
 import { TemplateTextEditor } from '@/components/TemplateTextEditor';
 import { ResponsibilitiesEditor } from '@/components/ResponsibilitiesEditor';
 import { ResponsibilityText } from '@/components/ResponsibilityText';
-import { getPortfolioUrl, getBaseUrl, validateAndFixUrl } from '@/lib/utils';
+import { getPortfolioUrl, getBaseUrl, validateAndFixUrl, formatDate, normalizeDateInput } from '@/lib/utils';
 import { fetchWithUser } from '@/lib/auth-fetch';
 import { useNotifications } from '@/components/notifications/NotificationStore';
 import { AppNotification } from '@/components/notifications/NotificationTypes';
@@ -149,9 +149,20 @@ function DashboardContent() {
   const ensureResumeDataStructure = (resumeData: any): ResumeData => {
     return {
       ...resumeData,
-      experience: resumeData?.experience || [],
-      education: resumeData?.education || [],
-      projects: resumeData?.projects || [],
+      experience: (resumeData?.experience || []).map((exp: Experience) => ({
+        ...exp,
+        startDate: normalizeDateInput(exp.startDate),
+        endDate: normalizeDateInput(exp.endDate),
+      })),
+      education: (resumeData?.education || []).map((edu: Education) => ({
+        ...edu,
+        graduationDate: normalizeDateInput(edu.graduationDate),
+      })),
+      projects: (resumeData?.projects || []).map((project: Project) => ({
+        ...project,
+        startDate: normalizeDateInput(project.startDate),
+        endDate: normalizeDateInput(project.endDate),
+      })),
       skills: resumeData?.skills || [],
       summary: resumeData?.summary || '',
       contact: {
@@ -618,8 +629,19 @@ function DashboardContent() {
       // Sanitize resume data before saving (e.g., remove empty technologies from projects)
       const sanitizedResumeData = effectiveResumeData ? {
         ...effectiveResumeData,
+        experience: (effectiveResumeData.experience || []).map((exp) => ({
+          ...exp,
+          startDate: normalizeDateInput(exp.startDate),
+          endDate: normalizeDateInput(exp.endDate),
+        })),
+        education: (effectiveResumeData.education || []).map((edu) => ({
+          ...edu,
+          graduationDate: normalizeDateInput(edu.graduationDate),
+        })),
         projects: (effectiveResumeData.projects || []).map((p) => ({
           ...p,
+          startDate: normalizeDateInput(p.startDate),
+          endDate: normalizeDateInput(p.endDate),
           technologies: (p.technologies || []).map(t => t.trim()).filter(t => t),
         })),
       } : effectiveResumeData;
@@ -1818,8 +1840,9 @@ function DashboardContent() {
                                   type="text"
                                   value={exp.startDate}
                                   onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
+                                  onBlur={(e) => updateExperience(index, 'startDate', normalizeDateInput(e.target.value))}
                                   className="w-full input-field"
-                                  placeholder="January 2023"
+                                  placeholder="Jan 2026, 2026-01, 01/2026, or 2026"
                                 />
                               </div>
                               {!exp.current && (
@@ -1829,8 +1852,9 @@ function DashboardContent() {
                                     type="text"
                                     value={exp.endDate}
                                     onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
+                                    onBlur={(e) => updateExperience(index, 'endDate', normalizeDateInput(e.target.value))}
                                     className="w-full input-field"
-                                    placeholder="December 2023"
+                                    placeholder="Dec 2026, 2026-12, 12/2026, or Present"
                                   />
                                 </div>
                               )}
@@ -1888,7 +1912,7 @@ function DashboardContent() {
                               <h4 className="text-[rgb(var(--fg))] font-medium">{exp.position || 'New Position'}</h4>
                               <p className="text-[rgb(var(--muted))]">{exp.company} {exp.location && `• ${exp.location}`}</p>
                               <p className="text-[rgb(var(--muted))] text-sm">
-                                {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                                {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
                               </p>
                               {exp.responsibilities && exp.responsibilities.length > 0 && (
                                 <ul className="text-[rgb(var(--muted))] text-sm mt-2 space-y-1">
@@ -2154,8 +2178,9 @@ function DashboardContent() {
                                   type="text"
                                   value={edu.graduationDate}
                                   onChange={(e) => updateEducation(index, 'graduationDate', e.target.value)}
+                                  onBlur={(e) => updateEducation(index, 'graduationDate', normalizeDateInput(e.target.value))}
                                   className="w-full input-field"
-                                  placeholder="May 2023"
+                                  placeholder="May 2026, 2026-05, or 2026"
                                 />
                               </div>
                               <div>
@@ -2195,7 +2220,7 @@ function DashboardContent() {
                             <div>
                               <h4 className="text-[rgb(var(--fg))] font-medium">{edu.degree || 'New Degree'} {edu.field && `in ${edu.field}`}</h4>
                               <p className="text-[rgb(var(--muted))]">{edu.institution}</p>
-                              <p className="text-[rgb(var(--muted))] text-sm">{edu.graduationDate} {edu.gpa && `• GPA: ${edu.gpa}`}</p>
+                              <p className="text-[rgb(var(--muted))] text-sm">{formatDate(edu.graduationDate)} {edu.gpa && `• GPA: ${edu.gpa}`}</p>
                             </div>
                             <div className="flex shrink-0 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-1 gap-0.5">
                               <button
