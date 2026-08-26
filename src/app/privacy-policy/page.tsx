@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-3">
           <h2 className="text-2xl font-semibold">Your Controls</h2>
           <p className="text-gray-300">
-            Signed-in users can download a JSON export of app-held account data or permanently delete account data from Dashboard Settings.
+            Signed-in users can download a JSON export of app-held account data or permanently delete their login and account data from Dashboard Settings. Signing in again after deletion starts a new account.
           </p>
         </section>
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthError, requireUser } from '@/lib/auth';
+import { AuthError, deleteFirebaseAuthUser, isFirebaseAdminConfigured, requireUser } from '@/lib/auth';
 import { requirePrisma } from '@/lib/prisma';
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
@@ -12,6 +12,14 @@ export async function DELETE(request: NextRequest) {
     if (limited) return limited;
 
     const user = await requireUser(request);
+
+    if (!isFirebaseAdminConfigured()) {
+      return NextResponse.json(
+        { error: 'Account deletion is unavailable' },
+        { status: 503 }
+      );
+    }
+
     const prisma = requirePrisma();
 
     await prisma.$transaction([
@@ -20,13 +28,23 @@ export async function DELETE(request: NextRequest) {
       prisma.portfolio.deleteMany({ where: { userId: user.uid } }),
       prisma.account.deleteMany({ where: { userId: user.uid } }),
       prisma.session.deleteMany({ where: { userId: user.uid } }),
+      ...(user.email
+        ? [prisma.verificationToken.deleteMany({ where: { identifier: user.email } })]
+        : []),
       prisma.user.deleteMany({ where: { id: user.uid } }),
     ]);
+
+    try {
+      await deleteFirebaseAuthUser(user.uid);
+    } catch (error) {
+      // App data is already gone; a leftover login would still land as an empty new account.
+      console.error('Failed to delete Firebase auth user after account wipe:', error);
+    }
 
     return NextResponse.json(
       {
         ok: true,
-        message: 'Account data deleted',
+        message: 'Account deleted',
       },
       {
         headers: {
@@ -39,6 +57,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     console.error('Privacy deletion error:', error);
-    return NextResponse.json({ error: 'Failed to delete account data' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 });
   }
 }

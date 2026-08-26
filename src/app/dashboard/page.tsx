@@ -727,7 +727,7 @@ function DashboardContent() {
   const deleteAccountData = async () => {
     if (!user) return;
 
-    const confirmation = window.prompt('Type DELETE to permanently delete your account data. This cannot be undone.');
+    const confirmation = window.prompt('Type DELETE to permanently delete your account and login. This cannot be undone. Signing in again will start a new account.');
     if (confirmation !== 'DELETE') return;
 
     setPrivacyActionLoading('delete');
@@ -740,16 +740,22 @@ function DashboardContent() {
       });
 
       if (!response.ok) {
-        showError('Unable to delete your account data right now.');
+        showError('Unable to delete your account right now.');
         return;
       }
 
-      showSuccess('Your account data has been deleted.');
+      try {
+        window.localStorage.removeItem('portfolio.notifications.v1');
+        window.localStorage.removeItem('portfolio.notifications.readIds.v1');
+      } catch {
+        // Ignore storage errors so sign-out still happens.
+      }
+
       await signOut();
-      router.push('/');
+      window.location.replace('/');
     } catch (error) {
       console.error('Account deletion failed:', error);
-      showError('Unable to delete your account data right now.');
+      showError('Unable to delete your account right now.');
     } finally {
       setPrivacyActionLoading(null);
     }
@@ -2594,8 +2600,8 @@ function DashboardContent() {
                     </div>
                     <div className="border-t border-[rgb(var(--border))] pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div>
-                        <div className="text-[rgb(var(--fg))] font-medium">Delete Account Data</div>
-                        <div className="text-[rgb(var(--muted))] text-sm">Permanently delete your account data from this app. This cannot be undone.</div>
+                        <div className="text-[rgb(var(--fg))] font-medium">Delete Account</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">Permanently delete your login and all account data. Signing in again starts a new account. This cannot be undone.</div>
                       </div>
                       <button
                         type="button"
@@ -2604,7 +2610,7 @@ function DashboardContent() {
                         className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
-                        {privacyActionLoading === 'delete' ? 'Deleting...' : 'Delete Data'}
+                        {privacyActionLoading === 'delete' ? 'Deleting...' : 'Delete Account'}
                       </button>
                     </div>
                   </div>

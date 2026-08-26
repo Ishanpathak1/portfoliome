@@ -54,7 +54,7 @@ const faqs = [
       },
       {
         q: 'How do I export or delete my data?',
-        a: 'Use Dashboard Settings to download a JSON export or permanently delete your account data from this app.',
+        a: 'Use Dashboard Settings to download a JSON export or permanently delete your login and account data. Signing in again after deletion starts a new account.',
       },
     ],
   },

@@ -222,3 +222,25 @@ export async function requireAdmin(request: NextRequest): Promise<AuthenticatedU
   if (!user.isAdmin) throw new AuthError();
   return user;
 }
+
+export function isFirebaseAdminConfigured(): boolean {
+  return hasFirebaseAdminCredentials();
+}
+
+export async function deleteFirebaseAuthUser(uid: string): Promise<void> {
+  if (!hasFirebaseAdminCredentials()) {
+    throw new Error('Firebase Admin credentials are required to delete an auth account');
+  }
+
+  const { getAuth } = await import('firebase-admin/auth');
+  const app = await getFirebaseAdminApp();
+
+  try {
+    await getAuth(app).deleteUser(uid);
+  } catch (error) {
+    const firebaseError = error as { code?: string; errorInfo?: { code?: string } };
+    const code = firebaseError.code || firebaseError.errorInfo?.code || '';
+    if (code === 'auth/user-not-found') return;
+    throw error;
+  }
+}
