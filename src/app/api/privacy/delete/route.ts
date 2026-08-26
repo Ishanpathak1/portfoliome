@@ -14,17 +14,59 @@ export async function DELETE(request: NextRequest) {
     const user = await requireUser(request);
     const prisma = requirePrisma();
 
-    await prisma.$transaction([
-      (prisma as any).application.deleteMany({ where: { userId: user.uid } }),
-      prisma.announcementReceipt.deleteMany({ where: { userId: user.uid } }),
-      prisma.portfolio.deleteMany({ where: { userId: user.uid } }),
-      prisma.account.deleteMany({ where: { userId: user.uid } }),
-      prisma.session.deleteMany({ where: { userId: user.uid } }),
-      ...(user.email
-        ? [prisma.verificationToken.deleteMany({ where: { identifier: user.email } })]
-        : []),
-      prisma.user.deleteMany({ where: { id: user.uid } }),
-    ]);
+    await prisma.$transaction(async (tx) => {
+      const userIds = new Set<string>([user.uid]);
+
+      if (user.email) {
+        const usersByEmail = await tx.user.findMany({
+          where: { email: { equals: user.email, mode: 'insensitive' } },
+          select: { id: true },
+        });
+        for (const row of usersByEmail) userIds.add(row.id);
+
+        const relatedPortfolios = await tx.portfolio.findMany({
+          where: {
+            OR: [
+              { userId: { in: Array.from(userIds) } },
+              {
+                resumeData: {
+                  path: ['contact', 'email'],
+                  equals: user.email,
+                },
+              },
+            ],
+          },
+          select: { userId: true },
+        });
+        for (const row of relatedPortfolios) userIds.add(row.userId);
+      }
+
+      const ids = Array.from(userIds);
+
+      await (tx as any).application.deleteMany({ where: { userId: { in: ids } } });
+      await tx.announcementReceipt.deleteMany({ where: { userId: { in: ids } } });
+      await tx.portfolio.deleteMany({
+        where: {
+          OR: [
+            { userId: { in: ids } },
+            ...(user.email
+              ? [{
+                  resumeData: {
+                    path: ['contact', 'email'],
+                    equals: user.email,
+                  },
+                }]
+              : []),
+          ],
+        },
+      });
+      await tx.account.deleteMany({ where: { userId: { in: ids } } });
+      await tx.session.deleteMany({ where: { userId: { in: ids } } });
+      if (user.email) {
+        await tx.verificationToken.deleteMany({ where: { identifier: user.email } });
+      }
+      await tx.user.deleteMany({ where: { id: { in: ids } } });
+    });
 
     if (isFirebaseAdminConfigured()) {
       try {

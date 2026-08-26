@@ -164,66 +164,18 @@ export async function getPortfolioBySlug(slug: string): Promise<DatabasePortfoli
   }
 }
 
-export async function getUserPortfolio(userId: string, userEmail?: string, testNewUser?: boolean): Promise<DatabasePortfolio | null> {
+export async function getUserPortfolio(userId: string, _userEmail?: string, testNewUser?: boolean): Promise<DatabasePortfolio | null> {
   try {
     const prisma = requirePrisma();
     if (testNewUser) {
       return null;
     }
 
-    const portfolioPromise = (async () => {
-      const portfolio = await prisma.portfolio.findUnique({
-        where: { userId },
-      });
-      if (portfolio) return portfolio;
-
-      if (!userEmail) return null;
-
-      const userByEmail = await prisma.user.findUnique({
-        where: { email: userEmail },
-        include: { portfolio: true },
-      });
-
-      const portfolioByEmail = userByEmail?.portfolio || await prisma.portfolio.findFirst({
-        where: {
-          resumeData: {
-            path: ['contact', 'email'],
-            equals: userEmail,
-          },
-        },
-      });
-
-      if (!portfolioByEmail) return null;
-
-      if (portfolioByEmail.userId !== userId) {
-        const targetUser = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { id: true },
-        });
-
-        try {
-          if (!targetUser) {
-            await prisma.user.update({
-              where: { id: portfolioByEmail.userId },
-              data: { id: userId, email: userEmail },
-            });
-          } else {
-            await prisma.portfolio.update({
-              where: { id: portfolioByEmail.id },
-              data: { userId },
-            });
-          }
-
-          return prisma.portfolio.findUnique({
-            where: { userId },
-          });
-        } catch (error) {
-          console.warn('Unable to relink portfolio user id during email recovery');
-        }
-      }
-
-      return portfolioByEmail;
-    })();
+    // Only return a portfolio owned by this auth user. Do not recover by email,
+    // or a deleted account would get /slug back on the next sign-in.
+    const portfolioPromise = prisma.portfolio.findUnique({
+      where: { userId },
+    });
 
     // Create a timeout promise
     const timeoutPromise = new Promise((_, reject) => {
