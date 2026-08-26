@@ -69,7 +69,7 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteCurrentAuthUser } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [portfolio, setPortfolio] = useState<DatabasePortfolio | null>(null);
@@ -740,7 +740,8 @@ function DashboardContent() {
       });
 
       if (!response.ok) {
-        showError('Unable to delete your account right now.');
+        const data = await response.json().catch(() => null);
+        showError(data?.error || 'Unable to delete your account right now.');
         return;
       }
 
@@ -749,6 +750,12 @@ function DashboardContent() {
         window.localStorage.removeItem('portfolio.notifications.readIds.v1');
       } catch {
         // Ignore storage errors so sign-out still happens.
+      }
+
+      try {
+        await deleteCurrentAuthUser();
+      } catch (error) {
+        console.error('Failed to delete Firebase login after account wipe:', error);
       }
 
       await signOut();

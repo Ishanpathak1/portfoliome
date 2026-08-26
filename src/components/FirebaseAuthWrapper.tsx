@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { User } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
-import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
+import { deleteUser, onAuthStateChanged, reauthenticateWithPopup, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
 import { User as UserIcon, LogOut, LogIn } from 'lucide-react';
 
 interface AuthContextType {
@@ -11,6 +11,7 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  deleteCurrentAuthUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,11 +66,41 @@ export function FirebaseAuthWrapper({ children }: FirebaseAuthWrapperProps) {
     }
   };
 
+  const deleteCurrentAuthUser = async () => {
+    const current = auth?.currentUser;
+    if (!current) return;
+
+    try {
+      await deleteUser(current);
+    } catch (error) {
+      const code = typeof error === 'object' && error && 'code' in error
+        ? String((error as { code?: string }).code)
+        : '';
+
+      if (code === 'auth/requires-recent-login' && googleProvider) {
+        const result = await reauthenticateWithPopup(current, googleProvider);
+        await deleteUser(result.user);
+        return;
+      }
+
+      if (
+        code === 'auth/user-not-found' ||
+        code === 'auth/user-token-expired' ||
+        code === 'auth/user-disabled'
+      ) {
+        return;
+      }
+
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
     signInWithGoogle,
     signOut,
+    deleteCurrentAuthUser,
   };
 
   if (loading) {

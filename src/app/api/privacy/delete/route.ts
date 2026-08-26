@@ -12,14 +12,6 @@ export async function DELETE(request: NextRequest) {
     if (limited) return limited;
 
     const user = await requireUser(request);
-
-    if (!isFirebaseAdminConfigured()) {
-      return NextResponse.json(
-        { error: 'Account deletion is unavailable' },
-        { status: 503 }
-      );
-    }
-
     const prisma = requirePrisma();
 
     await prisma.$transaction([
@@ -34,11 +26,13 @@ export async function DELETE(request: NextRequest) {
       prisma.user.deleteMany({ where: { id: user.uid } }),
     ]);
 
-    try {
-      await deleteFirebaseAuthUser(user.uid);
-    } catch (error) {
-      // App data is already gone; a leftover login would still land as an empty new account.
-      console.error('Failed to delete Firebase auth user after account wipe:', error);
+    if (isFirebaseAdminConfigured()) {
+      try {
+        await deleteFirebaseAuthUser(user.uid);
+      } catch (error) {
+        // App data is already gone; the client will also try to delete the login.
+        console.error('Failed to delete Firebase auth user after account wipe:', error);
+      }
     }
 
     return NextResponse.json(
