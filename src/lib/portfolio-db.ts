@@ -15,8 +15,16 @@ export interface DatabasePortfolio {
   fileType?: string;
   metaTitle?: string;
   metaDescription?: string;
+  // Default false = show the "Made with PortfolioHub" footer on the published page.
+  hideBranding: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export function resolveHideBranding(
+  portfolio: { hideBranding?: boolean; personalization?: Pick<PersonalizationData, 'hideBranding'> | null }
+): boolean {
+  return Boolean(portfolio.hideBranding ?? portfolio.personalization?.hideBranding);
 }
 
 export type ApplicationStatus = 'APPLIED' | 'ACCEPTED' | 'REJECTED';
@@ -76,10 +84,17 @@ export async function saveUserPortfolio(
     where: { userId }
   });
 
+  const existingPersonalization = (existingPortfolio?.personalization || {}) as unknown as PersonalizationData;
+  const hideBranding = personalization.hideBranding ?? existingPersonalization.hideBranding ?? false;
+  const persistedPersonalization: PersonalizationData = {
+    ...personalization,
+    hideBranding,
+  };
+
   const portfolioData = {
     slug: existingPortfolio?.slug || slug,
     resumeData: resumeData as any,
-    personalization: personalization as any,
+    personalization: persistedPersonalization as any,
     templateId: personalization.templateId || 'modern-glassmorphism',
     originalFileName: fileInfo?.originalFileName,
     fileUrl: fileInfo?.fileUrl,
@@ -206,6 +221,7 @@ export async function deleteUserPortfolio(userId: string): Promise<boolean> {
 }
 
 function transformPortfolio(portfolio: any): DatabasePortfolio {
+  const personalization = portfolio.personalization as PersonalizationData;
   return {
     id: portfolio.id,
     userId: portfolio.userId,
@@ -213,13 +229,17 @@ function transformPortfolio(portfolio: any): DatabasePortfolio {
     views: portfolio.views,
     isPublic: portfolio.isPublic,
     resumeData: portfolio.resumeData as ResumeData,
-    personalization: portfolio.personalization as PersonalizationData,
+    personalization,
     templateId: portfolio.templateId || 'modern-glassmorphism',
     originalFileName: portfolio.originalFileName,
     fileUrl: portfolio.fileUrl,
     fileType: portfolio.fileType,
     metaTitle: portfolio.metaTitle,
     metaDescription: portfolio.metaDescription,
+    hideBranding: resolveHideBranding({
+      hideBranding: portfolio.hideBranding,
+      personalization,
+    }),
     createdAt: portfolio.createdAt,
     updatedAt: portfolio.updatedAt,
   };

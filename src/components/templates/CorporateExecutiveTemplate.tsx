@@ -586,39 +586,43 @@ export function CorporateExecutiveTemplate({ portfolio }: CorporateExecutiveTemp
       ))}
 
       {/* Executive Contact CTA */}
-      <section className={`py-16 sm:py-20 lg:py-24 bg-gradient-to-r ${colors.primary} relative overflow-hidden`}>
+      <section className={`relative overflow-hidden bg-gradient-to-br ${colors.primary}`}>
         <div className="absolute inset-0 bg-black/20" />
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="space-y-6 sm:space-y-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white">
-              Ready to Lead the Future?
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-white/80 leading-relaxed max-w-3xl mx-auto">
-              Transform your organization with proven leadership expertise and strategic vision.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+        <div className="pointer-events-none absolute -top-24 right-[-4rem] h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 left-[-5rem] h-80 w-80 rounded-full bg-black/30 blur-3xl" />
+
+        <div className="relative z-10 mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.22em] text-white/50">
+            Let's connect
+          </p>
+          <h2 className="text-2xl font-black text-white sm:text-3xl md:text-4xl lg:text-5xl">
+            Ready to Lead the Future?
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg lg:text-xl">
+            Transform your organization with proven leadership expertise and strategic vision.
+          </p>
+
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
+            <a
+              href={`mailto:${resumeData.contact?.email}?subject=Executive Opportunity Discussion`}
+              className="inline-flex items-center justify-center space-x-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:bg-gray-100 sm:space-x-3 sm:px-8 sm:py-3.5 sm:text-base"
+            >
+              <Mail className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+              <span>Schedule Strategy Session</span>
+            </a>
+
+            {resumeData.contact?.linkedin && (
               <a
-                href={`mailto:${resumeData.contact?.email}?subject=Executive Opportunity Discussion`}
-                className="inline-flex items-center justify-center space-x-2 sm:space-x-3 bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-sm sm:text-base lg:text-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-2xl"
+                href={resumeData.contact.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center space-x-2 rounded-full border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-xl transition-all duration-300 hover:bg-white/20 sm:space-x-3 sm:px-8 sm:py-3.5 sm:text-base"
               >
-                <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span>Schedule Strategy Session</span>
+                <Linkedin className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                <span>LinkedIn Profile</span>
               </a>
-              
-              {resumeData.contact?.linkedin && (
-                <a
-                  href={resumeData.contact.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center space-x-2 sm:space-x-3 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-sm sm:text-base lg:text-lg hover:bg-white/20 transition-all duration-300"
-                >
-                  <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                  <span>LinkedIn Profile</span>
-                </a>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </section>

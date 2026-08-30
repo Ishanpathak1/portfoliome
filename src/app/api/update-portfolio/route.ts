@@ -12,7 +12,8 @@ const updatePortfolioSchema = z.object({
   slug: z.string().trim().min(3).max(50).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
   personalization: z.record(z.any()).optional(),
   resumeData: z.record(z.any()).optional(),
-}).refine((value) => value.slug || value.personalization || value.resumeData, {
+  hideBranding: z.boolean().optional(),
+}).refine((value) => value.slug || value.personalization || value.resumeData || typeof value.hideBranding === 'boolean', {
   message: 'No update data provided',
 });
 
@@ -29,7 +30,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid update data' }, { status: 400 });
     }
 
-    const { slug, personalization, resumeData } = parsed.data;
+    const { slug, personalization, resumeData, hideBranding } = parsed.data;
     
     const currentPortfolio = await getUserPortfolio(user.uid, user.emailVerified ? user.email : undefined);
     if (!currentPortfolio) {
@@ -40,9 +41,18 @@ export async function PUT(request: NextRequest) {
     const updateData: any = {};
 
     // Update personalization if provided
-    if (personalization) {
-      updateData.personalization = personalization as PersonalizationData;
-      updateData.templateId = personalization.templateId || currentPortfolio.templateId;
+    if (personalization || typeof hideBranding === 'boolean') {
+      const nextPersonalization = {
+        ...(currentPortfolio.personalization || {}),
+        ...(personalization || {}),
+      } as PersonalizationData;
+      if (typeof hideBranding === 'boolean') {
+        nextPersonalization.hideBranding = hideBranding;
+      } else if (typeof nextPersonalization.hideBranding !== 'boolean') {
+        nextPersonalization.hideBranding = currentPortfolio.hideBranding;
+      }
+      updateData.personalization = nextPersonalization;
+      updateData.templateId = nextPersonalization.templateId || currentPortfolio.templateId;
     }
 
     // Update resume data if provided
@@ -155,6 +165,9 @@ export async function PUT(request: NextRequest) {
       fileType: updatedPortfolio.fileType,
       metaTitle: updatedPortfolio.metaTitle,
       metaDescription: updatedPortfolio.metaDescription,
+      hideBranding: Boolean(
+        (updatedPortfolio.personalization as PersonalizationData | undefined)?.hideBranding
+      ),
       createdAt: updatedPortfolio.createdAt,
       updatedAt: updatedPortfolio.updatedAt,
     };

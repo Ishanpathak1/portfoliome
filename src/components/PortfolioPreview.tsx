@@ -128,6 +128,7 @@ export function PortfolioPreview({ resumeData, personalization }: PortfolioPrevi
       resumeData,
       personalization,
       templateId: personalization.templateId,
+      hideBranding: Boolean(personalization.hideBranding),
       createdAt: new Date(),
       updatedAt: new Date(),
     };

@@ -267,6 +267,8 @@ export interface PersonalizationData {
   sectionHeadings?: SectionHeadings;
   // Template-specific text customization
   templateText?: TemplateText;
+  // When true, the public "Made with PortfolioHub" footer is not rendered. Default false (shown).
+  hideBranding?: boolean;
 }
 
 export interface PortfolioData {

@@ -2604,6 +2604,34 @@ function DashboardContent() {
                   </div>
                 </div>
 
+                {/* Attribution */}
+                {editedPersonalization && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Branding</h3>
+                  <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl p-4">
+                    <label className="flex items-start sm:items-center justify-between gap-4 cursor-pointer">
+                      <div>
+                        <div className="text-[rgb(var(--fg))] font-medium">Show &apos;Made with PortfolioHub&apos; badge on my portfolio</div>
+                        <div className="text-[rgb(var(--muted))] text-sm">A quiet credit line at the bottom of your public page. You can turn it off anytime.</div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={!editedPersonalization.hideBranding}
+                        onChange={(e) => {
+                          const next = {
+                            ...editedPersonalization,
+                            hideBranding: !e.target.checked,
+                          };
+                          setEditedPersonalization(next);
+                          savePersonalizationChanges(next);
+                        }}
+                        className="mt-1 h-4 w-4 shrink-0 accent-purple-600"
+                      />
+                    </label>
+                  </div>
+                </div>
+                )}
+
                 {/* Privacy Settings */}
                 <div className="mb-8">
                   <h3 className="text-lg font-medium text-[rgb(var(--fg))] mb-4">Privacy</h3>
